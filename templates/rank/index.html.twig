@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/ListVoyage.css') }}">
+{% endblock %}
+
+{% block title %}Rank Index{% endblock %}
+
+{% block body %}
+<div class="main-container">
+    
+    {{ include('Sidebar/Sidebar.twig') }}
+
+    <div class="content-container">
+        <h1 class="page-title">RANK LIST</h1>
+
+        <button class="add-voyage-btn" onclick="window.location.href='{{ path('app_controller_rank_new') }}'">
+            CREATE NEW RANK
+        </button>
+
+        <div class="voyage-container">
+            {% for rank in ranks %}
+                <div class="voyage-card">
+                    <div class="voyage-number">#{{ rank.IDRang }}</div>
+                    <div class="voyage-details">
+                        <div class="voyage-departure">
+                            <img src="{{ asset('images/star.png') }}" alt="Star" class="star-icon">
+                            Rank Name:     {{ rank.NomRank }}
+                        </div>
+                      
+                    </div>
+                    <div class="voyage-actions">
+                        <button class="btn btn-check-vol" onclick="window.location.href='{{ path('app_controller_rank_show', {'IDRang': rank.IDRang}) }}'">
+                            VIEW
+                        </button>
+                        <button class="btn btn-update" onclick="window.location.href='{{ path('app_controller_rank_edit', {'IDRang': rank.IDRang}) }}'">
+                            EDIT
+                        </button>
+                        <button class="btn btn-danger delete-action-btn">
+    <i class="icon-delete">🗑️</i> Supprimer
+</button>
+                        {{ include('rank/_delete_form.html.twig') }}
+                    </div>
+                </div>
+            {% else %}
+                <p class="no-records">No records found.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

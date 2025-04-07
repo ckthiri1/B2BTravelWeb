@@ -1,0 +1,395 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+  {{ parent() }}
+  <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+<style>
+    .fidelite-container {
+        background-color: #e3e3e3;
+        min-height: 100vh;
+        position: relative;
+    }
+
+    .header-image {
+        width: 100%;
+        height: 350px;
+        object-fit: cover;
+        border-radius: 20px;
+        position: relative;
+    }
+
+    .content-panel {
+        background-color: #03045f;
+        padding: 20px;
+    }
+
+    .white-panel {
+        background-color: white;
+        border-radius: 20px;
+        padding: 20px;
+        position: relative;
+    }
+
+    .info-section {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    .info-card {
+        background-color: white;
+        border-radius: 20px;
+        padding: 20px;
+        width: 48%;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .info-icon {
+        width: 26px;
+        height: 26px;
+        margin-right: 10px;
+    }
+
+    .info-text {
+        font-weight: bold;
+        font-size: 20px;
+    }
+
+    .rank-section {
+        text-align: center;
+    }
+
+    .rank-text {
+        color: #f5c702;
+        font-size: 30px;
+        font-weight: bold;
+    }
+
+    .chatbot-btn {
+        background-color: #03045f;
+        color: white;
+        border-radius: 30px;
+        padding: 10px 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        position: absolute;
+        top: 20px;
+        right: 20px;
+    }
+
+    .chatbot-icon {
+        width: 30px;
+        height: 30px;
+    }
+
+    /* New class to align the text to the right */
+    .right-align {
+        text-align: right;
+    }
+    
+    /* Updated Chat Container Styles */
+    .chat-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 320px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+        display: none;
+        overflow: hidden;
+        z-index: 1000;
+    }
+
+    .chat-header {
+        background-color: #1a237e;
+        color: white;
+        padding: 12px;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .chat-header-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .chat-header-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .close-chat {
+        cursor: pointer;
+        font-size: 18px;
+    }
+
+    #chat-messages {
+        height: 300px;
+        overflow-y: auto;
+        padding: 15px;
+        background-color: #f0f0f0;
+    }
+
+    .message {
+        margin-bottom: 10px;
+        max-width: 80%;
+        word-wrap: break-word;
+        padding: 8px 12px;
+        border-radius: 18px;
+        position: relative;
+        clear: both;
+    }
+
+    .user {
+        background-color:#1a237e;
+        color: white;
+        float: right;
+        border-bottom-right-radius: 4px;
+    }
+
+    .bot {
+        background-color: #e4e6eb;
+        color: black;
+        float: left;
+        border-bottom-left-radius: 4px;
+    }
+
+    .chat-input-container {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        background-color: #f0f0f0;
+        border-top: 1px solid #e0e0e0;
+    }
+
+    #chat-input {
+        flex-grow: 1;
+        border: none;
+        border-radius: 20px;
+        padding: 8px 15px;
+        background-color: white;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        outline: none;
+    }
+
+    #chat-send {
+        background: transparent;
+        border: none;
+        color: #1a237e;
+        font-weight: bold;
+        padding: 8px 15px;
+        cursor: pointer;
+    }
+    
+    #chat-send:hover {
+        color: #1a237e;
+    }
+    
+    .typing-indicator {
+        display: inline-block;
+        padding: 8px 12px;
+        background-color: #e4e6eb;
+        border-radius: 18px;
+        margin-bottom: 10px;
+        float: left;
+        clear: both;
+        border-bottom-left-radius: 4px;
+    }
+    
+    .typing-indicator span {
+        height: 8px;
+        width: 8px;
+        background-color: #90949c;
+        display: inline-block;
+        border-radius: 50%;
+        margin: 0 1px;
+        animation: typing 1s infinite ease-in-out;
+    }
+    
+    .typing-indicator span:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+    
+    .typing-indicator span:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+    
+    @keyframes typing {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-5px); }
+        100% { transform: translateY(0px); }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="fidelite-container">
+    {# Include the navbar #}
+    {{ include('/Sidebar/Navbar.twig') }}
+    
+    <div class="content-panel">
+        <div class="white-panel">
+            <div style="position: relative;">
+                <img src="{{ asset('images/HomeFond.jpg') }}" alt="Header Image" class="header-image">
+                <button class="chatbot-btn" onclick="openChatbot()">
+                    <img src="{{ asset('images/chatbot-icon.jpg') }}" class="chatbot-icon">
+                    Assistance Bot
+                </button>
+            </div>
+            
+            <div class="chat-container">
+                <div class="chat-header">
+                    <div class="chat-header-title">
+                        <div class="chat-header-avatar">
+                            <img src="{{ asset('images/chatbot-icon.jpg') }}" alt="Bot" style="width: 20px; height: 20px;">
+                        </div>
+                        <span>Assistant Bot</span>
+                    </div>
+                    <span class="close-chat" onclick="closeChatbot()">×</span>
+                </div>
+                <div id="chat-messages"></div>
+                <div class="chat-input-container">
+                    <input type="text" id="chat-input" placeholder="Posez une question..." />
+                    <button id="chat-send">Envoyer</button>
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <div class="info-card">
+                    <div class="info-item">
+                        <img src="{{ asset('images/airplane-travel-day-on-page-with-number-4-of-a-calendar.png') }}" class="info-icon">
+                        <span class="info-text">Nombre De Voyage Effectuée :</span>
+                        <span class="info-text" id="txtNbVoyage">{{ user.nbrVoyage }}</span>
+                    </div>
+
+                    <div class="info-item">
+                        <img src="{{ asset('images/card (1).png') }}" class="info-icon">
+                        <span class="info-text">Point Fidélité :</span>
+                        <span class="info-text" id="txtPoints"> {{ fidelite.points }}</span>
+                    </div>
+
+                    <div class="info-item">
+                        <img src="{{ asset('images/discount-solid-36.png') }}" class="info-icon">
+                        <span class="info-text">Remise :</span>
+                        <span class="info-text" id="txtRemise"> {{ fidelite.remise }}%</span>
+                    </div>
+                </div>
+
+                <div class="info-card rank-section">
+                    <div class="info-item">
+                        <img src="{{ asset('images/rankings.png') }}" class="info-icon">
+                        <span class="info-text">RANK :</span>
+                        <span class="rank-text" id="txtRank">
+    {{ fidelite.idRank ? fidelite.idRank.nomRank : 'Aucun rang' }}
+</span>
+
+                        <img src="{{ asset('images/high-quality (1).png') }}" style="width: 30px; height: 30px; margin-left: 10px;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-align mt-3">
+                <span style="color: #1a237e; font-size: 14px;">
+                    Nb : 3 voyage = 1 Point De Fidélité
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block javascripts %}
+<script>
+    function openChatbot() {
+        document.querySelector('.chat-container').style.display = 'block';
+        // Add welcome message when chat opens
+        setTimeout(function() {
+            appendMessage("Bonjour ! Comment puis-je vous aider aujourd'hui ?", 'bot');
+        }, 500);
+    }
+    
+    function closeChatbot() {
+        document.querySelector('.chat-container').style.display = 'none';
+    }
+
+    window.onload = function () {
+        document.getElementById('chat-send').addEventListener('click', sendMessage);
+        document.getElementById('chat-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    };
+    
+    function sendMessage() {
+        let input = document.getElementById('chat-input');
+        let message = input.value.trim();
+
+        if (message === '') return;
+
+        appendMessage(message, 'user');
+        input.value = '';
+        
+        // Show typing indicator
+        showTypingIndicator();
+        
+        fetch("{{ path('chatbot_query') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ question: message })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Hide typing indicator
+            hideTypingIndicator();
+            appendMessage(data.response, 'bot');
+        })
+        .catch(() => {
+            hideTypingIndicator();
+            appendMessage("Service indisponible", 'bot');
+        });
+    }
+
+    function appendMessage(text, sender) {
+        let chatBox = document.getElementById('chat-messages');
+        let messageDiv = document.createElement('div');
+        messageDiv.textContent = text;
+        messageDiv.classList.add('message', sender);
+        chatBox.appendChild(messageDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+    
+    function showTypingIndicator() {
+        let chatBox = document.getElementById('chat-messages');
+        let indicator = document.createElement('div');
+        indicator.classList.add('typing-indicator');
+        indicator.id = 'typing-indicator';
+        indicator.innerHTML = '<span></span><span></span><span></span>';
+        chatBox.appendChild(indicator);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+    
+    function hideTypingIndicator() {
+        let indicator = document.getElementById('typing-indicator');
+        if (indicator) {
+            indicator.remove();
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard Admin{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/Dashboard.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="dashboard-container">
+    {% include '/Sidebar/Sidebar.twig' %}
+
+    <div class="dashboard-content">
+        <h1>Dashboard Admin</h1>
+
+        <div class="cards-container">
+            <div class="card card-blue" >
+                <h2>Users</h2>
+                <p>22+</p>
+            </div>
+
+       <div class="card card-lightblue">
+        <h2>Voyages</h2>
+        <p id="voyage-count">Chargement...</p>
+      </div>
+     <script>
+    fetch('/voyage/count')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('voyage-count').textContent = data.voyageCount + ' Voyages';
+        })
+        .catch(error => {
+            console.error('Erreur lors de la récupération du nombre de voyages:', error);
+            document.getElementById('voyage-count').textContent = 'Erreur de chargement';
+        });
+     </script>
+
+
+            <div class="card card-lightblue">
+    <h2>Ranks</h2>
+    <p id="rank-count">Chargement...</p>
+</div>
+
+<script>
+    fetch('/rank/count')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('rank-count').textContent = data.rankCount + ' Ranks';
+        })
+        .catch(error => {
+            console.error('Erreur lors de la récupération du nombre de ranks:', error);
+            document.getElementById('rank-count').textContent = 'Erreur de chargement';
+        });
+</script>
+
+
+            <div class="card card-yellow">
+                <h2>Reservations</h2>
+                <p>66+</p>
+            </div>
+
+            <div class="card card-orange" >
+                <h2>Events</h2>
+                <p>77+</p>
+            </div>
+
+            <div class="card card-red" >
+                <h2>Réclamations</h2>
+                <p>11</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

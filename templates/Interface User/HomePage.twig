@@ -1,0 +1,259 @@
+{# templates/home/index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+{% endblock %}
+
+{% block body %}
+    
+    {{ include('/Sidebar/Navbar.twig') }}
+
+    <div class="home-container">
+        <div class="banner-container">
+            <div class="banner-image">
+                <img src="{{ asset('images/HomeFond.jpg') }}" alt="Travel Banner">
+            </div>
+        </div>
+
+        <div class="search-section">
+            <form id="search-form" action="{{ path('app_search_flights') }}" method="POST" class="search-form">
+                <h2 class="section-title">VOLS</h2>
+
+                <div class="search-grid">
+                    <select name="departure_city" class="search-input" required>
+                        <option value="">Choisir Ville Départ...</option>
+                        {% for city in cities %}
+                            <option value="{{ city }}">{{ city }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <select name="arrival_city" class="search-input" required>
+                        <option value="">Choisir Ville Arrivée...</option>
+                        {% for city in cities %}
+                            <option value="{{ city }}">{{ city }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <select name="trip_type" class="search-input">
+                        {% for type in tripTypes %}
+                            <option value="{{ type }}">{{ type }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <input type="date" name="departure_date" id="departure-date" class="search-input" required>
+                    <input type="date" name="return_date" id="return-date" class="search-input">
+
+
+
+                    <button type="submit" class="search-button">Rechercher</button>
+                </div>
+            </form>
+        </div>
+
+    <div id="results-container" class="results-container">
+    {% include 'Interface User/results.html.twig' with { 'outboundFlights': [], 'returnFlights': [], 'tripType': 'ALLER SIMPLE' } %}
+</div>
+
+    </div>
+    <footer class="footer-container">
+    <div class="footer-content">
+        <div class="footer-section">
+            <img src="{{ asset('images/LogoDashboard.jpg') }}" alt="Company Logo" class="footer-logo">
+            <p>Votre partenaire de confiance pour des voyages inoubliables. Découvrez le monde avec nous.</p>
+        </div>
+        
+        <div class="footer-section">
+            <h4>Navigation</h4>
+            <ul class="footer-links">
+                <li><a href="#">Accueil</a></li>
+                <li><a href="#">Recherche de Vols</a></li>
+                <li><a href="#">Destinations</a></li>
+                <li><a href="#">Promotions</a></li>
+            </ul>
+        </div>
+        
+        <div class="footer-section">
+            <h4>Services</h4>
+            <ul class="footer-links">
+                <li><a href="#">Réservation</a></li>
+                <li><a href="#">Assistance Voyage</a></li>
+                <li><a href="#">Programme Fidélité</a></li>
+                <li><a href="#">Conditions de Voyage</a></li>
+            </ul>
+        </div>
+        
+        <div class="footer-section">
+            <h4>Contact</h4>
+            <div class="footer-contact">
+                <p>+216 22388893</p>
+                <p>contact@B2BTRAVEL.com</p>
+                <p>123 Rue du Voyage, 75000 Tunis</p>
+                
+                <div class="footer-social">
+                    <a href="https://www.facebook.com/profile.php?id=61572449858624" class="social-icon">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="social-icon">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="social-icon">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="social-icon">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <style>
+    .footer-container {
+        background-color:#13117D;
+        color: white;
+        padding: 60px 0;
+    }
+
+    .footer-content {
+        max-width: 1540px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 30px;
+        padding: 0 20px;
+    }
+
+    .footer-section {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .footer-logo {
+        max-width: 200px;
+        margin-bottom: 20px;
+    }
+
+    .footer-section h4 {
+        font-size: 16px;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        border-bottom: 2px solid #ffffff33;
+        padding-bottom: 10px;
+    }
+
+    .footer-links {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .footer-links li {
+        margin-bottom: 10px;
+    }
+
+    .footer-links a {
+        color: #ffffff99;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .footer-links a:hover {
+        color: white;
+    }
+
+    .footer-contact p {
+        color: #ffffff99;
+        margin-bottom: 10px;
+    }
+
+    .footer-social {
+        display: flex;
+        gap: 15px;
+        margin-top: 15px;
+    }
+
+    .social-icon {
+        color: white;
+        font-size: 24px;
+        transition: color 0.3s ease;
+    }
+
+    .social-icon:hover {
+        color: #e0e0e0;
+    }
+
+    .footer-bottom {
+        background-color: #121858;
+        color: #ffffff99;
+        text-align: center;
+        padding: 15px 0;
+        font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+        .footer-content {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+
+        .footer-social {
+            justify-content: center;
+        }
+    }
+    </style>
+    <div class="footer-bottom">
+        <p>&copy; 2024 Votre Agence de Voyage. Tous droits réservés.</p>
+    </div>
+</footer>
+{% endblock %}
+
+ {% block javascripts %}
+    {{ parent() }}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#search-form").submit(function (event) {
+                event.preventDefault(); // Prevent default form submission
+
+                $.ajax({
+                    url: "{{ path('app_search_flights') }}",
+                    type: "POST",
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        $("#results-container").html(response); // Load only the results
+                    },
+                    error: function (xhr) {
+                        console.error("Erreur AJAX :", xhr.responseText);
+                        alert("Une erreur s'est produite, veuillez réessayer.");
+                    }
+                });
+            });
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+    const departureInput = document.getElementById("departure-date");
+    const returnInput = document.getElementById("return-date");
+
+    // Today's date in YYYY-MM-DD
+    const today = new Date().toISOString().split("T")[0];
+
+    // Set today's date as min for departure
+    departureInput.min = today;
+    returnInput.min = today;
+
+    departureInput.addEventListener("change", function () {
+        const departureDate = departureInput.value;
+
+        // Set the min of return date to departure date
+        returnInput.min = departureDate;
+
+        // If return date is before departure, reset it
+        if (returnInput.value && returnInput.value < departureDate) {
+            returnInput.value = "";
+        }
+    });
+});
+
+    </script>
+    
+{% endblock %}

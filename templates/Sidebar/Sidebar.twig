@@ -1,0 +1,23 @@
+{% block sidebar %}
+
+    <div class="sidebar">
+        <div class="logo">
+            <a href="{{ path('Dashboard') }}">
+                <img src="{{ asset('images/LogoDashboard.jpg') }}" alt="Logo">
+                 <link rel="stylesheet" href="{{ asset('css/SideBar.css') }}">
+            </a>
+        </div>
+
+    <ul class="nav">
+    <li><a href="{{ path('app_voyage_new') }}"><i class="fas fa-user"> </i> Gestion Utilisateur</a></li>
+    <li><a href="{{ path('app_voyage_index') }}"><i class="fas fa-plane"></i> Gestion Voyage</a></li>
+    <li><a href="{{ path('app_controller_rank_index') }}"><i class="fas fa-gift"></i> Gestion Fidélité</a></li>
+    <li><a href="{{ path('app_voyage_new') }}"><i class="fas fa-calendar-alt"></i> Gestion Événement</a></li>
+    <li><a href="{{ path('app_voyage_new') }}"><i class="fas fa-exclamation-circle"></i> Gestion Réclamation</a></li>
+    <li><a href="{{ path('app_voyage_new') }}"><i class="fas fa-ticket-alt"></i> Gestion Réservation</a></li>
+</ul>
+
+
+        <a href="" class="logout-btn">Déconnexion</a>
+    </div>
+{% endblock %}

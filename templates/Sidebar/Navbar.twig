@@ -1,0 +1,60 @@
+{% block navbar %}
+<nav class="navbar">
+    <div class="navbar-brand">
+        <div class="logo-container" id="logoContainer">
+            <img src="{{ asset('images/Logo.png') }}" alt="Logo" class="navbar-logo">
+            <div class="logo-border"></div>
+            <div class="logo-highlight" id="logoHighlight"></div>
+            <div class="particle-container">
+                <!-- Particles at different positions -->
+                <div class="particle" style="width: 4px; height: 4px; top: 20%; left: 20%;"></div>
+                <div class="particle" style="width: 3px; height: 3px; top: 20%; left: 80%;"></div>
+                <div class="particle" style="width: 5px; height: 5px; top: 80%; left: 20%;"></div>
+                <div class="particle" style="width: 4px; height: 4px; top: 80%; left: 80%;"></div>
+                <div class="particle" style="width: 3px; height: 3px; top: 40%; left: 30%;"></div>
+                <div class="particle" style="width: 4px; height: 4px; top: 60%; left: 70%;"></div>
+                <div class="particle" style="width: 5px; height: 5px; top: 30%; left: 60%;"></div>
+                <div class="particle" style="width: 3px; height: 3px; top: 70%; left: 40%;"></div>
+            </div>
+        </div>
+        <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
+    </div>
+    <div class="navbar-menu">
+        <a href="{{ path('app_home') }}" class="nav-button">HOME</a>
+        <a href="{{ path('app_fidelite') }}" class="nav-button">FIDELITE</a>
+        <a href="{{ path('app_voyage_index') }}" class="nav-button">RECLAMATION</a>
+        <a href="{{ path('app_voyage_index') }}" class="nav-button">PROFIL</a>
+         <a href="{{ path('app_voyage_index') }}" class="nav-button">EVENEMENT</a>
+        <a href="{{ path('reservation_page') }}" class="nav-button">RESERVATION</a>
+       
+    </div>
+</nav>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const logoContainer = document.getElementById('logoContainer');
+    const highlight = document.getElementById('logoHighlight');
+    
+    if (logoContainer && highlight) {
+        // Make highlight visible when hovering over logo
+        logoContainer.addEventListener('mouseenter', function() {
+            highlight.style.opacity = '1';
+        });
+        
+        logoContainer.addEventListener('mouseleave', function() {
+            highlight.style.opacity = '0';
+        });
+        
+        // Move highlight with cursor
+        logoContainer.addEventListener('mousemove', function(e) {
+            const rect = logoContainer.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            highlight.style.left = x + 'px';
+            highlight.style.top = y + 'px';
+        });
+    }
+});
+</script>
+{% endblock %}

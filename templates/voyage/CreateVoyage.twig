@@ -1,0 +1,182 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter Voyage{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/CreateVoyage.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="dashboard-container">
+    {% include '/Sidebar/Sidebar.twig' %}
+
+    <div class="main-content">
+        <div class="container">
+            <h1 class="page-title">AJOUTER VOYAGE</h1>
+
+            <!-- 🚨 ALERTS SECTION -->
+            {% for message in app.flashes('error') %}
+                <div class="alert error-alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('success') %}
+                <div class="alert success-alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+            <!-- 🚨 END ALERTS SECTION -->
+
+            <div class="voyage-form-container">
+                <form method="post" action="{{ path('app_voyage_new') }}">
+                    {{ form_start(form) }}
+
+                    <div class="form-section">
+                        <label class="form-label">LIEU DE DÉPART</label>
+                        <div>
+                            {{ form_widget(form.depart, { 'attr': {'class': 'select-input', 'required': 'required'} }) }}
+                            <div class="error-message">
+                                {{ form_errors(form.depart) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <label class="form-label">LIEU D'ARRIVÉE</label>
+                        <div>
+                            {{ form_widget(form.Destination, { 'attr': {'class': 'select-input', 'required': 'required'} }) }}
+                            <div class="error-message">
+                                {{ form_errors(form.Destination) }}
+                            </div>
+                            <button type="button" class="generate-description-btn">
+                                GÉNÉRER DESCRIPTION (IA)
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <label class="form-label">DESCRIPTION DE VOYAGE</label>
+                        <div>
+                            {{ form_widget(form.Description, { 'attr': {'class': 'description-textarea', 'placeholder': 'Entrer La Description Du Voyage Ici...'} }) }}
+                            <div class="error-message">
+                                {{ form_errors(form.Description) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="add-voyage-btn">
+                        AJOUTER VOYAGE
+                    </button>
+
+                    {{ form_end(form) }}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("DOM fully loaded and parsed");
+    
+    const generateBtn = document.querySelector(".generate-description-btn");
+    const departureField = document.querySelector("[name='{{ form.depart.vars.full_name }}']");
+    const arrivalField = document.querySelector("[name='{{ form.Destination.vars.full_name }}']");
+    const descriptionField = document.querySelector("[name='{{ form.Description.vars.full_name }}']");
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+    console.log("Elements selected:", {
+        generateBtn,
+        departureField,
+        arrivalField,
+        descriptionField,
+        csrfToken
+    });
+
+    if (!generateBtn) {
+        console.error("Generate button not found!");
+        return;
+    }
+
+    generateBtn.addEventListener("click", async function () {
+        console.log("Generate button clicked");
+        
+        const departure = departureField?.value.trim();
+        const arrival = arrivalField?.value.trim();
+
+        console.log("Field values:", { departure, arrival });
+
+        if (!departure || !arrival) {
+            const errorMsg = "Veuillez sélectionner un lieu de départ et une destination.";
+            console.error(errorMsg);
+            alert(errorMsg);
+            return;
+        }
+
+        // Disable form submission while generating
+        console.log("Disabling button during generation");
+        generateBtn.innerText = "Génération en cours...";
+        generateBtn.disabled = true;
+
+        try {
+            const apiUrl = "{{ path('generate_description') }}";
+            console.log("Making request to:", apiUrl);
+            
+            const requestOptions = {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-Token": csrfToken
+                },
+                body: JSON.stringify({ 
+                    departure: departure, 
+                    arrival: arrival 
+                }),
+            };
+            
+            console.log("Request options:", requestOptions);
+
+            const response = await fetch(apiUrl, requestOptions);
+            console.log("Response received:", response);
+
+            if (!response.ok) {
+                const errorDetails = {
+                    status: response.status,
+                    statusText: response.statusText,
+                    url: response.url
+                };
+                console.error("HTTP error:", errorDetails);
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log("Response data:", data);
+            
+            if (data.description) {
+                console.log("Description received:", data.description);
+                descriptionField.value = data.description;
+            } else if (data.error) {
+                console.error("API error:", data.error);
+                alert(data.error);
+            } else {
+                const unexpectedError = "Erreur: Aucune description générée.";
+                console.error(unexpectedError, data);
+                alert(unexpectedError);
+            }
+        } catch (error) {
+            console.error("Fetch error:", {
+                error: error.message,
+                stack: error.stack,
+                name: error.name
+            });
+            alert("Une erreur s'est produite lors de la génération de la description.");
+        } finally {
+            console.log("Re-enabling button");
+            generateBtn.innerText = "GÉNÉRER DESCRIPTION (IA)";
+            generateBtn.disabled = false;
+        }
+    });
+});
+</script>
+
+{% endblock %}

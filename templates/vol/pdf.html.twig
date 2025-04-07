@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Vols</title>
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        h1 { text-align: center; }
+        .signature-container { 
+            margin-top: 30px;
+            text-align: right;
+            padding-right: 50px;
+        }
+        .signature-image {
+            width: 150px;
+            height: auto;
+        }
+        .signature-text {
+            margin-top: 5px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <h1>Liste des Vols de {{ voyage.depart }} a {{ voyage.destination }}</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Airline</th>
+                <th>Flight Number</th>
+                <th>Departure</th>
+                <th>Arrival</th>
+                <th>Price (DT)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for flight in flights %}
+                <tr>
+                    <td>{{ flight.airline }}</td>
+                    <td>{{ flight.flightNumber }}</td>
+                    <td>{{ flight.departureTime|date('Y-m-d H:i') }}</td>
+                    <td>{{ flight.arrivalTime|date('Y-m-d H:i') }}</td>
+                    <td>{{ flight.price }} DT</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5" style="text-align: center;">Aucun vol disponible</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <div class="signature-container">
+        <img src="{{ asset('images/signature.png') }}" alt="Signature" class="signature-image">
+        <p class="signature-text">Liste Des Vols Disponible Le {{ "now"|date('d/m/Y') }}</p>
+    </div>
+</body>
+</html>

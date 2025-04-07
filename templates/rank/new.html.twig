@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter Rank{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/CreateRank.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="dashboard-container">
+    {% include '/Sidebar/Sidebar.twig' %}
+
+    <div class="main-content">
+        <div class="container">
+            <h1 class="page-title">AJOUTER RANK</h1>
+
+            <!-- 🚨 ALERTS SECTION -->
+            {% for message in app.flashes('error') %}
+                <div class="alert error-alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('success') %}
+                <div class="alert success-alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+            <!-- 🚨 END ALERTS SECTION -->
+
+            <div class="rank-form-container">
+                <form method="post" action="{{ path('app_controller_rank_new') }}">
+                    {{ form_start(form) }}
+
+                     <div class="form-section">
+                        <label class="form-label">NOM RANK</label>
+                        <div>
+                            {{ form_widget(form.NomRank, { 'attr': {'class': 'input-field', 'required': 'required'} }) }}
+                            <div class="error-message">
+                                {{ form_errors(form.NomRank) }}
+                            </div>
+                        </div>
+                    </div>
+
+                     <div class="form-section">
+                        <label class="form-label">POINTS</label>
+                        <div>
+                            {{ form_widget(form.points, { 'attr': {'class': 'input-field ', 'required': 'required'} }) }}
+                            <div class="error-message">
+                                {{ form_errors(form.points) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="add-rank-btn">
+                        AJOUTER RANK
+                    </button>
+
+                    {{ form_end(form) }}
+                </form>
+            </div>
+
+        
+        </div>
+    </div>
+</div>
+{% endblock %}

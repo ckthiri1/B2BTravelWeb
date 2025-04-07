@@ -1,0 +1,204 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <Style>
+    :root {
+    --primary-blue: #03045f;
+    --background-gray: #e3e3e3;
+    --white: #ffffff;
+}
+
+body {
+    background-color: #e3e3e3;
+    min-height: 100vh;
+    display: flex;
+}
+
+
+.main-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0px 40px 20px 280px;
+    overflow-y: auto;
+}
+
+
+.content-container {
+    flex-grow: 1;
+    padding: 20px;
+}
+
+.page-title {
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    margin-left: 60px;
+}
+
+.add-voyage-btn {
+    position: absolute;
+    top: 20px;
+    right: 50px;
+    padding: 10px 20px;
+    background-color: var(--white);
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.voyage-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-left: 60px;
+    margin-right: 50px;
+}
+
+.voyage-card {
+    background-color: var(--primary-blue);
+    border-radius: 15px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    color: var(--white);
+}
+
+.voyage-number {
+    font-size: 22px;
+    font-weight: bold;
+    margin-right: 20px;
+}
+
+.voyage-details {
+    flex-grow: 1;
+    display: flex;
+    gap: 50px;
+}
+
+.voyage-departure, 
+.voyage-destination {
+    display: flex;
+    align-items: center;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.star-icon {
+    width: 10px;
+    height: 10px;
+    margin-right: 10px;
+}
+
+.voyage-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    background-color: transparent;
+    border: 2px solid var(--white);
+    color: var(--white);
+    padding: 10px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+.btn-delete {
+    background-color: transparent;
+    border-color: var(--white);
+}
+
+.btn-update {
+    background-color: transparent;
+    border-color: var(--white);
+}
+
+.btn-check-vol {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    width: 500px;
+    max-width: 90%;
+}
+    </style>
+
+   
+{% endblock %}
+
+{% block body %}
+<div class="main-container">
+
+        {{ include('Sidebar/Sidebar.twig') }}
+  
+    <div class="content-container">
+        <h1 class="page-title">LIST VOYAGE</h1>
+
+        <button class="add-voyage-btn" onclick="window.location.href='{{ path('app_voyage_new') }}'">
+            AJOUTER VOYAGE
+        </button>
+
+        <div class="voyage-container">
+            {% for voyage in voyages %}
+                <div class="voyage-card">
+                    <div class="voyage-number">{{ voyage.vid }}</div>
+                    <div class="voyage-details">
+                        <div class="voyage-departure">
+                            <img src="{{ asset('images/star.png') }}" alt="Star" class="star-icon">
+                            Departure: {{ voyage.depart }}
+                        </div>
+                        <div class="voyage-destination">
+                            <img src="{{ asset('images/star.png') }}" alt="Star" class="star-icon">
+                            Arriver: {{ voyage.destination }}
+                        </div>
+                    </div>
+                    <div class="voyage-actions">
+                
+                    <button class="btn btn-check-vol" onclick="window.location.href='{{ path('app_voyage_flights', {id: voyage.vid}) }}'">
+                            CHECK VOL
+                        </button>
+                        <button class="btn btn-update" onclick="window.location.href='{{ path('app_voyage_update', {id: voyage.vid}) }}'">
+                            UPDATE
+                        </button>
+                         {{ include('voyage/DeleteVoyage.twig') }}
+                       
+
+                        
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

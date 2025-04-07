@@ -1,0 +1,158 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="modal-overlay show">
+    <div class="modal-content">
+        <h2 class="modal-title">Modifier Voyage</h2>
+        
+        {{ form_start(form, {'attr': {'class': 'update-voyage-form'}}) }}
+            <div class="form-group">
+                {{ form_label(form.depart, 'Lieu de départ', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.depart, {'attr': {'class': 'form-input'}}) }}
+                {{ form_errors(form.depart) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.Destination, 'Destination', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.Destination, {'attr': {'class': 'form-input'}}) }}
+                {{ form_errors(form.Destination) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.Description, 'Description', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.Description, {'attr': {'class': 'form-textarea'}}) }}
+                {{ form_errors(form.Description) }}
+            </div>
+
+            <div class="modal-actions">
+                <a href="{{ path('app_voyage_index') }}" class="btn btn-cancel">Annuler</a>
+                <button type="submit" class="btn btn-update">Modifier</button>
+            </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(8px);
+            opacity: 0;
+            transform: scale(0.9);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        
+        .modal-content {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 450px;
+            animation: fadeInUp 0.3s ease-in-out;
+        }
+
+       
+        .modal-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #03045f;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            border-color: #03045f;
+            outline: none;
+            box-shadow: 0 0 5px rgba(3, 4, 95, 0.3);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            height: 100px;
+        }
+
+        
+        .modal-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .btn-cancel {
+            background: #e74c3c;
+            color: white;
+            border: none;
+        }
+
+        .btn-update {
+            background: #03045f;
+            color: white;
+            border: none;
+        }
+
+        .btn:hover {
+            opacity: 0.85;
+            transform: scale(1.05);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+{% endblock %}

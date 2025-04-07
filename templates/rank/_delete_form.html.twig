@@ -1,0 +1,264 @@
+<div id="delete-modal" class="delete-modal">
+    <div class="delete-modal-content">
+        <div class="delete-modal-header">
+            <h2>Confirmer la Suppression</h2>
+            <button class="close-btn" onclick="closeDeleteModal()">&times;</button>
+        </div>
+        <div class="delete-modal-body">
+            <div class="delete-icon">🗑️</div>
+            <p>Êtes-vous sûr de vouloir supprimer ce rang ?</p>
+            <p class="delete-warning">Cette action est irréversible.</p>
+        </div>
+        <div class="delete-modal-footer">
+            <button class="btn btn-cancel" onclick="closeDeleteModal()">Annuler</button>
+            <form id="delete-form" method="post" action="{{ path('app_controller_rank_delete', {'IDRang': rank.IDRang}) }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ rank.IDRang) }}">
+                <button type="submit" class="btn btn-delete">Supprimer</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .delete-modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.5);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .delete-modal.show {
+        display: flex;
+        opacity: 1;
+    }
+
+    .delete-modal-content {
+        background-color: white;
+        border-radius: 15px;
+        width: 400px;
+        max-width: 90%;
+        box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+        animation: fadeInDown 0.4s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .delete-modal-header {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-bottom: 1px solid #e9ecef;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .delete-modal-header h2 {
+        margin: 0;
+        color: #2c3e50;
+        font-size: 1.2rem;
+    }
+
+    .close-btn {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #6c757d;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+    .close-btn:hover {
+        color: #2c3e50;
+    }
+
+    .delete-modal-body {
+        padding: 30px;
+        text-align: center;
+    }
+
+    .delete-icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+    }
+
+    .delete-modal-body p {
+        color: #34495e;
+        margin: 10px 0;
+    }
+
+    .delete-warning {
+        color: #e74c3c;
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+
+    .delete-modal-footer {
+        display: flex;
+        justify-content: space-between;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-cancel {
+        background-color: #ecf0f1;
+        color: #2c3e50;
+    }
+
+    .btn-delete {
+        background-color: #e74c3c;
+        color: white;
+    }
+
+    .btn:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+    }
+
+
+    .delete-modal-footer .btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    color: white; /* Ensure text is always visible */
+}
+
+.delete-modal-footer .btn-cancel {
+    background-color: #6c757d; /* More visible gray */
+    color: white;
+}
+
+.delete-modal-footer .btn-delete {
+    background-color: #dc3545; /* Bootstrap-like red for delete */
+    color: white;
+}
+
+.delete-modal-footer .btn:hover {
+    opacity: 0.8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.delete-modal-footer .btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+}
+
+/* Ensure hover states are clear and visible */
+.delete-modal-footer .btn-cancel:hover {
+    background-color: #5a6268;
+}
+
+.delete-modal-footer .btn-delete:hover {
+    background-color: #bd2130;
+}
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const deleteButtons = document.querySelectorAll('.delete-action-btn');
+    
+    deleteButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            // Find the closest voyage card
+            const rank = button.closest('.voyage-card');
+            
+            // Extract rank ID and name
+            const rankId = rank.querySelector('.voyage-number').textContent.replace('#', '').trim();
+            const rankName = rank.querySelector('.voyage-departure').textContent.split(':')[1].trim();
+            
+            // Find the delete form for this specific rank
+            const deleteForm = rank.querySelector('form[method="post"]');
+            
+            if (deleteForm) {
+                // Create and show the modal dynamically
+                const modal = createDeleteModal(rankId, rankName, deleteForm);
+                document.body.appendChild(modal);
+                modal.classList.add('show');
+            }
+        });
+    });
+});
+
+function createDeleteModal(rankId, rankName, deleteForm) {
+    const modalDiv = document.createElement('div');
+    modalDiv.id = `delete-modal-${rankId}`;
+    modalDiv.className = 'delete-modal';
+    
+    // Clone the form to use its original action and token
+    const clonedForm = deleteForm.cloneNode(true);
+    clonedForm.id = `delete-form-${rankId}`;
+    
+    modalDiv.innerHTML = `
+        <div class="delete-modal-content">
+            <div class="delete-modal-header">
+                <h2>Confirmer la Suppression</h2>
+                <button class="close-btn" onclick="closeDeleteModal(this)">&times;</button>
+            </div>
+            <div class="delete-modal-body">
+                <div class="delete-icon">🗑️</div>
+                <p>Êtes-vous sûr de vouloir supprimer le rang "${rankName}" ?</p>
+                <p class="delete-warning">Cette action est irréversible.</p>
+            </div>
+            <div class="delete-modal-footer">
+                <button class="btn btn-cancel" onclick="closeDeleteModal(this)">Annuler</button>
+                <button type="submit" class="btn btn-delete" onclick="submitDeleteForm(this)">Supprimer</button>
+            </div>
+        </div>
+    `;
+
+    // Append the cloned form (hidden) to the modal for submission
+    const formContainer = modalDiv.querySelector('.delete-modal-footer');
+    formContainer.appendChild(clonedForm);
+    clonedForm.style.display = 'none';
+
+    return modalDiv;
+}
+
+function submitDeleteForm(button) {
+    const modal = button.closest('.delete-modal');
+    const form = modal.querySelector('form');
+    form.submit();
+}
+
+function closeDeleteModal(element) {
+    const modal = element.closest('.delete-modal');
+    modal.classList.remove('show');
+    
+    // Remove the modal from the DOM after animation
+    setTimeout(() => {
+        modal.remove();
+    }, 300);
+}
+</script>
