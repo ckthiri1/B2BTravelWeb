@@ -17,7 +17,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class FideliteController extends AbstractController {
 
     private HttpClientInterface $httpClient;
-    private const API_TOKEN = "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";
+    private const API_TOKEN = "hello"        ;//"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";
     private const MODEL_NAME = "google/flan-t5-large";
     private $fideliteService;
     private $userService;

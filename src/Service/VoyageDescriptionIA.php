@@ -6,7 +6,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class VoyageDescriptionIA
 {
     private const API_URL = "https://api-inference.huggingface.co/models/tiiuae/falcon-7b-instruct";
-    private const API_TOKEN = "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"; // Directly declare the token here
+    private const API_TOKEN = 'hello';//"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"; // Directly declare the token here
 
     private HttpClientInterface $client;
 
