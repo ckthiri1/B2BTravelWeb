@@ -1,0 +1,220 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier la Réponse{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px; 
+            height: 100vh; 
+            background-color: #13117D;
+            color: white;
+            padding-top: 20px;
+            position: fixed; 
+            left: 0;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .sidebar .logo img {
+            display: block;
+            width: 160px;
+            margin: 0 auto;
+            margin-bottom: 5px; 
+        }
+
+        .sidebar .nav {
+            list-style: none;
+            padding: 0;
+            width: 100%;
+            margin-top: 5px; 
+        }
+
+        .sidebar .nav li {
+            width: 80%;
+            padding: 11px;
+            margin: 4% auto;
+            text-align: left;
+            background-color: #03045f;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s ease-in-out;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar .nav li a {
+            text-decoration: none;
+            color: white;
+            display: block;
+            width: 90%;
+            height: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            padding-left: 25px;
+            text-align: left;
+        }
+        
+        .sidebar .nav li a i {
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        .sidebar .nav li:hover,
+        .sidebar .nav li a:hover {
+            background-color: #0077b6;
+            transform: scale(1.05);
+            box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .logout-btn {
+            display: block;
+            text-align: center;
+            margin: 13% auto;
+            padding: 10px;
+            background: white;
+            color: black;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 10px;
+            width: 150px;
+            transition: 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: red;
+            color: white;
+        }
+
+        /* Main Content Styles */
+        .dashboard-content {
+            margin-left: 250px; 
+            padding: 30px;
+            background: #F4F4F8;
+            min-height: 100vh;
+        }
+
+        .response-form {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+        }
+
+        textarea.form-control {
+            min-height: 200px;
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: #1a237e;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #121858;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo">
+            </div>
+            
+            <ul class="nav">
+                <li>
+                    <a href="{{ path('admin_reclamations') }}">
+                        <i class="fas fa-exclamation-circle"></i> Réclamations
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ path('admin_reponses_list', {'id': reponse.reclamation.id}) }}">
+                        <i class="fas fa-comments"></i> Réponses
+                    </a>
+                </li>
+            </ul>
+
+            <a href="#" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Déconnexion
+            </a>
+        </div>
+
+        <!-- Main content -->
+        <div class="dashboard-content">
+            <h2>
+                <i class="fas fa-edit"></i> Modifier la réponse
+                <small class="text-muted">pour la réclamation #{{ reponse.reclamation.id }}</small>
+            </h2>
+            
+            <div class="response-form">
+                {{ form_start(form) }}
+                    <div class="form-group">
+                        {{ form_label(form.DescriptionRep) }}
+                        {{ form_widget(form.DescriptionRep, {
+                            'attr': {
+                                'class': 'form-control',
+                                'rows': 10
+                            }
+                        }) }}
+                    </div>
+                    
+                    <div class="form-group mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Enregistrer les modifications
+                        </button>
+                        <a href="{{ path('admin_reponses_list', {'id': reponse.reclamation.id}) }}" 
+                           class="btn btn-secondary">
+                           <i class="fas fa-arrow-left"></i> Retour
+                        </a>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

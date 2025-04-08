@@ -1,0 +1,291 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Réponses pour: {{ reclamation.titre }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px; 
+            height: 100vh; 
+            background-color: #13117D;
+            color: white;
+            padding-top: 20px;
+            position: fixed; 
+            left: 0;
+            top: 0;
+        }
+
+        .sidebar .logo img {
+            display: block;
+            width: 160px;
+            margin: 0 auto;
+            margin-bottom: 5px; 
+        }
+
+        .sidebar .nav {
+            list-style: none;
+            padding: 0;
+            width: 100%;
+            margin-top: 5px; 
+        }
+
+        .sidebar .nav li {
+            width: 80%;
+            padding: 11px;
+            margin: 4% auto;
+            text-align: left;
+            background-color: #03045f;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s ease-in-out;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar .nav li a {
+            text-decoration: none;
+            color: white;
+            display: block;
+            width: 90%;
+            height: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            padding-left: 25px;
+            text-align: left;
+        }
+        
+        .sidebar .nav li a i {
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        .sidebar .nav li:hover,
+        .sidebar .nav li a:hover {
+            background-color: #0077b6;
+            transform: scale(1.05);
+            box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .logout-btn {
+            display: block;
+            text-align: center;
+            margin: 13% auto;
+            padding: 10px;
+            background: white;
+            color: black;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 10px;
+            width: 150px;
+            transition: 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: red;
+            color: white;
+        }
+
+        /* Main Content Styles */
+        .dashboard-content {
+            margin-left: 250px; 
+            padding: 30px;
+            background: #F4F4F8;
+            min-height: 100vh;
+        }
+
+        .response-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+        }
+
+        .search-form {
+            max-width: 400px;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            text-align: left;
+        }
+
+        th {
+            background-color: #1a237e;
+            color: white;
+            font-weight: 500;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+
+        .btn-edit {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .btn-edit:hover {
+            background-color: #e0a800;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-delete:hover {
+            background-color: #c82333;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            margin-top: 20px;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .no-reponse {
+            padding: 20px;
+            background-color: #fff3cd;
+            border-left: 4px solid #ffeeba;
+            color: #856404;
+            border-radius: 4px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <img src="{{ asset('images/logo.png') }}" alt="Logo">
+        </div>
+        
+        <ul class="nav">
+            <li>
+                <a href="#">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="{{ path('admin_reclamations') }}">
+                    <i class="fas fa-exclamation-circle"></i> Réclamations
+                </a>
+            </li>
+            <li>
+                <a href="#" class="active">
+                    <i class="fas fa-comments"></i> Réponses
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-cog"></i> Paramètres
+                </a>
+            </li>
+        </ul>
+
+        <a href="#" class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i> Déconnexion
+        </a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="dashboard-content">
+        <div class="response-container">
+            <h2><i class="fas fa-comments"></i> Réponses pour : {{ reclamation.titre }}</h2>
+
+            <!-- Barre de recherche -->
+            <form method="get" action="{{ path('admin_reponses_list', {'id': reclamation.id}) }}" class="search-form">
+                <div class="input-group">
+                    <input type="text" name="search" class="form-control" placeholder="Rechercher une réponse..." value="{{ search ?? '' }}">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-search"></i> Rechercher
+                    </button>
+                </div>
+            </form>
+
+            {% if reponses is not empty %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Description</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for reponse in reponses %}
+                            <tr>
+                                <td>{{ reponse.id }}</td>
+                                <td>{{ reponse.descriptionRep }}</td>
+                                <td>{{ reponse.dateRep|date('d/m/Y H:i') }}</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="{{ path('admin_reponse_edit', {'id': reponse.id}) }}" class="btn btn-edit">
+                                            <i class="fas fa-edit"></i> Modifier
+                                        </a>
+                                        <form method="post" action="{{ path('admin_reponse_delete', {'id': reponse.id}) }}" 
+                                            onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette réponse ?');">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reponse.id) }}">
+                                            <button type="submit" class="btn btn-delete">
+                                                <i class="fas fa-trash"></i> Supprimer
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="no-reponse">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <strong>Aucune réponse trouvée pour cette réclamation.</strong>
+                </div>
+            {% endif %}
+
+            <a href="{{ path('admin_reclamations') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Retour aux réclamations
+            </a>
+        </div>
+    </div>
+{% endblock %}

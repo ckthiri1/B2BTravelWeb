@@ -1,0 +1,276 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Répondre à la réclamation #{{ reclamation.id }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px; 
+            height: 100vh; 
+            background-color: #13117D;
+            color: white;
+            padding-top: 20px;
+            position: fixed; 
+            left: 0;
+            top: 0;
+        }
+
+        .sidebar .logo img {
+            display: block;
+            width: 160px;
+            margin: 0 auto;
+            margin-bottom: 5px; 
+        }
+
+        .sidebar .nav {
+            list-style: none;
+            padding: 0;
+            width: 100%;
+            margin-top: 5px; 
+        }
+
+        .sidebar .nav li {
+            width: 80%;
+            padding: 11px;
+            margin: 4% auto;
+            text-align: left;
+            background-color: #03045f;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s ease-in-out;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar .nav li a {
+            text-decoration: none;
+            color: white;
+            display: block;
+            width: 90%;
+            height: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            padding-left: 25px;
+            text-align: left;
+        }
+        
+        .sidebar .nav li a i {
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        .sidebar .nav li:hover,
+        .sidebar .nav li a:hover {
+            background-color: #0077b6;
+            transform: scale(1.05);
+            box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .dashboard-content {
+            margin-left: 250px; 
+            padding: 20px;
+            background: #F4F4F8;
+            min-height: 100vh;
+        }
+
+        .response-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .date-display {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: #1a237e;
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-resolved {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .form-error {
+            color: #dc3545;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <img src="{{ asset('images/logo.png') }}" alt="Logo">
+        </div>
+        
+        <ul class="nav">
+            <li>
+                <a href="#">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="{{ path('admin_reclamations') }}" class="active">
+                    <i class="fas fa-exclamation-circle"></i> Réclamations
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-comments"></i> Réponses
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-cog"></i> Paramètres
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="dashboard-content">
+        <div class="response-container">
+            <h1><i class="fas fa-reply me-2"></i>Répondre à la réclamation #{{ reclamation.id }}</h1>
+            
+            <!-- Réclamation Originale -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-exclamation-circle me-2"></i>Réclamation originale</h3>
+                </div>
+                <div class="card-body">
+                    <p><strong>Titre :</strong> {{ reclamation.titre }}</p>
+                    <p><strong>Description :</strong></p>
+                    <p>{{ reclamation.description }}</p>
+                    <p><strong>Date :</strong> {{ reclamation.dateR|date('d/m/Y H:i') }}</p>
+                    <p><strong>Statut :</strong> 
+                        <span class="status-badge status-{{ reclamation.status == 'Traité' ? 'resolved' : 'pending' }}">
+                            {{ reclamation.status }}
+                        </span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Formulaire de Réponse -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-edit me-2"></i>Formulaire de réponse</h3>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form, { attr: { novalidate: 'novalidate' } }) }}
+                    
+                    {# Affichage des erreurs de validation pour le formulaire entier #}
+                    {{ form_errors(form) }}
+                    
+                    <div class="form-group">
+                        {{ form_label(form.DescriptionRep) }}
+                        {{ form_widget(form.DescriptionRep, {
+                            'attr': {
+                                'class': 'form-control',
+                                'rows': 8,
+                                'placeholder': 'Rédigez votre réponse ici...'
+                            }
+                        }) }}
+                        {# Affichage des erreurs de validation spécifiques au champ DescriptionRep #}
+                        {{ form_errors(form.DescriptionRep) }}
+                    </div>
+                    
+                    <div class="date-display">
+                        <i class="fas fa-calendar-alt me-2"></i>
+                        <strong>Date de réponse :</strong> 
+                        <span id="response-date">{{ "now"|date('d/m/Y H:i') }}</span>
+                    </div>
+                    
+                    <div class="form-actions mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-2"></i> Envoyer la réponse
+                        </button>
+                        <a href="{{ path('admin_reclamations') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i> Annuler
+                        </a>
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+  
+{% endblock %}

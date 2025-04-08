@@ -1,0 +1,178 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Votre CSS existant */
+        .form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 30px auto;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+            color: #13117D;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .btn-primary {
+            background-color: #13117D;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background-color: #03045f;
+        }
+        
+        /* Styles pour les erreurs de validation */
+        .invalid-feedback {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        /* Style amélioré pour les messages flash */
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+{% endblock %}
+
+{% block title %}Modifier Réclamation{% endblock %}
+
+{% block body %}
+    <div class="navbar">
+        <div class="navbar-brand">
+            <img src="{{ asset('images/LogoDashboard.jpg') }}" alt="Logo">
+        </div>
+        <div class="navbar-menu">
+            <a href="#" class="nav-button"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="{{ path('app_reclamation_index') }}" class="nav-button"><i class="fas fa-exclamation-circle"></i> Réclamations</a>
+            <a href="#" class="nav-button"><i class="fas fa-comment"></i> Réponses</a>
+            <a href="#" class="nav-button"><i class="fas fa-cog"></i> Paramètres</a>
+            <a href="#" class="nav-button"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+        </div>
+    </div>
+
+    <div class="dashboard-content">
+        <h1>Modifier Réclamation</h1>
+
+        {# Affichage des messages flash #}
+        <div class="flash-messages">
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success">
+                    {{ message }}
+                </div>
+            {% endfor %}
+            
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-error">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="form-container">
+            {# Désactivation de la validation HTML5 #}
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+            
+                {# Champ Titre avec validation Symfony #}
+                <div class="form-group">
+                    {{ form_label(form.titre) }}
+                    {{ form_widget(form.titre, {
+                        'attr': {
+                            'class': 'form-control',
+                            'placeholder': '5 à 100 caractères'
+                        }
+                    }) }}
+                    {{ form_errors(form.titre) }}
+                </div>
+                
+                {# Champ Description avec validation Symfony #}
+                <div class="form-group">
+                    {{ form_label(form.description) }}
+                    {{ form_widget(form.description, {
+                        'attr': {
+                            'class': 'form-control',
+                            'placeholder': '10 à 1000 caractères'
+                        }
+                    }) }}
+                    {{ form_errors(form.description) }}
+                </div>
+                
+                {# Champ Date avec validation Symfony #}
+                <div class="form-group">
+                    {{ form_label(form.dateR) }}
+                    {{ form_widget(form.dateR, {
+                        'attr': {
+                            'class': 'form-control',
+                            'max': 'today'|date('Y-m-d')
+                        }
+                    }) }}
+                    {{ form_errors(form.dateR) }}
+                </div>
+                
+                {# Champ Statut avec validation Symfony #}
+                <div class="form-group">
+                    {{ form_label(form.status) }}
+                    {{ form_widget(form.status, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.status) }}
+                </div>
+
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-save"></i> Enregistrer
+                </button>
+            {{ form_end(form) }}
+
+            <div style="margin-top: 20px;">
+                <a href="{{ path('app_reclamation_index') }}" class="btn-primary" style="background-color: #6c757d;">
+                    <i class="fas fa-arrow-left"></i> Retour à la liste
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
