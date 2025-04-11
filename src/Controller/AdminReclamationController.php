@@ -10,7 +10,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Validator\Validator\ValidatorInterface; // <-- à ajouter
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use TCPDF;
 
 class AdminReclamationController extends AbstractController
 {
@@ -49,6 +50,7 @@ class AdminReclamationController extends AbstractController
         ]);
     }
     
+
     #[Route('/admin/reclamation/{id}/reponses', name: 'admin_reponses_list', methods: ['GET', 'POST'])]
     public function listReponses(Request $request, Reclamation $reclamation, EntityManagerInterface $em): Response
     {
@@ -74,6 +76,40 @@ class AdminReclamationController extends AbstractController
         ]);
     }
 
+
+   #[Route('/admin/reclamation/{id}/export-pdf', name: 'admin_reclamation_export_pdf')]
+public function exportPdf(Reclamation $reclamation, EntityManagerInterface $em): Response
+{
+    $reponses = $em->getRepository(Reponse::class)
+        ->findBy(['reclamation' => $reclamation]);
+
+    $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+    
+    // Configuration du document
+    $pdf->SetCreator('Système de Gestion des Réclamations');
+    $pdf->SetAuthor('Administrateur');
+    $pdf->SetTitle('Réponses - Réclamation #'.$reclamation->getId());
+    $pdf->SetMargins(15, 25, 15); // Marge supérieure augmentée pour le logo
+    $pdf->AddPage();
+
+    // Chemin absolu vers l'image
+    $logoPath = $this->getParameter('kernel.project_dir').'/public/images/logo.png';
+
+    // Génération du contenu HTML
+    $html = $this->renderView('reponse/export_pdf.html.twig', [
+        'reclamation' => $reclamation,
+        'reponses' => $reponses,
+        'logo_path' => $logoPath // Passer le chemin au template
+    ]);
+
+    $pdf->writeHTML($html, true, false, true, false, '');
+
+    return new Response(
+        $pdf->Output('reponses_reclamation_'.$reclamation->getId().'.pdf', 'I'),
+        200,
+        ['Content-Type' => 'application/pdf']
+    );
+}
     #[Route('/admin/reponse/{id}/edit', name: 'admin_reponse_edit', methods: ['GET', 'POST'])]
     public function editReponse(Request $request, Reponse $reponse, EntityManagerInterface $em, ValidatorInterface $validator): Response
     {

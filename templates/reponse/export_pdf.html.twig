@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Réponses pour Réclamation #{{ reclamation.id }}</title>
+    <style type="text/css">
+        body {
+            font-family: helvetica, sans-serif;
+            color: #333333;
+            line-height: 1.5;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #13117D;
+        }
+        .header img {
+            height: 60px;
+            margin-bottom: 10px;
+        }
+        h1 {
+            color: #13117D;
+            font-size: 20px;
+            margin: 5px 0;
+        }
+        .reclamation-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .reponse-item {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eeeeee;
+        }
+        .reponse-date {
+            color: #13117D;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 10px;
+            border-top: 1px solid #dddddd;
+            font-size: 12px;
+            color: #666666;
+            text-align: center;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .status-resolved {
+            background-color: #d4edda;
+            color: #155724;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Réponses pour la Réclamation #{{ reclamation.id }}</h1>
+        <p>Export généré le {{ "now"|date("d/m/Y à H:i") }}</p>
+    </div>
+
+    <div class="reclamation-info">
+        <p><strong>Titre :</strong> {{ reclamation.titre }}</p>
+        <p><strong>Description :</strong> {{ reclamation.description }}</p>
+        <p><strong>Date :</strong> {{ reclamation.dateR|date('d/m/Y') }}</p>
+        <p><strong>Statut :</strong> 
+            <span class="status-badge status-{{ reclamation.status }}">
+                {% if reclamation.status == 'pending' %}En attente
+                {% elseif reclamation.status == 'resolved' %}Traité
+                {% else %}{{ reclamation.status }}
+                {% endif %}
+            </span>
+        </p>
+    </div>
+
+    <h2 style="color: #13117D; font-size: 18px; margin-bottom: 15px;">
+        Liste des Réponses ({{ reponses|length }})
+    </h2>
+
+    {% for reponse in reponses %}
+    <div class="reponse-item">
+        <div class="reponse-date">
+            {{ reponse.dateRep|date('d/m/Y à H:i') }}
+        </div>
+        <div class="reponse-content">
+            {{ reponse.descriptionRep|nl2br }}
+        </div>
+    </div>
+    {% else %}
+    <p style="color: #666666; font-style: italic;">
+        Aucune réponse trouvée pour cette réclamation.
+    </p>
+    {% endfor %}
+
+    <div class="footer">
+        Système de Gestion des Réclamations - © {{ "now"|date("Y") }}
+    </div>
+</body>
+</html>
