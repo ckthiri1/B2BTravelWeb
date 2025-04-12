@@ -4,6 +4,7 @@
 
 {% block stylesheets %}
     {{ parent() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         /* Sidebar Styles */
         .sidebar {
@@ -15,6 +16,7 @@
             position: fixed; 
             left: 0;
             top: 0;
+            z-index: 1000;
         }
 
         .sidebar .logo img {
@@ -71,7 +73,7 @@
 
         .dashboard-content {
             margin-left: 250px; 
-            padding: 20px;
+            padding: 30px;
             background: #F4F4F8;
             min-height: 100vh;
         }
@@ -86,44 +88,75 @@
             background: white;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            padding: 20px;
-            margin-bottom: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
         }
 
         .card-header {
             border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card-header h3 {
+            margin: 0;
+            color: #13117D;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #495057;
         }
 
         .form-control {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: #13117D;
+            outline: none;
         }
 
         textarea.form-control {
-            min-height: 150px;
+            min-height: 200px;
             resize: vertical;
         }
 
         .date-display {
             background: #f8f9fa;
-            padding: 10px;
-            border-radius: 4px;
-            margin-top: 15px;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 20px;
             font-size: 14px;
         }
 
+        /* Error Styles */
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+
+        .invalid-feedback {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 8px;
+            display: block;
+        }
+
+        /* Buttons */
         .btn {
-            padding: 10px 20px;
-            border-radius: 4px;
+            padding: 12px 25px;
+            border-radius: 6px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s;
@@ -134,8 +167,12 @@
         }
 
         .btn-primary {
-            background-color: #1a237e;
+            background-color: #13117D;
             color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0d0a5a;
         }
 
         .btn-secondary {
@@ -143,15 +180,15 @@
             color: white;
         }
 
-        .btn:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
+        .btn i {
+            margin-right: 8px;
         }
 
+        /* Status Badges */
         .status-badge {
-            padding: 5px 10px;
+            padding: 5px 12px;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             font-weight: 600;
             display: inline-block;
         }
@@ -166,10 +203,35 @@
             color: #155724;
         }
 
-        .form-error {
-            color: #dc3545;
+        /* Constraints Info */
+        .constraints-info {
             font-size: 13px;
-            margin-top: 5px;
+            color: #6c757d;
+            margin-top: 8px;
+        }
+
+        .constraints-info ul {
+            padding-left: 20px;
+            margin: 5px 0;
+        }
+
+        /* Flash Messages */
+        .alert {
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 6px;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
     </style>
 {% endblock %}
@@ -210,6 +272,21 @@
         <div class="response-container">
             <h1><i class="fas fa-reply me-2"></i>Répondre à la réclamation #{{ reclamation.id }}</h1>
             
+            <!-- Flash Messages -->
+            <div class="flash-messages">
+                {% for message in app.flashes('success') %}
+                    <div class="alert alert-success">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+                
+                {% for message in app.flashes('error') %}
+                    <div class="alert alert-error">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+
             <!-- Réclamation Originale -->
             <div class="card">
                 <div class="card-header">
@@ -234,30 +311,38 @@
                     <h3><i class="fas fa-edit me-2"></i>Formulaire de réponse</h3>
                 </div>
                 <div class="card-body">
-                    {{ form_start(form, { attr: { novalidate: 'novalidate' } }) }}
+                    {{ form_start(form, { attr: { novalidate: 'novalidate', id: 'response-form' } }) }}
                     
-                    {# Affichage des erreurs de validation pour le formulaire entier #}
-                    {{ form_errors(form) }}
-                    
+                    <!-- Champ Description -->
                     <div class="form-group">
-                        {{ form_label(form.DescriptionRep) }}
+                        {{ form_label(form.DescriptionRep, 'Votre réponse *') }}
                         {{ form_widget(form.DescriptionRep, {
                             'attr': {
-                                'class': 'form-control',
+                                'class': form.DescriptionRep.vars.valid ? 'form-control' : 'form-control is-invalid',
                                 'rows': 8,
                                 'placeholder': 'Rédigez votre réponse ici...'
                             }
                         }) }}
-                        {# Affichage des erreurs de validation spécifiques au champ DescriptionRep #}
-                        {{ form_errors(form.DescriptionRep) }}
+                        <div class="invalid-feedback">
+                            {{ form_errors(form.DescriptionRep) }}
+                        </div>
+                        <div class="constraints-info">
+                            <ul>
+                                <li>La réponse ne peut pas être vide</li>
+                                <li>Doit contenir entre 10 et 2000 caractères</li>
+                                <li>Doit être une chaîne de caractères valide</li>
+                            </ul>
+                        </div>
                     </div>
                     
+                    <!-- Date de réponse -->
                     <div class="date-display">
                         <i class="fas fa-calendar-alt me-2"></i>
                         <strong>Date de réponse :</strong> 
                         <span id="response-date">{{ "now"|date('d/m/Y H:i') }}</span>
                     </div>
                     
+                    <!-- Boutons d'action -->
                     <div class="form-actions mt-4">
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-paper-plane me-2"></i> Envoyer la réponse
@@ -271,6 +356,36 @@
             </div>
         </div>
     </div>
+{% endblock %}
 
-  
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script>
+        // Validation en temps réel
+        document.addEventListener('DOMContentLoaded', function() {
+            const textarea = document.querySelector('#{{ form.DescriptionRep.vars.id }}');
+            const form = document.querySelector('#response-form');
+            
+            if (textarea) {
+                textarea.addEventListener('input', function() {
+                    if (this.value.trim().length > 0) {
+                        this.classList.remove('is-invalid');
+                        this.nextElementSibling.style.display = 'none';
+                    }
+                });
+            }
+            
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    if (textarea.value.trim().length === 0) {
+                        e.preventDefault();
+                        textarea.classList.add('is-invalid');
+                        textarea.nextElementSibling.style.display = 'block';
+                        textarea.focus();
+                    }
+                });
+            }
+        });
+    </script>
 {% endblock %}
