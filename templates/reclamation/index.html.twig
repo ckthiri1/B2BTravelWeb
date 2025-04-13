@@ -204,9 +204,9 @@
                             </span>
                         </td>
                         <td>
-                            <!-- Bouton Voir Réponse -->
+                            <!-- Bouton Voir Réponse corrigé -->
                             {% if not reclamation.isPending() %}
-                                <a href="{{ path('admin_reponses_list', {'id': reclamation.id}) }}" 
+                                <a href="{{ path('app_reclamation_reponse_show', {'id': reclamation.id}) }}" 
                                    class="btn btn-view"
                                    title="Voir la réponse">
                                    <i class="fas fa-eye"></i>

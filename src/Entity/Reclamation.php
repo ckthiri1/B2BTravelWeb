@@ -6,6 +6,8 @@ use App\Repository\ReclamationRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: ReclamationRepository::class)]
 class Reclamation
@@ -51,7 +53,16 @@ class Reclamation
     )]
     private ?string $status = 'pending';
 
-    // Getters
+    // Ajout de la relation OneToMany avec Reponse
+    #[ORM\OneToMany(targetEntity: Reponse::class, mappedBy: "reclamation")]
+    private Collection $reponses;
+
+    public function __construct()
+    {
+        $this->reponses = new ArrayCollection();
+    }
+
+    // Getters existants (inchangés)
     public function getId(): ?int
     {
         return $this->id;
@@ -77,7 +88,7 @@ class Reclamation
         return $this->status;
     }
 
-    // Setters avec validation intégrée
+    // Setters existants (inchangés)
     public function setTitre(?string $titre): self
     {
         $this->titre = $titre;
@@ -92,7 +103,6 @@ class Reclamation
 
     public function setDateR(?\DateTimeInterface $dateR): self
     {
-        // Validation supplémentaire si nécessaire
         if ($dateR > new \DateTime()) {
             throw new \InvalidArgumentException("La date ne peut pas être dans le futur");
         }
@@ -113,7 +123,7 @@ class Reclamation
         return $this;
     }
 
-    // Méthodes utilitaires
+    // Méthodes utilitaires existantes (inchangées)
     public function isPending(): bool
     {
         return $this->status === 'pending';
@@ -132,5 +142,39 @@ class Reclamation
     public function __toString(): string
     {
         return $this->titre ?? 'Nouvelle réclamation';
+    }
+
+    // Nouveaux getters pour la relation avec Reponse
+    public function getReponses(): Collection
+    {
+        return $this->reponses;
+    }
+
+    public function getLatestReponse(): ?Reponse
+    {
+        return $this->reponses->first() ?: null;
+    }
+
+    // Méthodes pour gérer la relation (optionnelles mais recommandées)
+    public function addReponse(Reponse $reponse): self
+    {
+        if (!$this->reponses->contains($reponse)) {
+            $this->reponses[] = $reponse;
+            $reponse->setReclamation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReponse(Reponse $reponse): self
+    {
+        if ($this->reponses->removeElement($reponse)) {
+            // set the owning side to null (unless already changed)
+            if ($reponse->getReclamation() === $this) {
+                $reponse->setReclamation(null);
+            }
+        }
+
+        return $this;
     }
 }

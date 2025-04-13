@@ -19,6 +19,7 @@ class ReponseType extends AbstractType
             ->add('DescriptionRep', TextareaType::class, [
                 'label' => 'Réponse',
                 'required' => false, // Désactive la validation HTML5
+                'empty_data' => '',  // ✅ Ajout crucial pour éviter le "null"
                 'constraints' => [
                     new NotBlank([
                         'message' => 'La réponse ne peut pas être vide.',
@@ -46,7 +47,7 @@ class ReponseType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Reponse::class,
-            'validation_groups' => ['Default'] // Activation des groupes de validation
+            'validation_groups' => ['Default']
         ]);
     }
 }

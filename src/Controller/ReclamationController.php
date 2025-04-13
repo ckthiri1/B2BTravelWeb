@@ -101,6 +101,24 @@ public function edit(Request $request, Reclamation $reclamation, EntityManagerIn
     
         return $this->redirectToRoute('app_reclamation_index');
     }
+    #[Route('/{id}/voir-reponse', name: 'app_reclamation_reponse_show', methods: ['GET'])]
+    public function voirReponse(int $id, EntityManagerInterface $em): Response
+    {
+        $reclamation = $em->getRepository(Reclamation::class)->find($id);
     
-
+        if (!$reclamation) {
+            throw $this->createNotFoundException('Réclamation introuvable.');
+        }
+    
+        $reponse = $reclamation->getLatestReponse();
+    
+        if (!$reponse) {
+            throw $this->createNotFoundException('Aucune réponse trouvée pour cette réclamation.');
+        }
+    
+        return $this->render('reclamation/reponse_show.html.twig', [
+            'reclamation' => $reclamation,
+            'reponse' => $reponse,
+        ]);
+    }
 }

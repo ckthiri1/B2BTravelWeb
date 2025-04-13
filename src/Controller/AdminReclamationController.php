@@ -110,31 +110,30 @@ public function exportPdf(Reclamation $reclamation, EntityManagerInterface $em):
         ['Content-Type' => 'application/pdf']
     );
 }
-    #[Route('/admin/reponse/{id}/edit', name: 'admin_reponse_edit', methods: ['GET', 'POST'])]
-    public function editReponse(Request $request, Reponse $reponse, EntityManagerInterface $em, ValidatorInterface $validator): Response
-    {
-        $form = $this->createForm(ReponseType::class, $reponse);
-        $form->handleRequest($request);
+#[Route('/admin/reponse/{id}/edit', name: 'admin_reponse_edit', methods: ['GET', 'POST'])]
+public function editReponse(Request $request, Reponse $reponse, EntityManagerInterface $em): Response
+{
+    $form = $this->createForm(ReponseType::class, $reponse);
+    $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
-            $errors = $validator->validate($reponse);
+    if ($form->isSubmitted()) {
+        if ($form->isValid()) {
+            $reponse->setDateRep(new \DateTime());
+            $em->flush();
 
-            if (count($errors) > 0) {
-                $this->addFlash('error', 'Erreur de validation dans le formulaire.');
-            } else {
-                $reponse->setDateRep(new \DateTime());
-                $em->flush();
-
-                $this->addFlash('success', 'Réponse modifiée avec succès');
-                return $this->redirectToRoute('admin_reponses_list', ['id' => $reponse->getReclamation()->getId()]);
-            }
+            $this->addFlash('success', 'Réponse modifiée avec succès');
+            return $this->redirectToRoute('admin_reponses_list', ['id' => $reponse->getReclamation()->getId()]);
         }
-
-        return $this->render('reponse/edit_reponse.html.twig', [
-            'form' => $form->createView(),
-            'reponse' => $reponse
-        ]);
+        // Si le formulaire est invalide, on reste sur la même page
+        $this->addFlash('error', 'Erreur de validation dans le formulaire');
     }
+
+    return $this->render('reponse/edit_reponse.html.twig', [
+        'form' => $form->createView(),
+        'reponse' => $reponse,
+        'reclamation' => $reponse->getReclamation() // Important pour afficher les détails
+    ]);
+}
 
     #[Route('/admin/reponse/{id}', name: 'admin_reponse_delete', methods: ['POST'])]
     public function deleteReponse(Request $request, Reponse $reponse, EntityManagerInterface $em): Response
