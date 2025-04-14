@@ -25,30 +25,34 @@ class AdminReclamationController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/reclamation/{id}/repondre', name: 'admin_reclamation_repondre', methods: ['GET', 'POST'])]
-    public function repondre(Request $request, Reclamation $reclamation, EntityManagerInterface $em): Response
-    {
-        $reponse = new Reponse();
-        $reponse->setReclamation($reclamation);
-        $reponse->setDateRep(new \DateTime());
-    
-        $form = $this->createForm(ReponseType::class, $reponse);
-        $form->handleRequest($request);
-    
-        if ($form->isSubmitted() && $form->isValid()) {
+   #[Route('/admin/reclamation/{id}/repondre', name: 'admin_reclamation_repondre', methods: ['GET', 'POST'])]
+public function repondre(Request $request, Reclamation $reclamation, EntityManagerInterface $em): Response
+{
+    $reponse = new Reponse();
+    $reponse->setReclamation($reclamation);
+    $reponse->setDateRep(new \DateTime());
+
+    $form = $this->createForm(ReponseType::class, $reponse);
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted()) {
+        if ($form->isValid()) {
             $em->persist($reponse);
             $em->flush();
-    
+
             $this->addFlash('success', 'Réponse enregistrée avec succès');
             return $this->redirectToRoute('admin_reponses_list', ['id' => $reclamation->getId()]);
         }
-    
-        // Si le formulaire est soumis mais non valide, les erreurs seront automatiquement gérées par Symfony
-        return $this->render('reponse/repondre.html.twig', [
-            'reclamation' => $reclamation,
-            'form' => $form->createView()
-        ]);
+        
+        // Ajout d'un message flash d'erreur si le formulaire est invalide
+        $this->addFlash('error', 'Veuillez corriger les erreurs dans le formulaire');
     }
+
+    return $this->render('reponse/repondre.html.twig', [
+        'reclamation' => $reclamation,
+        'form' => $form->createView()
+    ]);
+}
     
 
     #[Route('/admin/reclamation/{id}/reponses', name: 'admin_reponses_list', methods: ['GET', 'POST'])]
@@ -149,4 +153,23 @@ public function editReponse(Request $request, Reponse $reponse, EntityManagerInt
 
         return $this->redirectToRoute('admin_reponses_list', ['id' => $reclamationId]);
     }
+    #[Route('/admin/dashboard', name: 'admin_dashboard')]
+public function dashboard(EntityManagerInterface $em): Response
+{
+    $reclamationRepo = $em->getRepository(Reclamation::class);
+    $reponseRepo = $em->getRepository(Reponse::class);
+
+    return $this->render('reponse/admin_dashboard.html.twig', [
+        'stats' => [
+            'total_reclamations' => $reclamationRepo->count([]),
+            'pending_reclamations' => $reclamationRepo->count(['status' => 'pending']),
+            'resolved_reclamations' => $reclamationRepo->count(['status' => 'resolved']),
+            'total_reponses' => $reponseRepo->count([]),
+            'reponses_recentes' => $reponseRepo->countLastWeekResponses()
+        ],
+        'last_reponses' => $reponseRepo->findBy([], ['dateRep' => 'DESC'], 5),
+        'pending_claims' => $reclamationRepo->count(['status' => 'pending'])
+    ]);
+    
+}
 }

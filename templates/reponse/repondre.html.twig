@@ -244,8 +244,8 @@
         </div>
         
         <ul class="nav">
-            <li>
-                <a href="#">
+            <li class="{{ app.request.attributes.get('_route') == 'admin_dashboard' ? 'active' : '' }}">
+                <a href="{{ path('admin_dashboard') }}">
                     <i class="fas fa-tachometer-alt"></i> Dashboard
                 </a>
             </li>

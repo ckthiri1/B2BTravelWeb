@@ -40,4 +40,25 @@ class ReponseRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    // src/Repository/ReponseRepository.php
+
+    public function findRecentResponses(int $limit = 5): array
+    {
+        return $this->createQueryBuilder('r')
+            ->orderBy('r.dateRep', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+    // src/Repository/ReponseRepository.php
+
+public function countLastWeekResponses(): int
+{
+    return $this->createQueryBuilder('r')
+        ->select('COUNT(r.id)')
+        ->where('r.dateRep >= :last_week')
+        ->setParameter('last_week', new \DateTime('-7 days'))
+        ->getQuery()
+        ->getSingleScalarResult();
+}
 }
