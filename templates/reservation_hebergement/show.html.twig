@@ -1,0 +1,130 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails de la réservation{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .detail-card {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e9ecef;
+            overflow: hidden;
+        }
+
+        .detail-header {
+            background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+            color: white;
+            padding: 1.5rem;
+        }
+
+        .detail-body {
+            padding: 2rem;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #f1f3f5;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-icon {
+            font-size: 1.2rem;
+            width: 40px;
+            color: #3b82f6;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            min-width: 120px;
+            color: #495057;
+        }
+
+        .detail-value {
+            flex-grow: 1;
+            color: #212529;
+        }
+
+        .status-badge {
+            background: #e9f5ff;
+            color: #3b82f6;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #f1f3f5;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+
+
+<div class="detail-card">
+    <div class="detail-header">
+        <h1 class="h2 mb-0">Réservation </h1>
+        <div class="text-muted mt-2">{{ reservation_hebergement.status == 'EnAttente' ? 'En attente' : 'Résolue' }}</div>
+    </div>
+
+    <div class="detail-body">
+        <div class="detail-item">
+            <div class="detail-icon"><i class="bi bi-building"></i></div>
+            <div class="detail-label">Hébergement</div>
+            <div class="detail-value">
+                {% if reservation_hebergement.hebergement %}
+                    {{ reservation_hebergement.hebergement.nom }}
+                {% else %}
+                    <span class="text-muted">Non spécifié</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="detail-item">
+            <div class="detail-icon"><i class="bi bi-calendar-event"></i></div>
+            <div class="detail-label">Date de début</div>
+            <div class="detail-value">{{ reservation_hebergement.date|date('d/m/Y') }}</div>
+        </div>
+
+        <div class="detail-item">
+            <div class="detail-icon"><i class="bi bi-calendar-check"></i></div>
+            <div class="detail-label">Date de fin</div>
+            <div class="detail-value">{{ reservation_hebergement.dateFin|date('d/m/Y') }}</div>
+        </div>
+
+        <div class="detail-item">
+            <div class="detail-icon"><i class="bi bi-cash"></i></div>
+            <div class="detail-label">Prix total</div>
+            <div class="detail-value">
+                <span class="status-badge">{{ reservation_hebergement.prix }} €</span>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="{{ path('app_reservation_hebergement_index') }}" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left me-2"></i>Retour à la liste
+            </a>
+            <a href="{{ path('app_reservation_hebergement_edit', {'idResH': reservation_hebergement.idResH}) }}" 
+               class="btn btn-primary">
+                <i class="bi bi-pencil me-2"></i>Modifier
+            </a>
+            {{ include('reservation_hebergement/_delete_form.html.twig') }}
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

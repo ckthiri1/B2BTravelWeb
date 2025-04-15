@@ -1,0 +1,111 @@
+.hebergement-details {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.hebergement-details h1 {
+    color: #2c3e50;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Style du tableau */
+.table {
+    width: 100%;
+    margin-bottom: 1rem;
+    background-color: white;
+    border-collapse: collapse;
+}
+
+.table th {
+    background-color: #3498db;
+    color: white;
+    padding: 12px;
+    text-align: left;
+    width: 30%;
+}
+
+.table td {
+    padding: 12px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+/* Style des liens */
+.action-links {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+}
+
+.action-links a {
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.back-link {
+    background-color: #6c757d;
+    color: white;
+}
+
+.back-link:hover {
+    background-color: #5a6268;
+}
+
+.edit-link {
+    background-color: #3498db;
+    color: white;
+}
+
+.edit-link:hover {
+    background-color: #2980b9;
+}
+
+/* Style du formulaire de suppression */
+.delete-form {
+    margin-top: 1rem;
+}
+
+.delete-form button {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.delete-form button:hover {
+    background-color: #c0392b;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .hebergement-details {
+        margin: 1rem;
+        padding: 10px;
+    }
+    
+    .table th, 
+    .table td {
+        display: block;
+        width: 100%;
+    }
+    
+    .table tr {
+        margin-bottom: 1rem;
+        display: block;
+        border: 1px solid #dee2e6;
+    }
+}

@@ -1,0 +1,56 @@
+.dashboard-container {
+    display: flex;
+    height: 100vh;
+}
+
+.dashboard-content {
+    flex-grow: 1;
+    padding: 20px;
+    background: #F4F4F8;
+}
+
+h1 {
+    color: #03045f;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.card {
+    height: 180px;
+    border-radius: 10px;
+    padding: 20px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card h2 {
+    font-size: 20px;
+}
+
+.card p {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+/* Couleurs des cartes */
+.card-blue { background: #03045f; }
+.card-lightblue { background: #0077b6; }
+.card-cyan { background: #00b4d8; }
+.card-yellow { background: #ffb703; }
+.card-orange { background: #fb8500; }
+.card-red { background: #d00000; }

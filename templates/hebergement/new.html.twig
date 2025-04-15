@@ -1,0 +1,91 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvel hébergement{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <div class="creation-card shadow-lg">
+        <div class="card-header bg-gradient-primary">
+            <h1 class="h2 mb-0 text-white">
+                <i class="bi bi-house-add"></i> Nouvel hébergement
+            </h1>
+        </div>
+
+        <div class="card-body">
+            {{ include('hebergement/_form.html.twig') }}
+        </div>
+
+        <div class="card-footer bg-transparent border-top-0">
+            <a href="{{ path('app_hebergement_index') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left-circle me-2"></i> Retour à la liste
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .creation-card {
+        max-width: 800px;
+        margin: 2rem auto;
+        border-radius: 1rem;
+        overflow: hidden;
+        background: #ffffff;
+        border: none;
+        transition: transform 0.3s ease;
+    }
+
+    .card-header {
+        padding: 1.5rem 2rem;
+        background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+        border-bottom: none;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .card-footer {
+        padding: 1.5rem 2rem;
+        text-align: right;
+    }
+
+    .btn-outline-secondary {
+        transition: all 0.2s ease;
+        border-width: 2px;
+    }
+
+    .btn-outline-secondary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    @media (max-width: 768px) {
+        .creation-card {
+            margin: 1rem;
+            border-radius: 0.75rem;
+        }
+
+        .card-header {
+            padding: 1.25rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .card-footer {
+            text-align: center;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    }
+
+    @media (min-width: 992px) {
+        .creation-card:hover {
+            transform: translateY(-5px);
+        }
+    }
+</style>
+{% endblock %}

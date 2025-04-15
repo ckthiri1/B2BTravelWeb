@@ -1,0 +1,19 @@
+
+{% block navbar %}
+<nav class="navbar">
+    <div class="navbar-brand">
+        <img src="{{ asset('images/Logo.png') }}" alt="Logo" class="navbar-logo">
+        <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
+    </div>
+    <div class="navbar-menu">
+        <a href="{{ path('app_home') }}" class="nav-button">HOME</a>
+        <a href="{{ path('app_fidelite') }}" class="nav-button">FIDELITE</a>
+        <a href="{{ path('app_voyage_index') }}" class="nav-button">RECLAMATION</a>
+        <a href="{{ path('app_voyage_index') }}" class="nav-button">PROFIL</a>
+        <a href="{{ path('app_voyage_index') }}" class="nav-button">RESERVATION</a>
+        <a href="{{ path('app_voyage_index') }}" class="nav-button">EVENEMENT</a>
+    </div>
+</nav>
+
+
+{% endblock %}
