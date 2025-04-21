@@ -163,6 +163,83 @@
         .bg-success {
             background-color: #28a745;
         }
+
+        /* Nouveaux styles pour le feedback PRO */
+        .feedback-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .rating-container {
+            display: flex;
+            justify-content: center;
+            margin: 1.5rem 0;
+            direction: rtl;
+        }
+
+        .rating-input {
+            display: none;
+        }
+
+        .rating-label {
+            cursor: pointer;
+            padding: 0 5px;
+            font-size: 2rem;
+            color: #e4e5e9;
+            transition: all 0.2s ease;
+        }
+
+        .rating-label:hover,
+        .rating-label:hover ~ .rating-label,
+        .rating-input:checked ~ .rating-label {
+            color: #ffc107;
+        }
+
+        .feedback-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            resize: none;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .feedback-textarea:focus {
+            border-color: #1a237e;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.1);
+        }
+
+        .submit-feedback {
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .submit-feedback:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(26, 35, 126, 0.2);
+        }
+
+        .submit-feedback:active {
+            transform: translateY(0);
+        }
+
+        #feedback-alert {
+            transition: all 0.3s ease;
+        }
     </style>
 {% endblock %}
 
@@ -220,6 +297,41 @@
             </div>
         </div>
 
+        {# Nouvelle section Feedback PRO #}
+          <div class="card mt-4 feedback-card">
+            <div class="card-header bg-info text-white">
+                <i class="fas fa-comment-alt"></i> Votre avis compte
+            </div>
+            <div class="card-body text-center">
+                
+                {# Message d'alerte #}
+                <div id="feedback-alert" class="alert d-none mb-4"></div>
+                
+                {# Titre #}
+                <h5 class="mb-4">Comment évaluez-vous cette réponse ?</h5>
+                
+                {# Conteneur des étoiles - Version visuelle pure #}
+                <div class="rating-container mb-4">
+                    {% for i in 5..1 %}
+                        <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" class="rating-input">
+                        <label for="star{{ i }}" class="rating-label" title="{{ i }} étoile{{ i > 1 ? 's' : '' }}">
+                            <i class="fas fa-star"></i>
+                        </label>
+                    {% endfor %}
+                </div>
+                
+                {# Zone de commentaire #}
+                <textarea class="feedback-textarea mb-4" 
+                        placeholder="Votre commentaire..."></textarea>
+                
+                {# Bouton d'envoi #}
+                <button id="submit-feedback" class="submit-feedback">
+                    <i class="fas fa-paper-plane me-2"></i>Envoyer
+                </button>
+            </div>
+        </div>
+
+
         <div class="mt-3">
             <a href="{{ path('app_reclamation_index') }}" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Retour à la liste
@@ -232,4 +344,70 @@
             {% endif %}
         </div>
     </div>
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const stars = document.querySelectorAll('.rating-input');
+            const textarea = document.querySelector('.feedback-textarea');
+            const submitBtn = document.getElementById('submit-feedback');
+            const alertBox = document.getElementById('feedback-alert');
+            let selectedRating = 0;
+
+            stars.forEach(star => {
+                star.addEventListener('change', function() {
+                    selectedRating = parseInt(this.value);
+                });
+            });
+
+            submitBtn.addEventListener('click', async function() {
+                if (selectedRating === 0) {
+                    showAlert('Veuillez sélectionner une note', 'danger');
+                    return;
+                }
+
+                const feedback = {
+                    rating: selectedRating,
+                    comment: textarea.value
+                };
+
+                try {
+                    const response = await fetch(`/api/feedback/{{ reponse.id }}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(feedback)
+                    });
+
+                    if (response.ok) {
+                        showAlert('Merci pour votre précieux feedback !', 'success');
+                        resetForm();
+                    } else {
+                        const error = await response.json();
+                        showAlert(error.error || 'Erreur lors de l\'envoi', 'danger');
+                    }
+                } catch (error) {
+                    showAlert('Erreur de connexion au serveur', 'danger');
+                }
+            });
+
+            function showAlert(message, type) {
+                alertBox.textContent = message;
+                alertBox.className = `alert alert-${type} d-block`;
+                setTimeout(() => {
+                    alertBox.classList.add('d-none');
+                }, 3000);
+            }
+
+            function resetForm() {
+                stars.forEach(star => star.checked = false);
+                textarea.value = '';
+                selectedRating = 0;
+            }
+        });
+    </script>
+{% endblock %}
 {% endblock %}

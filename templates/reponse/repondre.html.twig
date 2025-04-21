@@ -369,6 +369,22 @@
             descElement.innerHTML = text;
         }
     });
+    function insertSuggestion(text) {
+            const formData = new FormData();
+            formData.append('suggestion', text);
+            formData.append('_token', '{{ csrf_token('insert-suggestion') }}');
+
+            fetch("{{ path('admin_inserer_suggestion', {'id': reclamation.id}) }}", {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
     
 </script>
 {% endblock %}  

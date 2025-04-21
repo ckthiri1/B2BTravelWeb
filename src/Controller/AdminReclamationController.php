@@ -260,4 +260,20 @@ public function dashboard(EntityManagerInterface $em): Response
     ]);
     
 }
+#[Route('/admin/reclamation/{id}/inserer', name: 'admin_inserer_suggestion', methods: ['POST'])]
+public function insererSuggestion(Request $request, Reclamation $reclamation, EntityManagerInterface $em): Response
+{
+    $suggestion = $request->request->get('suggestion');
+
+    $reponse = new Reponse();
+    $reponse->setDescriptionRep($suggestion);
+    $reponse->setReclamation($reclamation);
+    $reponse->setDateRep(new \DateTime());
+
+    $em->persist($reponse);
+    $em->flush();
+
+    $this->addFlash('success', 'Suggestion insérée avec succès');
+    return $this->redirectToRoute('admin_reponses_list', ['id' => $reclamation->getId()]);
+}
 }

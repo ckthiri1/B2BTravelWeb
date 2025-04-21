@@ -25,6 +25,7 @@ class Reponse
 
     #[ORM\ManyToOne(targetEntity: Reclamation::class, inversedBy: "reponses")]
     #[ORM\JoinColumn(name: "IDR", referencedColumnName: "IDR", nullable: false, onDelete: "CASCADE")]
+    
     private ?Reclamation $reclamation = null;
 
     public function getId(): ?int
@@ -64,4 +65,5 @@ class Reponse
         $this->reclamation = $reclamation;
         return $this;
     }
+    
 }
