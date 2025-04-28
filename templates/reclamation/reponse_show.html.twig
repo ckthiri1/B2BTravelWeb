@@ -3,7 +3,7 @@
 {% block stylesheets %}
     {{ parent() }}
     <style>
-        /* Navbar Styles */
+        /* Updated Navbar Styles */
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -164,7 +164,7 @@
             background-color: #28a745;
         }
 
-        /* Nouveaux styles pour le feedback PRO */
+        /* Feedback PRO Styles */
         .feedback-card {
             border: 1px solid #e0e0e0;
             border-radius: 10px;
@@ -297,40 +297,34 @@
             </div>
         </div>
 
-        {# Nouvelle section Feedback PRO #}
-          <div class="card mt-4 feedback-card">
+        <div class="card mt-4 feedback-card">
             <div class="card-header bg-info text-white">
                 <i class="fas fa-comment-alt"></i> Votre avis compte
             </div>
             <div class="card-body text-center">
-                
-                {# Message d'alerte #}
                 <div id="feedback-alert" class="alert d-none mb-4"></div>
-                
-                {# Titre #}
                 <h5 class="mb-4">Comment évaluez-vous cette réponse ?</h5>
                 
-                {# Conteneur des étoiles - Version visuelle pure #}
-                <div class="rating-container mb-4">
+                <div class="rating-container mb-4" id="rating-container">
                     {% for i in 5..1 %}
-                        <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" class="rating-input">
+                        <input type="radio" id="star{{ i }}" 
+                               name="rating" 
+                               value="{{ i }}" 
+                               class="rating-input">
                         <label for="star{{ i }}" class="rating-label" title="{{ i }} étoile{{ i > 1 ? 's' : '' }}">
                             <i class="fas fa-star"></i>
                         </label>
                     {% endfor %}
                 </div>
                 
-                {# Zone de commentaire #}
-                <textarea class="feedback-textarea mb-4" 
-                        placeholder="Votre commentaire..."></textarea>
+                <textarea class="feedback-textarea mb-4" id="feedback-comment" 
+                          placeholder="Votre commentaire..."></textarea>
                 
-                {# Bouton d'envoi #}
                 <button id="submit-feedback" class="submit-feedback">
                     <i class="fas fa-paper-plane me-2"></i>Envoyer
                 </button>
             </div>
         </div>
-
 
         <div class="mt-3">
             <a href="{{ path('app_reclamation_index') }}" class="btn btn-secondary">
@@ -344,16 +338,20 @@
             {% endif %}
         </div>
     </div>
+{% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const stars = document.querySelectorAll('.rating-input');
-            const textarea = document.querySelector('.feedback-textarea');
+            const textarea = document.getElementById('feedback-comment');
             const submitBtn = document.getElementById('submit-feedback');
             const alertBox = document.getElementById('feedback-alert');
             let selectedRating = 0;
+
+            // Vérifie si un feedback existe déjà
+            checkExistingFeedback();
 
             stars.forEach(star => {
                 star.addEventListener('change', function() {
@@ -384,7 +382,13 @@
 
                     if (response.ok) {
                         showAlert('Merci pour votre précieux feedback !', 'success');
-                        resetForm();
+                        // Désactive le formulaire après envoi
+                        document.querySelectorAll('.rating-input').forEach(star => {
+                            star.disabled = true;
+                        });
+                        textarea.disabled = true;
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<i class="fas fa-check me-2"></i>Feedback envoyé';
                     } else {
                         const error = await response.json();
                         showAlert(error.error || 'Erreur lors de l\'envoi', 'danger');
@@ -394,6 +398,29 @@
                 }
             });
 
+            async function checkExistingFeedback() {
+                try {
+                    const response = await fetch(`/api/feedback/check/{{ reponse.id }}`);
+                    const data = await response.json();
+                    
+                    if (data.hasFeedback) {
+                        // Affiche le feedback existant
+                        document.getElementById(`star${data.feedback.rating}`).checked = true;
+                        textarea.value = data.feedback.comment || '';
+                        selectedRating = data.feedback.rating;
+                        
+                        // Désactive le formulaire
+                        document.querySelectorAll('.rating-input').forEach(star => star.disabled = true);
+                        textarea.disabled = true;
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<i class="fas fa-check me-2"></i>Feedback déjà envoyé';
+                        submitBtn.style.opacity = '0.7';
+                    }
+                } catch (error) {
+                    console.error("Erreur lors de la vérification du feedback:", error);
+                }
+            }
+
             function showAlert(message, type) {
                 alertBox.textContent = message;
                 alertBox.className = `alert alert-${type} d-block`;
@@ -401,13 +428,6 @@
                     alertBox.classList.add('d-none');
                 }, 3000);
             }
-
-            function resetForm() {
-                stars.forEach(star => star.checked = false);
-                textarea.value = '';
-                selectedRating = 0;
-            }
         });
     </script>
-{% endblock %}
 {% endblock %}

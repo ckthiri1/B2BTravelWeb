@@ -2,11 +2,13 @@ framework:
     notifier:
         chatter_transports:
         texter_transports:
+            twilio: '%env(TWILIO_DSN)%'
         channel_policy:
             # use chat/slack, chat/telegram, sms/twilio or sms/nexmo
             urgent: ['email']
             high: ['email']
             medium: ['email']
             low: ['email']
+            sms: ['twilio']  # Ajoutez cette ligne pour diriger les notifications SMS vers Twilio
         admin_recipients:
-            - { email: admin@example.com }
+              - { email: admin@example.com, phone: '+21627185228' }  

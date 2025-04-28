@@ -10,10 +10,31 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
+use Psr\Log\LoggerInterface;
+use App\Service\SmsNotifier;
 
 #[Route('/reclamation')]
 class ReclamationController extends AbstractController
 {
+
+    private SmsNotifier $twilio;
+    
+
+    public function __construct(SmsNotifier $twilio)
+    {
+$this->twilio = $twilio;
+    }
+
+
+
+
+
+
+
+
+
     #[Route('/ReclamationList', name: 'app_reclamation_index', methods: ['GET'])]
     public function index(EntityManagerInterface $entityManager): Response
     {
@@ -38,7 +59,8 @@ class ReclamationController extends AbstractController
     public function new(
         Request $request, 
         EntityManagerInterface $entityManager,
-        ValidatorInterface $validator
+        ValidatorInterface $validator,
+        
     ): Response {
         $reclamation = new Reclamation();
         $form = $this->createForm(ReclamationType::class, $reclamation);
@@ -50,8 +72,12 @@ class ReclamationController extends AbstractController
             if (count($errors) === 0) {
                 $entityManager->persist($reclamation);
                 $entityManager->flush();
-    
-                $this->addFlash('success', 'Réclamation créée avec succès');
+                $this->twilio->sendSms("+21627185228","🚨 Nouvelle réclamation client !");
+
+                
+
+                
+                $this->addFlash('success', '🚨 Nouvelle réclamation client !');
                 return $this->redirectToRoute('app_reclamation_index');
             }
     
@@ -64,6 +90,7 @@ class ReclamationController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+
 #[Route('/{id}/edit', name: 'app_reclamation_edit', methods: ['GET', 'POST'])]
 public function edit(Request $request, Reclamation $reclamation, EntityManagerInterface $entityManager): Response
 {
