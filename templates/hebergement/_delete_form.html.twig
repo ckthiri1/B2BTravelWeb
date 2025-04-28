@@ -1,0 +1,39 @@
+{# _delete_form.html.twig #}
+
+<style>
+    .delete-btn {
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+        background-color: #dc3545;
+        border-color: #dc3545;
+        color: white;
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.25rem;
+    }
+    
+    .delete-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(220, 53, 69, 0.25);
+        background-color: #bb2d3b;
+        border-color: #b02a37;
+    }
+    
+    .delete-btn:active {
+        transform: translateY(0);
+    }
+    
+    .delete-btn i {
+        margin-right: 8px;
+    }
+</style>
+
+<form method="post" 
+      action="{{ path('app_hebergement_delete', {'id': hebergement.id}) }}" 
+      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet hébergement ?');"
+      class="d-inline">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ hebergement.id) }}">
+    <button class="delete-btn">
+        <i class="bi bi-trash"></i>Supprimer
+    </button>
+</form>

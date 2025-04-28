@@ -1,0 +1,353 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New User{% endblock %}
+
+{% block body %}
+<div class="layout-container">
+  <!-- Sidebar -->
+  <aside class="main-sidebar">
+    {% include '/Sidebar/Sidebar.twig' %}
+  </aside>
+
+  <!-- Main Content -->
+  <main class="content-wrapper">
+    <div class="content-header">
+      <h1>Create New User</h1>
+    </div>
+
+    <div class="content-body">
+      <div class="user-creation-container">
+        <!-- User Preview Card -->
+        <div class="user-preview">
+          <div class="preview-card">
+            <div class="preview-image">
+              <i class="fas fa-user-plus fa-5x"></i>
+            </div>
+            <h2 class="preview-name">New User</h2>
+            <div class="preview-rank">
+              <span class="rank-label">Rank:</span>
+              <span class="rank-value">New</span>
+            </div>
+            <div class="preview-actions">
+              <a href="{{ path('admin_user_index') }}" class="btn cancel-btn">Cancel</a>
+              <button type="submit" form="user-form" class="btn create-btn">Create User</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Creation Form -->
+        <div class="creation-form">
+          {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'id': 'user-form', 'class': 'needs-validation'}}) }}
+
+          <div class="form-section">
+            <div class="form-row">
+              {{ form_label(form.nom, 'Last Name', {'label_attr': {'class': 'form-label'}}) }}
+              <div class="form-input">
+                {{ form_widget(form.nom, {'attr': {'class': 'form-control', 'data-validate': 'true'}}) }}
+                <div class="invalid-feedback">
+                  {{ form_errors(form.nom) ? form_errors(form.nom) : 'Required field' }}
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              {{ form_label(form.prenom, 'First Name', {'label_attr': {'class': 'form-label'}}) }}
+              <div class="form-input">
+                {{ form_widget(form.prenom, {'attr': {'class': 'form-control', 'data-validate': 'true'}}) }}
+                <div class="invalid-feedback">
+                  {{ form_errors(form.prenom) ? form_errors(form.prenom) : 'Required field' }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Repeat similar structure for other fields -->
+            <!-- Email Field -->
+            <div class="form-row">
+              {{ form_label(form.email, 'Email', {'label_attr': {'class': 'form-label'}}) }}
+              <div class="form-input">
+                {{ form_widget(form.email, {'attr': {'class': 'form-control', 'data-validate': 'true'}}) }}
+                <div class="invalid-feedback">
+                  {{ form_errors(form.email) ? form_errors(form.email) : 'Valid email required' }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Role Field -->
+            <div class="form-row">
+              {{ form_label(form.role, 'Role', {'label_attr': {'class': 'form-label'}}) }}
+              <div class="form-input">
+                {{ form_widget(form.role, {'attr': {'class': 'form-select'}}) }}
+              </div>
+            </div>
+
+            <!-- Password Fields -->
+            <div class="form-row">
+              {{ form_label(form.plainPassword.first, 'Password', {'label_attr': {'class': 'form-label'}}) }}
+              <div class="form-input">
+                {{ form_widget(form.plainPassword.first, {'attr': {'class': 'form-control', 'data-validate': 'true'}}) }}
+                <div class="invalid-feedback">
+                  {{ form_errors(form.plainPassword.first) ? form_errors(form.plainPassword.first) : 'Required field' }}
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              {{ form_label(form.plainPassword.second, 'Repeat Password', {'label_attr': {'class': 'form-label'}}) }}
+              <div class="form-input">
+                {{ form_widget(form.plainPassword.second, {'attr': {'class': 'form-control', 'data-validate': 'true'}}) }}
+                <div class="invalid-feedback">
+                  {{ form_errors(form.plainPassword.second) ? form_errors(form.plainPassword.second) : 'Passwords must match' }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Profile Image -->
+            <div class="form-row">
+              {{ form_label(form.profileImage, 'Profile Image', {'label_attr': {'class': 'form-label'}}) }}
+              <div class="form-input">
+                {{ form_widget(form.profileImage, {'attr': {'class': 'form-control', 'data-validate': 'true'}}) }}
+                <small class="form-note">JPEG/PNG/GIF, max 2MB</small>
+                <div class="invalid-feedback">
+                  {{ form_errors(form.profileImage) ? form_errors(form.profileImage) : 'Image required' }}
+                </div>
+              </div>
+            </div>
+
+          </div>
+          {{ form_end(form) }}
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<style>
+/* Layout Structure */
+.layout-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-sidebar {
+  flex: 0 0 250px;
+  background: #2c3e50;
+  color: white;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+}
+
+.content-wrapper {
+  flex: 1;
+  background: #f8f9fa;
+  padding: 2rem;
+  margin-left: 10px;
+}
+
+/* Content Styling */
+.content-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.content-header h1 {
+  font-size: 2rem;
+  color: #2c3e50;
+}
+
+.user-creation-container {
+  display: flex;
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.user-preview {
+  flex: 0 0 300px;
+}
+
+.creation-form {
+  flex: 1;
+  min-width: 400px;
+}
+
+/* Preview Card */
+.preview-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.preview-image {
+  width: 140px;
+  height: 140px;
+  background: #f0f4f8;
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.preview-name {
+  font-size: 1.5rem;
+  margin: 1rem 0;
+}
+
+.preview-rank {
+  margin: 1.5rem 0;
+  padding: 1rem 0;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+}
+
+/* Form Styling */
+.form-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.form-row {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.form-select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background-color: white;
+}
+
+.form-note {
+  display: block;
+  margin-top: 0.5rem;
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+/* Buttons */
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.cancel-btn {
+  background: #e74c3c;
+  color: white;
+}
+
+.create-btn {
+  background: #3498db;
+  color: white;
+}
+
+.btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* Validation */
+.invalid-feedback {
+  color: #e74c3c;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: none;
+}
+
+.is-invalid {
+  border-color: #e74c3c !important;
+}
+
+.is-invalid + .invalid-feedback {
+  display: block;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('user-form');
+  const validateField = (field) => {
+    const feedback = field.parentNode.querySelector('.invalid-feedback');
+    
+    if (field.hasAttribute('data-validate')) {
+      // Check required fields
+      if (!field.value.trim()) {
+        field.classList.add('is-invalid');
+        feedback.style.display = 'block';
+        return false;
+      }
+      
+      // Email validation
+      if (field.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(field.value)) {
+        field.classList.add('is-invalid');
+        feedback.textContent = 'Please enter a valid email address';
+        feedback.style.display = 'block';
+        return false;
+      }
+      
+      // Password match validation
+      if (field.id.includes('_second') && field.value !== document.getElementById(field.id.replace('_second', '_first')).value) {
+        field.classList.add('is-invalid');
+        feedback.textContent = 'Passwords must match';
+        feedback.style.display = 'block';
+        return false;
+      }
+    }
+    
+    field.classList.remove('is-invalid');
+    feedback.style.display = 'none';
+    return true;
+  };
+
+  form.addEventListener('submit', function(e) {
+    let isValid = true;
+    
+    // Validate all fields
+    document.querySelectorAll('[data-validate="true"]').forEach(field => {
+      if (!validateField(field)) isValid = false;
+    });
+    
+    // Validate file input
+    const fileInput = form.querySelector('input[type="file"]');
+    if (fileInput && !fileInput.files.length) {
+      fileInput.classList.add('is-invalid');
+      fileInput.nextElementSibling.style.display = 'block';
+      isValid = false;
+    }
+    
+    if (!isValid) e.preventDefault();
+  });
+
+  // Real-time validation
+  document.querySelectorAll('[data-validate="true"]').forEach(field => {
+    field.addEventListener('input', () => validateField(field));
+  });
+});
+</script>
+{% endblock %}

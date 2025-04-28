@@ -95,51 +95,34 @@ final class VoyageController extends AbstractController
 
     }
 
-    #[Route('/new', name: 'app_voyage_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $voyage = new Voyage();
-        $form = $this->createForm(VoyageType::class, $voyage);
-        $form->handleRequest($request);
-    
-        if ($form->isSubmitted() && $form->isValid()) {
-            $depart = $voyage->getDepart();
-            $destination = $voyage->getDestination();
-    
-            // Validate empty fields
-            if (!$depart || !$destination) {
-                $this->addFlash('error', 'Tous les champs sont obligatoires.');
-            } 
-            // Validate same departure and destination
-            elseif ($depart === $destination) {
-                $this->addFlash('error', 'Le lieu de départ et d\'arrivée ne peuvent pas être identiques.');
-            }
-            // Check if the voyage already exists
-            else {
-                $existingVoyage = $entityManager->getRepository(Voyage::class)
-                    ->findOneBy(['depart' => $depart, 'Destination' => $destination]);
-    
-                if ($existingVoyage) {
-                    $this->addFlash('error', 'Ce voyage existe déjà dans la base de données.');
-                } else {
-                    // Save the voyage if it doesn't exist
-                    $entityManager->persist($voyage);
-                    $entityManager->flush();
-                    $this->addFlash('success', 'Voyage ajouté avec succès !');
-    
-                    return $this->redirectToRoute('app_voyage_index', [], Response::HTTP_SEE_OTHER);
-                }
-            }
-        }
-    
-        return $this->render('voyage/CreateVoyage.twig', [
-            'voyage' => $voyage,
-            'form' => $form->createView(),
-        ]);
-    }
-    
-    
+ #[Route('/new', name: 'app_voyage_new', methods: ['GET', 'POST'])]
+public function new(Request $request, EntityManagerInterface $entityManager): Response
+{
+    $voyage = new Voyage();
+    $form = $this->createForm(VoyageType::class, $voyage);
+    $form->handleRequest($request);
 
+    if ($form->isSubmitted() && $form->isValid()) {
+        // Check if the voyage already exists
+        $existingVoyage = $entityManager->getRepository(Voyage::class)
+            ->findOneBy(['depart' => $voyage->getDepart(), 'Destination' => $voyage->getDestination()]);
+
+        if ($existingVoyage) {
+            $this->addFlash('error', 'Ce voyage existe déjà dans la base de données.');
+        } else {
+            $entityManager->persist($voyage);
+            $entityManager->flush();
+            $this->addFlash('success', 'Voyage ajouté avec succès !');
+            return $this->redirectToRoute('app_voyage_index');
+        }
+    }
+
+    return $this->render('voyage/CreateVoyage.twig', [
+        'voyage' => $voyage,
+        'form' => $form->createView(),
+    ]);
+}
+    
     #[Route('/{VID}', name: 'app_voyage_show', methods: ['GET'])]
     public function show(Voyage $voyage): Response
     {
@@ -148,7 +131,7 @@ final class VoyageController extends AbstractController
         ]);
     }
 
-    #[Route('/voyage/update/{id}', name: 'app_voyage_update', methods: ['GET', 'POST'])]
+    #[Route('/update/{id}', name: 'app_voyage_update', methods: ['GET', 'POST'])]
     public function updateVoyage(
         Request $request, 
         Voyage $voyage, 
@@ -157,24 +140,41 @@ final class VoyageController extends AbstractController
         $form = $this->createForm(VoyageType::class, $voyage);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Check if voyage already exists
-            $existingVoyage = $entityManager->getRepository(Voyage::class)
-                ->findOneBy([
-                    'depart' => $voyage->getDepart(),
-                    'Destination' => $voyage->getDestination()
-                ]);
+        if ($form->isSubmitted()) {
+            // Ensure fields are not null
+            if ($voyage->getDepart() === null) {
+                $voyage->setDepart('');
+            }
+            
+            if ($voyage->getDestination() === null) {
+                $voyage->setDestination('');
+            }
+            
+            if ($voyage->getDescription() === null) {
+                $voyage->setDescription('');
+            }
+            
+            if ($form->isValid()) {
+                // Check if voyage already exists
+                $existingVoyage = $entityManager->getRepository(Voyage::class)
+                    ->findOneBy([
+                        'depart' => $voyage->getDepart(),
+                        'Destination' => $voyage->getDestination()
+                    ]);
 
-            if ($existingVoyage && $existingVoyage->getVid() !== $voyage->getVid()) {
-                $this->addFlash('error', 'This voyage already exists!');
+                if ($existingVoyage && $existingVoyage->getVid() !== $voyage->getVid()) {
+                    $this->addFlash('error', 'Ce voyage avec le même départ et la même destination existe déjà.');
+                    return $this->render('voyage/UpdateVoyage.twig', [
+                        'form' => $form->createView(),
+                        'voyage' => $voyage
+                    ]);
+                }
+
+                $entityManager->flush();
+
+                $this->addFlash('success', 'Le voyage a été mis à jour avec succès.');
                 return $this->redirectToRoute('app_voyage_index');
             }
-
-            $entityManager->persist($voyage);
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Voyage updated successfully!');
-            return $this->redirectToRoute('app_voyage_index');
         }
 
         return $this->render('voyage/UpdateVoyage.twig', [
@@ -194,9 +194,4 @@ final class VoyageController extends AbstractController
         return $this->redirectToRoute('app_voyage_index', [], Response::HTTP_SEE_OTHER);
     }
 
-  
-
-    
-  
-    
 }

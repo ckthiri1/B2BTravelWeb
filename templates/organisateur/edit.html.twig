@@ -1,0 +1,107 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier un organisateur{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .form-wrapper {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #1a237e;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #1a237e;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        .btn {
+            background-color: #1a237e;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background-color: #303f9f;
+        }
+
+        .return-link {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            color: #1a237e;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .return-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="sidebar">
+        <div class="logo">
+            <img src="{{ asset('images/LogoDashboard.jpg') }}" alt="Logo B2B Travel">
+        </div>
+        <ul class="nav">
+            <li><a href="{{ path('organisateur_index') }}"><i class="fas fa-home"></i> Accueil</a></li>
+            <li><a href="#"><i class="fas fa-envelope"></i> Contact</a></li>
+        </ul>
+        <a href="#" class="logout-btn">Déconnexion</a>
+    </div>
+
+    <div class="dashboard-content">
+        <h1>Modifier l’organisateur</h1>
+
+        <div class="form-wrapper">
+            {{ form_start(form) }}
+                <div class="form-group">
+                    {{ form_label(form.nomOr) }}
+                    {{ form_widget(form.nomOr) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(form.contact) }}
+                    {{ form_widget(form.contact) }}
+                </div>
+
+                <button class="btn">Enregistrer les modifications</button>
+            {{ form_end(form) }}
+
+            <a href="{{ path('organisateur_index') }}" class="return-link">← Retour à la liste</a>
+        </div>
+    </div>
+{% endblock %}

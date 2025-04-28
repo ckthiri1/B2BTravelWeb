@@ -19,15 +19,34 @@
         </div>
         <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
     </div>
-    <div class="navbar-menu">
-        <a href="{{ path('app_home') }}" class="nav-button">HOME</a>
-        <a href="{{ path('app_fidelite') }}" class="nav-button">FIDELITE</a>
-        <a href="{{ path('app_voyage_index') }}" class="nav-button">RECLAMATION</a>
-        <a href="{{ path('app_voyage_index') }}" class="nav-button">PROFIL</a>
-         <a href="{{ path('app_voyage_index') }}" class="nav-button">EVENEMENT</a>
-        <a href="{{ path('reservation_page') }}" class="nav-button">RESERVATION</a>
-       
-    </div>
+<div class="navbar-menu">
+    <a href="{{ path('app_home') }}" class="nav-button transition-link">
+        <span class="nav-icon"><i class="fas fa-home"></i></span>
+        <span class="nav-text">HOME</span>
+    </a>
+    <a href="{{ path('app_fidelite') }}" class="nav-button transition-link">
+        <span class="nav-icon"><i class="fas fa-gem"></i></span>
+        <span class="nav-text">FIDELITE</span>
+    </a>
+    <a href="{{ path('app_reclamation_index') }}" class="nav-button transition-link">
+        <span class="nav-icon"><i class="fas fa-bullhorn"></i></span>
+        <span class="nav-text">RECLAMATION</span>
+    </a>
+    <a href="{{ path('profile') }}" class="nav-button transition-link">
+        <span class="nav-icon"><i class="fas fa-user"></i></span>
+        <span class="nav-text">PROFIL</span>
+    </a>
+    <a href="#" class="nav-button transition-link">
+        <span class="nav-icon"><i class="fas fa-calendar-alt"></i></span>
+        <span class="nav-text">EVENEMENT</span>
+    </a>
+    <a href="{{ path('reservation_page') }}" class="nav-button transition-link">
+        <span class="nav-icon"><i class="fas fa-calendar-check"></i></span>
+        <span class="nav-text">RESERVATION</span>
+    </a>
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </nav>
 
 <script>

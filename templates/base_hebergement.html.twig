@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Gestion Hôtelière{% endblock %}</title>
+    <link rel="icon" href="{{ asset('favicon.ico') }}">
+    
+    {% block stylesheets %}
+        {{ encore_entry_link_tags('app') }}
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+       <style>
+    :root[data-theme="light"] {
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8f9fa;
+        --text-primary: #333333;
+        --text-secondary: #666666;
+        --border-color: #dee2e6;
+        --navy-blue: #13117D;
+        --navy-blue-dark: #0e0c5f;
+        --card-bg: #ffffff;
+        --modal-bg: #ffffff;
+        --hover-bg: #f0f0f0;
+        --sidebar-bg: #13117D;
+        --sidebar-width: 280px;
+    }
+
+    :root[data-theme="dark"] {
+        --bg-primary: #1a1a2e;
+        --bg-secondary: #16213e;
+        --text-primary: #ffffff;
+        --text-secondary: #b3b3b3;
+        --border-color: #2d3748;
+        --navy-blue: #13117D;
+        --navy-blue-dark: #0e0c5f;
+        --card-bg: #242444;
+        --modal-bg: #242444;
+        --hover-bg: #2d2d50;
+        --sidebar-bg: #13117D;
+        --sidebar-width: 280px;
+    }
+
+    body {
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+        transition: all 0.3s ease;
+        margin: 0;
+        padding: 0;
+    }
+
+    .card {
+        background-color: var(--card-bg);
+        border-color: var(--border-color);
+    }
+
+    .modal-content {
+        background-color: var(--modal-bg);
+        color: var(--text-primary);
+    }
+
+    .table {
+        color: var(--text-primary);
+    }
+
+    .form-control, .form-select {
+        background-color: var(--bg-secondary);
+        border-color: var(--border-color);
+        color: var(--text-primary);
+    }
+
+    .form-control:focus, .form-select:focus {
+        background-color: var(--bg-secondary);
+        color: var(--text-primary);
+    }
+
+    .nav-link {
+        color: var(--text-primary);
+    }
+
+    .theme-toggle {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+        background-color: var(--navy-blue);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        transition: all 0.3s ease;
+    }
+
+    .theme-toggle:hover {
+        background-color: var(--navy-blue-dark);
+        transform: scale(1.1);
+    }
+
+    /* FullCalendar Dark Mode Styles */
+    .fc {
+        background-color: var(--card-bg);
+        border-color: var(--border-color);
+    }
+
+    .fc-theme-standard td, .fc-theme-standard th {
+        border-color: var(--border-color);
+    }
+
+    .fc-day-today {
+        background-color: var(--navy-blue) !important;
+        opacity: 0.1;
+    }
+
+    .fc-daygrid-day-number {
+        color: var(--text-primary);
+    }
+
+    /* Custom scrollbar for dark mode */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: var(--bg-secondary);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--navy-blue);
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--navy-blue-dark);
+    }
+
+    .dashboard-container {
+        display: flex;
+        min-height: 100vh;
+        background-color: var(--bg-primary);
+    }
+
+    .sidebar {
+        width: var(--sidebar-width);
+        min-height: 100vh;
+        background: var(--sidebar-bg);
+        position: fixed;
+        left: 0;
+        top: 0;
+        display: flex;
+        flex-direction: column;
+        z-index: 1000;
+        box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar-header {
+        padding: 1.5rem;
+        text-align: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar-header img {
+        width: 180px;
+        height: auto;
+    }
+
+    .sidebar-nav {
+        padding: 1rem 0.75rem;
+    }
+
+    .sidebar .nav-link {
+        display: flex;
+        align-items: center;
+        color: rgba(255, 255, 255, 0.8);
+        padding: 0.75rem 1.25rem;
+        margin: 0.25rem 0;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .sidebar .nav-link:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: #ffffff;
+        transform: translateX(5px);
+    }
+
+    .sidebar .nav-link.active {
+        background: rgba(255, 255, 255, 0.15);
+        color: #ffffff;
+        font-weight: 500;
+    }
+
+    .sidebar .nav-link i {
+        margin-right: 10px;
+        font-size: 1.1rem;
+    }
+
+    .main-content {
+        margin-left: var(--sidebar-width);
+        padding: 2rem;
+        flex: 1;
+        min-height: 100vh;
+        background-color: var(--bg-primary);
+    }
+
+    .content-card {
+        background: var(--card-bg);
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin-top: 1.5rem;
+    }
+
+    [data-theme="dark"] .content-card {
+        background: var(--card-bg);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    [data-theme="dark"] .main-content {
+        background-color: var(--bg-primary);
+    }
+
+    [data-theme="dark"] .sidebar {
+        background: var(--sidebar-bg);
+    }
+
+    [data-theme="dark"] .sidebar .nav-link {
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    [data-theme="dark"] .sidebar .nav-link:hover,
+    [data-theme="dark"] .sidebar .nav-link.active {
+        background: rgba(255, 255, 255, 0.15);
+        color: #ffffff;
+    }
+
+    .sidebar-footer {
+        margin-top: auto;
+        padding: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar-footer .btn-outline-light {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .sidebar-footer .btn-outline-light:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+    }
+
+    @media (max-width: 992px) {
+        .sidebar {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+        .main-content {
+            margin-left: 0;
+            padding: 1rem;
+        }
+    }
+
+    /* Ajustements pour le thème sombre */
+    [data-theme="dark"] .alert {
+        background-color: var(--card-bg);
+        border-color: var(--border-color);
+        color: var(--text-primary);
+    }
+
+    [data-theme="dark"] .container-fluid {
+        background-color: var(--bg-primary);
+    }
+</style>
+    {% endblock %}
+
+    {% block javascripts %}
+        {{ encore_entry_script_tags('app') }}
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const sidebarToggle = document.querySelector('.sidebar-toggle');
+                const sidebar = document.querySelector('.sidebar');
+                
+                if(sidebarToggle && sidebar) {
+                    sidebarToggle.addEventListener('click', () => {
+                        sidebar.classList.toggle('active');
+                    });
+                }
+            });
+        </script>
+    {% endblock %}
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header text-center py-4">
+                <img src="{{ asset('images/LogoDashboard.jpg') }}" alt="Logo" style="width: 180px;">
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a href="{{ path('app_reservation_hebergement_index') }}" 
+                           class="nav-link {% if app.request.attributes.get('_route') starts with 'app_reservation' %}active{% endif %}">
+                            <i class="bi bi-calendar-check"></i>
+                            <span class="ms-2">Gestion Réservation</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ path('admin_user_index') }}" class="nav-link">
+                            <i class="bi bi-person"></i>
+                            <span class="ms-2">Gestion Utilisateur</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ path('app_controller_rank_index') }}" class="nav-link">
+                            <i class="bi bi-gift"></i>
+                            <span class="ms-2">Gestion Fidélité</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ path('EvennementHome') }}" class="nav-link">
+                            <i class="bi bi-calendar-event"></i>
+                            <span class="ms-2">Gestion Événement</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ path('admin_reclamations') }}" class="nav-link">
+                            <i class="bi bi-exclamation-circle"></i>
+                            <span class="ms-2">Gestion Réclamation</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ path('app_voyage_index') }}" class="nav-link">
+                            <i class="bi bi-airplane"></i>
+                            <span class="ms-2">Gestion Voyage</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer mt-auto p-3">
+                <a href="{{ path('app_logout') }}" class="btn btn-outline-light w-100">
+                    <i class="bi bi-box-arrow-left"></i>
+                    Déconnexion
+                </a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="container-fluid mt-4">
+                {% for message in app.flashes('success') %}
+                    <div class="alert alert-success alert-dismissible fade show mb-4">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+
+                <div class="content-card">
+                    {% block body %}{% endblock %}
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="bg-dark text-white py-3 mt-auto">
+        <div class="container text-center">
+            <p class="mb-0 small">&copy; {{ 'now'|date('Y') }} Hôtel Manager Pro. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <!-- Bouton de basculement du thème -->
+    <button class="theme-toggle" id="themeToggle">
+        <i class="bi bi-moon-fill"></i>
+    </button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('themeToggle');
+            const html = document.documentElement;
+            const icon = themeToggle.querySelector('i');
+
+            // Charger le thème depuis le localStorage
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            html.setAttribute('data-theme', savedTheme);
+            updateIcon(savedTheme === 'dark');
+
+            themeToggle.addEventListener('click', function() {
+                const currentTheme = html.getAttribute('data-theme');
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                
+                html.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                updateIcon(newTheme === 'dark');
+            });
+
+            function updateIcon(isDark) {
+                icon.className = isDark ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+            }
+        });
+    </script>
+</body>
+</html>

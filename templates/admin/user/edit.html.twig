@@ -1,0 +1,334 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit User{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .main-container {
+            margin-left: 250px;
+            padding: 20px;
+            min-height: 100vh;
+            background-color: #f5f7fa;
+        }
+
+        .edit-profile-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .profile-sidebar {
+            width: 300px;
+            background: #fff;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+        }
+
+        .profile-image-container {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .profile-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #3498db;
+            padding: 3px;
+            transition: transform 0.3s ease;
+        }
+
+        .profile-image:hover {
+            transform: scale(1.05);
+        }
+
+        .user-name {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .rank-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            background: linear-gradient(45deg, #ffd700, #ffa500);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .edit-form-container {
+            flex: 1;
+            min-width: 300px;
+            background: #fff;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-title {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-title i {
+            color: #3498db;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.95rem;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            color: #2c3e50;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+        }
+
+        .form-input:focus {
+            border-color: #3498db;
+            background-color: #fff;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            outline: none;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            color: #2c3e50;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 1em;
+        }
+
+        .form-select:focus {
+            border-color: #3498db;
+            background-color: #fff;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            outline: none;
+        }
+
+        .form-error {
+            color: #e74c3c;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        .form-help {
+            color: #7f8c8d;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        .form-actions {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #2c3e50;
+            border: 2px solid #e0e0e0;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        
+
+        @media (max-width: 768px) {
+            .main-container {
+                margin-left: 0;
+                padding: 10px;
+            }
+
+            .edit-profile-container {
+                flex-direction: column;
+            }
+
+            .profile-sidebar {
+                width: 100%;
+                position: relative;
+                top: 0;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+{{ include('/Sidebar/SideBar.twig') }}
+<div class="main-container">
+    <div class="edit-profile-container">
+        <!-- Sidebar -->
+        <div class="profile-sidebar">
+            <div class="profile-image-container">
+                {% if user.imageUrl %}
+                    <img src="{{ asset(user.imageUrl) }}" alt="Profile Picture" class="profile-image">
+                {% else %}
+                    <div class="profile-image-placeholder">
+                        <i class="fas fa-user-circle" style="font-size: 150px; color: #bdc3c7;"></i>
+                    </div>
+                {% endif %}
+                <h2 class="user-name">{{ user.prenom }} {{ user.nom }}</h2>
+                <div class="rank-badge">
+                    <i class="fas fa-crown"></i> Gold Member
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Form -->
+        <div class="edit-form-container">
+            <h1 class="form-title">
+                <i class="fas fa-user-edit"></i> Modifier le profil
+            </h1>
+
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'class': 'edit-form'}}) }}
+                <div class="form-grid">
+                    <div class="form-group">
+                        {{ form_label(form.nom, 'Nom', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.nom, {'attr': {'class': 'form-input'}}) }}
+                        <div class="form-error">
+                            {{ form_errors(form.nom) }}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        {{ form_label(form.prenom, 'Prénom', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.prenom, {'attr': {'class': 'form-input'}}) }}
+                        <div class="form-error">
+                            {{ form_errors(form.prenom) }}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        {{ form_label(form.email, 'Email', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.email, {'attr': {'class': 'form-input'}}) }}
+                        <div class="form-error">
+                            {{ form_errors(form.email) }}
+                        </div>
+                    </div>
+
+                   <div class="form-group">
+                    {{ form_label(form.role, 'Rôle', {'label_attr': {'class': 'form-label'}}) }}
+                        <div class="form-select-wrapper">
+                        {{ form_widget(form.role, {'attr': {'class': 'form-select'}}) }}
+                        </div>
+                        <div class="form-error">
+                            {{ form_errors(form.role) }}
+                         </div>
+                    </div>
+
+                    <div class="form-group">
+                        {{ form_label(form.plainPassword, 'Mot de passe', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.plainPassword, {'attr': {'class': 'form-input', 'placeholder': 'Laisser vide pour ne pas changer'}}) }}
+                        <div class="form-help">Laisser vide pour ne pas changer le mot de passe</div>
+                        <div class="form-error">
+                            {{ form_errors(form.plainPassword) }}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        {{ form_label(form.profileImage, 'Image de profil', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.profileImage, {'attr': {'class': 'form-input'}}) }}
+                        <div class="form-help">Formats acceptés: JPEG/PNG (max 2MB)</div>
+                        <div class="form-error">
+                            {{ form_errors(form.profileImage) }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <a href="{{ path('admin_user_index', {'userId': user.userId}) }}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Annuler
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Enregistrer
+                    </button>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

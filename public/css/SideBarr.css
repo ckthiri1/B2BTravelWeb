@@ -1,13 +1,21 @@
 /* Sidebar */
 .sidebar {
     width: 250px; 
-    height: 100vh; 
+    height: 100%; 
     background-color: #13117D;
     color: white;
     padding-top: 20px;
     position: fixed; 
     left: 0;
     top: 0;
+    overflow-y: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 0;
+    height: 0;
 }
 
 /* Logo */
@@ -24,11 +32,20 @@
     padding: 0;
     width: 100%;
     margin-top: 5px; 
+    max-height: calc(95% - 200px);
+    overflow-y: auto;
+    scrollbar-width: none; 
+    -ms-overflow-style: none; 
+}
+
+.sidebar .nav::-webkit-scrollbar {
+    width: 0;
+    height: 0;
 }
 
 .sidebar .nav li {
     width: 80%;
-    padding: 11px; /* Ajustement du padding pour un meilleur look */
+    padding: 11px; 
     margin: 4% auto;
     text-align: left;
     background-color: #03045f;
@@ -50,13 +67,12 @@
     border-radius: 10px;
     padding-left: 25px;
     text-align: left;
-    
 }
+
 .sidebar .nav li a i {
     margin-right: 10px; /* Augmente l'espace entre l'icône et le texte */
     font-size: 16px; /* Taille de l'icône */
 }
-
 
 .sidebar .nav li:hover,
 .sidebar .nav li a:hover {
@@ -66,9 +82,12 @@
 }
 
 .logout-btn {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
     display: block;
     text-align: center;
-    margin: 13% auto;
     padding: 10px;
     background: white;
     color: black;

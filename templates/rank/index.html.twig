@@ -3,6 +3,124 @@
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href="{{ asset('css/ListVoyage.css') }}">
+    <style>.sorting-options {
+    margin: 20px 0 30px 60px; /* Match left margin with other elements */
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.sort-label {
+    font-weight: bold;
+    margin-right: 10px;
+    color: var(--primary-blue); /* Use your primary blue color */
+    font-size: 18px;
+}
+
+.sort-btn, .add-voyage-btn {
+    padding: 10px 20px;
+    background-color: var(--white);
+    color: var(--primary-blue);
+    border: 2px solid var(--primary-blue);
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+    font-weight: bold;
+    font-size: 16px;
+    text-decoration: none;
+}
+
+.sort-btn:hover, .add-voyage-btn:hover {
+    background-color: var(--primary-blue);
+    color: var(--white);
+    transform: scale(1.05);
+}
+
+.sort-btn i, .add-voyage-btn i {
+    font-size: 16px;
+}
+
+.voyage-points {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--white); /* White text to match card style */
+    background-color: rgba(255, 255, 255, 0.2); /* Semi-transparent white background */
+    padding: 5px 15px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-top: 10px;
+}
+.search-container {
+    margin: 0 0 20px 60px;
+    width: 50%;
+    position: relative;
+}
+
+.search-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+#rank-search {
+    padding: 12px 20px;
+    width: 100%;
+    border: 2px solid var(--primary-blue);
+    border-radius: 10px;
+    font-size: 16px;
+    outline: none;
+    transition: all 0.3s;
+}
+
+#rank-search:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 5px rgba(3, 4, 95, 0.3);
+}
+
+.search-btn {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--primary-blue);
+    font-size: 16px;
+}
+
+.autocomplete-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 0 0 10px 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+}
+
+.autocomplete-results div {
+    padding: 10px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+.autocomplete-results div:hover {
+    background-color: #f5f5f5;
+}
+
+.autocomplete-results div:last-child {
+    border-bottom: none;
+}
+
+/* If you're using Font Awesome icons, add this */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
+    </style>
 {% endblock %}
 
 {% block title %}Rank Index{% endblock %}
@@ -16,8 +134,39 @@
         <h1 class="page-title">RANK LIST</h1>
 
         <button class="add-voyage-btn" onclick="window.location.href='{{ path('app_controller_rank_new') }}'">
-            CREATE NEW RANK
+           <i class="fas fa-plus"></i> CREATE NEW RANK
         </button>
+
+        <div class="search-container">
+    <form id="search-form" method="get" action="{{ path('app_controller_rank_index') }}">
+        <div class="search-input-container">
+            <input type="text" 
+                   id="rank-search" 
+                   name="search" 
+                   placeholder="Search ranks..." 
+                   value="{{ searchTerm ?? '' }}"
+                   autocomplete="off">
+            <button type="submit" class="search-btn">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+        <div id="autocomplete-results" class="autocomplete-results"></div>
+    </form>
+</div>
+        <div class="sorting-options">
+            <span class="sort-label">Sort by Points:</span>
+            <button class="sort-btn" onclick="window.location.href='{{ path('app_controller_rank_index', {'sort': 'asc'}) }}'">
+                <i class="fas fa-sort-amount-up"></i> Ascending
+            </button>
+            <button class="sort-btn" onclick="window.location.href='{{ path('app_controller_rank_index', {'sort': 'desc'}) }}'">
+                <i class="fas fa-sort-amount-down"></i> Descending
+            </button>
+             <button class="sort-btn" onclick="window.location.href='{{ path('app_controller_rank_export_pdf', {'sort': app.request.query.get('sort'), 'search': app.request.query.get('search')}) }}'">
+        <i class="fas fa-file-pdf"></i> Export to PDF
+    </button>
+        </div>
+
+
 
         <div class="voyage-container">
             {% for rank in ranks %}
@@ -26,9 +175,11 @@
                     <div class="voyage-details">
                         <div class="voyage-departure">
                             <img src="{{ asset('images/star.png') }}" alt="Star" class="star-icon">
-                            Rank Name:     {{ rank.NomRank }}
+                            Rank Name: {{ rank.NomRank }}
                         </div>
-                      
+                        <div class="voyage-points">
+                            Points: {{ rank.points }}
+                        </div>
                     </div>
                     <div class="voyage-actions">
                         <button class="btn btn-check-vol" onclick="window.location.href='{{ path('app_controller_rank_show', {'IDRang': rank.IDRang}) }}'">
@@ -38,8 +189,8 @@
                             EDIT
                         </button>
                         <button class="btn btn-danger delete-action-btn">
-    <i class="icon-delete">🗑️</i> Supprimer
-</button>
+                            <i class="icon-delete">🗑️</i> Supprimer
+                        </button>
                         {{ include('rank/_delete_form.html.twig') }}
                     </div>
                 </div>
@@ -49,4 +200,69 @@
         </div>
     </div>
 </div>
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('rank-search');
+            const autocompleteResults = document.getElementById('autocomplete-results');
+            let timeoutId;
+            
+            // Handle search input
+            searchInput.addEventListener('input', function() {
+                clearTimeout(timeoutId);
+                const searchTerm = this.value.trim();
+                
+                if (searchTerm.length > 1) {
+                    timeoutId = setTimeout(() => {
+                        fetchAutocompleteResults(searchTerm);
+                    }, 300);
+                } else {
+                    autocompleteResults.style.display = 'none';
+                }
+            });
+            
+            // Handle click on autocomplete results
+            autocompleteResults.addEventListener('click', function(e) {
+                if (e.target && e.target.nodeName === 'DIV') {
+                    searchInput.value = e.target.textContent;
+                    document.getElementById('search-form').submit();
+                }
+            });
+            
+            // Close autocomplete when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !autocompleteResults.contains(e.target)) {
+                    autocompleteResults.style.display = 'none';
+                }
+            });
+            
+            function fetchAutocompleteResults(searchTerm) {
+                fetch(`{{ path('app_controller_rank_index') }}?search=${encodeURIComponent(searchTerm)}`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        autocompleteResults.innerHTML = '';
+                        data.forEach(item => {
+                            const div = document.createElement('div');
+                            div.textContent = item.text;
+                            autocompleteResults.appendChild(div);
+                        });
+                        autocompleteResults.style.display = 'block';
+                    } else {
+                        autocompleteResults.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    autocompleteResults.style.display = 'none';
+                });
+            }
+        });
+    </script>
+{% endblock %}
 {% endblock %}

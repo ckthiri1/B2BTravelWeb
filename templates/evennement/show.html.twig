@@ -1,0 +1,152 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails de l’Évènement{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f1f4f8;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 850px;
+            margin: 50px auto;
+            background: #fff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            color: #1a237e;
+            font-size: 28px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .detail-item {
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .detail-item strong {
+            color: #1a237e;
+        }
+
+        h3 {
+            margin-top: 40px;
+            color: #1a237e;
+            font-size: 20px;
+        }
+
+        canvas {
+            border: 2px solid #1a237e;
+            border-radius: 8px;
+            background-color: #fefefe;
+            width: 100%;
+            max-width: 100%;
+            height: 200px;
+            display: block;
+            margin: 15px 0;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+
+        button {
+            background-color: #1a237e;
+            color: #fff;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0d164f;
+        }
+
+        button:first-of-type {
+            background-color: #f44336;
+        }
+
+        button:first-of-type:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>Détails de l’Évènement</h1>
+
+    <div class="detail-item"><strong>Nom :</strong> {{ evennement.nomE }}</div>
+    <div class="detail-item"><strong>Lieu :</strong> {{ evennement.local }}</div>
+    <div class="detail-item"><strong>Date :</strong> {{ evennement.dateE|date('Y-m-d H:i') }}</div>
+    <div class="detail-item"><strong>Description :</strong> {{ evennement.desE }}</div>
+    <div class="detail-item"><strong>Type :</strong> {{ evennement.eventType }}</div>
+    <div class="detail-item"><strong>Organisateur :</strong> {{ evennement.idOr.nomOr }} ({{ evennement.idOr.contact }})</div>
+
+    <h3>Signature :</h3>
+    <canvas id="signature-pad" width="600" height="200"></canvas>
+
+    <div class="btn-group">
+        <button onclick="clearSignature()">
+            <i class="fas fa-eraser"></i> Effacer
+        </button>
+        <button onclick="submitSignature()">
+            <i class="fas fa-file-export"></i> Exporter avec Signature
+        </button>
+    </div>
+
+    <form id="export-form" method="post" action="{{ path('evennement_export_signed_pdf', { id: evennement.id }) }}">
+        <input type="hidden" name="signature" id="signature-data">
+    </form>
+</div>
+
+<script>
+    const canvas = document.getElementById('signature-pad');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+
+    canvas.addEventListener('mousedown', () => drawing = true);
+    canvas.addEventListener('mouseup', () => {
+        drawing = false;
+        ctx.beginPath();
+    });
+    canvas.addEventListener('mouseleave', () => drawing = false);
+    canvas.addEventListener('mousemove', draw);
+
+    function draw(e) {
+        if (!drawing) return;
+        const rect = canvas.getBoundingClientRect();
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = '#1a237e';
+        ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    }
+
+    function clearSignature() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.beginPath();
+    }
+
+    function submitSignature() {
+        const dataUrl = canvas.toDataURL();
+        document.getElementById('signature-data').value = dataUrl;
+        document.getElementById('export-form').submit();
+    }
+</script>
+{% endblock %}

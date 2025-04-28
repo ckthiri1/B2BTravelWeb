@@ -3,7 +3,9 @@
 {% block title %}Ajouter Voyage{% endblock %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset('css/CreateVoyage.css') }}">
+{{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/voyageadd.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 {% endblock %}
 
 {% block body %}
@@ -12,86 +14,156 @@
 
     <div class="main-content">
         <div class="container">
-            <h1 class="page-title">AJOUTER VOYAGE</h1>
+            <h1 class="page-title"><i class="fas fa-plane-departure"></i>AJOUTER VOYAGE</h1>
 
             <!-- 🚨 ALERTS SECTION -->
             {% for message in app.flashes('error') %}
                 <div class="alert error-alert">
-                    {{ message }}
+                    <i class="fas fa-exclamation-circle"></i>{{ message }}
                 </div>
             {% endfor %}
 
             {% for message in app.flashes('success') %}
                 <div class="alert success-alert">
-                    {{ message }}
+                    <i class="fas fa-check-circle"></i>{{ message }}
                 </div>
             {% endfor %}
             <!-- 🚨 END ALERTS SECTION -->
 
             <div class="voyage-form-container">
-                <form method="post" action="{{ path('app_voyage_new') }}">
-                    {{ form_start(form) }}
-
-                    <div class="form-section">
-                        <label class="form-label">LIEU DE DÉPART</label>
-                        <div>
-                            {{ form_widget(form.depart, { 'attr': {'class': 'select-input', 'required': 'required'} }) }}
-                            <div class="error-message">
-                                {{ form_errors(form.depart) }}
-                            </div>
-                        </div>
+                <!-- Form Progress Indicator -->
+                <div class="form-progress">
+                    <div class="progress-step active">
+                        <div class="step-icon">1</div>
+                        <div class="step-text">Destinations</div>
                     </div>
-
-                    <div class="form-section">
-                        <label class="form-label">LIEU D'ARRIVÉE</label>
-                        <div>
-                            {{ form_widget(form.Destination, { 'attr': {'class': 'select-input', 'required': 'required'} }) }}
-                            <div class="error-message">
-                                {{ form_errors(form.Destination) }}
-                            </div>
-                            <button type="button" class="generate-description-btn">
-                                GÉNÉRER DESCRIPTION (IA)
-                            </button>
-                        </div>
+                    <div class="progress-step">
+                        <div class="step-icon">2</div>
+                        <div class="step-text">Description</div>
                     </div>
-
-                    <div class="form-section">
-                        <label class="form-label">DESCRIPTION DE VOYAGE</label>
-                        <div>
-                            {{ form_widget(form.Description, { 'attr': {'class': 'description-textarea', 'placeholder': 'Entrer La Description Du Voyage Ici...'} }) }}
-                            <div class="error-message">
-                                {{ form_errors(form.Description) }}
-                            </div>
-                        </div>
+                    <div class="progress-step">
+                        <div class="step-icon">3</div>
+                        <div class="step-text">Confirmation</div>
                     </div>
+                </div>
+
+                <!-- Disabling HTML5 validation with novalidate attribute -->
+                {{ form_start(form, {'attr': {'novalidate': 'novalidate'}} ) }}
+
+         <div class="form-section">
+    <label class="form-label">LIEU DE DÉPART</label>
+    <div class="input-with-icon" style="flex-grow: 1; position: relative;">
+        {{ form_widget(form.depart, { 'attr': {'style': 'display: none;'} }) }}
+        <input type="text" name="depart_autocomplete" id="depart" 
+               class="autocomplete-input {% if form.depart.vars.errors|length %}error-field{% endif %}" 
+               placeholder="Choisissez un pays de départ"
+               value="{{ form.depart.vars.value }}">
+        <i class="fas fa-map-marker-alt"></i>
+        <div id="depart-dropdown" class="autocomplete-dropdown"></div>
+ 
+    </div>
+</div>
+
+<div class="form-section">
+    <label class="form-label">LIEU D'ARRIVÉE</label>
+    <div class="input-with-icon">
+        {{ form_widget(form.Destination, { 'attr': {'style': 'display: none;'} }) }}
+        <input type="text" name="destination_autocomplete" id="destination" 
+               class="autocomplete-input {% if form.Destination.vars.errors|length %}error-field{% endif %}" 
+               placeholder="Choisissez un pays de destination"
+               value="{{ form.Destination.vars.value }}">
+        <i class="fas fa-map-marker-alt"></i>
+        <div id="destination-dropdown" class="autocomplete-dropdown"></div>
+      
+    </div>
+</div>
+
+                    <button type="button" class="generate-description-btn" id="generate-btn">
+                        <i class="fas fa-magic"></i>GÉNÉRER DESCRIPTION (IA)
+                    </button>
+
+            <div class="form-section">
+    <label class="form-label">DESCRIPTION DE VOYAGE</label>
+    <div style="flex-grow: 1;">
+        {{ form_widget(form.Description, { 
+            'attr': {
+                'class': 'description-textarea ' ~ (form.Description.vars.errors|length ? 'error-field' : ''),
+                'placeholder': 'Entrer La Description Du Voyage Ici...'
+            } 
+        }) }}
+  
+    </div>
+</div>
 
                     <button type="submit" class="add-voyage-btn">
                         AJOUTER VOYAGE
                     </button>
 
-                    {{ form_end(form) }}
-                </form>
+                {{ form_end(form) }}
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block javascripts %}
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     console.log("DOM fully loaded and parsed");
     
     const generateBtn = document.querySelector(".generate-description-btn");
     const departureField = document.querySelector("[name='{{ form.depart.vars.full_name }}']");
+    const departureInput = document.getElementById("depart");
     const arrivalField = document.querySelector("[name='{{ form.Destination.vars.full_name }}']");
+    const arrivalInput = document.getElementById("destination");
     const descriptionField = document.querySelector("[name='{{ form.Description.vars.full_name }}']");
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+    const progressSteps = document.querySelectorAll(".progress-step");
 
-    console.log("Elements selected:", {
-        generateBtn,
-        departureField,
-        arrivalField,
-        descriptionField,
-        csrfToken
-    });
+    // Progress tracking
+    function updateProgress() {
+        let step = 1;
+        
+        if (departureInput.value && arrivalInput.value) {
+            step = 2;
+        }
+        
+        if (departureInput.value && arrivalInput.value && descriptionField.value) {
+            step = 3;
+        }
+        
+        progressSteps.forEach((stepEl, index) => {
+            if (index < step) {
+                stepEl.classList.add("active");
+                if (index < step - 1) {
+                    stepEl.classList.add("complete");
+                } else {
+                    stepEl.classList.remove("complete");
+                }
+            } else {
+                stepEl.classList.remove("active", "complete");
+            }
+        });
+    }
+    
+    // Initialize fields to trigger progress updates
+    departureInput.addEventListener("input", updateProgress);
+    arrivalInput.addEventListener("input", updateProgress);
+    descriptionField.addEventListener("input", updateProgress);
+
+    // Update Symfony hidden fields when selecting from dropdowns
+    function updateSymfonyField(input, value) {
+        const correspondingField = input.id === 'depart' 
+            ? departureField
+            : arrivalField;
+        
+        if (correspondingField) {
+            correspondingField.value = value;
+            const event = new Event('change', { bubbles: true });
+            correspondingField.dispatchEvent(event);
+            console.log(`Updated Symfony field for ${input.id} with value: ${value}`);
+        }
+    }
 
     if (!generateBtn) {
         console.error("Generate button not found!");
@@ -115,7 +187,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Disable form submission while generating
         console.log("Disabling button during generation");
-        generateBtn.innerText = "Génération en cours...";
+        const originalBtnText = generateBtn.innerHTML;
+        generateBtn.innerHTML = `<span class="loading-spinner"></span>Génération en cours...`;
         generateBtn.disabled = true;
 
         try {
@@ -155,6 +228,13 @@ document.addEventListener("DOMContentLoaded", function () {
             if (data.description) {
                 console.log("Description received:", data.description);
                 descriptionField.value = data.description;
+                
+                // Clear any error on the description field when generated
+                descriptionField.classList.remove('error-field');
+                const errorMessage = descriptionField.parentNode.querySelector('.error-message');
+                if (errorMessage) errorMessage.remove();
+                
+                updateProgress();
             } else if (data.error) {
                 console.error("API error:", data.error);
                 alert(data.error);
@@ -172,11 +252,902 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("Une erreur s'est produite lors de la génération de la description.");
         } finally {
             console.log("Re-enabling button");
-            generateBtn.innerText = "GÉNÉRER DESCRIPTION (IA)";
+            generateBtn.innerHTML = originalBtnText;
             generateBtn.disabled = false;
         }
     });
 });
 </script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const autocompleteInputs = document.querySelectorAll(".autocomplete-input");
+    let countriesList = [];
+    let countriesLoaded = false;
+    let countryData = {};
 
+    // Fetch countries from a more reliable API
+    async function loadCountries() {
+        try {
+            console.log("Fetching countries data from API...");
+            const res = await fetch("https://restcountries.com/v2/all");
+            
+            if (!res.ok) {
+                throw new Error(`HTTP error! Status: ${res.status}`);
+            }
+            
+            const countries = await res.json();
+            countries.forEach(country => {
+                const name = country.name;
+                countriesList.push(name);
+                countryData[name] = {
+                    flag: country.flag || '',
+                    code: country.alpha2Code || '',
+                    region: country.region || ''
+                };
+            });
+            
+            countriesList.sort();
+            countriesLoaded = true;
+            console.log("Countries loaded successfully:", countriesList.length);
+            
+            autocompleteInputs.forEach(input => {
+                if (document.activeElement !== input) {
+                    showInitialSuggestions(input);
+                }
+            });
+        } catch (e) {
+            console.error("Erreur lors du chargement des pays:", e);
+            
+            // Fallback to hardcoded list
+            const fallbackCountries = [
+                "France", "États-Unis", "Canada", "Allemagne", "Royaume-Uni", 
+                "Espagne", "Italie", "Japon", "Chine", "Australie", "Brésil",
+                "Maroc", "Égypte", "Afrique du Sud", "Inde", "Russie"
+            ];
+            
+            fallbackCountries.forEach(name => {
+                countriesList.push(name);
+                countryData[name] = { flag: '', code: '', region: '' };
+            });
+            
+            countriesLoaded = true;
+            
+            autocompleteInputs.forEach(input => {
+                const dropdownId = `${input.id}-dropdown`;
+                let dropdown = document.getElementById(dropdownId);
+                if (dropdown) {
+                    dropdown.innerHTML = "<div class='autocomplete-option error'><i class='fas fa-exclamation-triangle'></i> Erreur de chargement - liste alternative utilisée</div>";
+                    dropdown.style.display = "block";
+                    
+                    setTimeout(() => {
+                        showInitialSuggestions(input);
+                    }, 2000);
+                }
+            });
+        }
+    }
+
+    function showInitialSuggestions(input) {
+        if (!countriesLoaded) return;
+        
+        const dropdownId = `${input.id}-dropdown`;
+        let dropdown = document.getElementById(dropdownId);
+        if (!dropdown) return;
+        
+        dropdown.innerHTML = "";
+        dropdown.style.display = "block";
+        
+        // Show popular countries first
+        const popularCountries = [
+            "France", "États-Unis", "Canada", "Espagne", "Italie", 
+            "Allemagne", "Royaume-Uni", "Japon", "Chine", "Australie"
+        ].filter(c => countriesList.includes(c));
+        
+        // Combine popular with others from the main list
+        const suggestedCountries = [...popularCountries, ...countriesList.filter(c => !popularCountries.includes(c))].slice(0, 10);
+        
+        suggestedCountries.forEach(country => {
+            const option = document.createElement("div");
+            option.classList.add("autocomplete-option");
+            
+            if (countryData[country] && countryData[country].flag) {
+                option.innerHTML = `
+                    <img src="${countryData[country].flag}" class="country-flag" alt="${country}">
+                    <span class="country-name">${country}</span>
+                    <span class="country-region">${countryData[country].region || ''}</span>
+                `;
+            } else {
+                option.innerHTML = `
+                    <i class="fas fa-flag" style="margin-right: 12px; color: #ccc;"></i>
+                    <span class="country-name">${country}</span>
+                `;
+            }
+            
+            option.addEventListener("click", () => {
+                input.value = country;
+                dropdown.innerHTML = "";
+                dropdown.style.display = "none";
+                
+                // Update the hidden Symfony field when selecting from dropdown
+                const correspondingField = input.id === 'depart' 
+                    ? document.querySelector("[name='{{ form.depart.vars.full_name }}']")
+                    : document.querySelector("[name='{{ form.Destination.vars.full_name }}']");
+                
+                if (correspondingField) {
+                    correspondingField.value = country;
+                    const event = new Event('change', { bubbles: true });
+                    correspondingField.dispatchEvent(event);
+                    
+                    // Clear any errors when a country is selected
+                    input.classList.remove('error-field');
+                    const errorMessage = input.parentNode.querySelector('.error-message');
+                    if (errorMessage) errorMessage.remove();
+                }
+            });
+            dropdown.appendChild(option);
+        });
+    }
+
+    loadCountries();
+
+    autocompleteInputs.forEach((input) => {
+        const dropdownId = `${input.id}-dropdown`;
+        let dropdown = document.getElementById(dropdownId);
+        if (!dropdown) {
+            dropdown = document.createElement("div");
+            dropdown.id = dropdownId;
+            dropdown.classList.add("autocomplete-dropdown");
+            input.parentNode.appendChild(dropdown);
+        }
+
+        input.addEventListener("input", function() {
+            const query = this.value.toLowerCase().trim();
+            
+            dropdown.style.display = "block";
+            
+            if (!countriesLoaded) {
+                dropdown.innerHTML = "<div class='autocomplete-option loading'>Chargement des pays...</div>";
+                return;
+            }
+            
+            if (query.length === 0) {
+                showInitialSuggestions(input);
+                return;
+            }
+
+            function normalizeText(text) {
+                return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+            }
+            
+            const normalizedQuery = normalizeText(query);
+            
+            const exactMatches = countriesList.filter(name => 
+                normalizeText(name).startsWith(normalizedQuery)
+            );
+            
+            const wordMatches = countriesList.filter(name => 
+                !exactMatches.includes(name) && 
+                normalizeText(name).split(/\s+/).some(word => normalizeText(word).startsWith(normalizedQuery))
+            );
+            
+            const partialMatches = countriesList.filter(name => 
+                !exactMatches.includes(name) && 
+                !wordMatches.includes(name) && 
+                normalizeText(name).includes(normalizedQuery)
+            );
+            
+            const matches = [...exactMatches, ...wordMatches, ...partialMatches].slice(0, 10);
+            
+            dropdown.innerHTML = "";
+
+            if (matches.length === 0) {
+                dropdown.innerHTML = "<div class='autocomplete-option no-results'>Aucun résultat</div>";
+                return;
+            }
+
+            matches.forEach(country => {
+                const option = document.createElement("div");
+                option.classList.add("autocomplete-option");
+                
+                if (countryData[country] && countryData[country].flag) {
+                    option.innerHTML = `
+                        <img src="${countryData[country].flag}" class="country-flag" alt="${country}">
+                        <span class="country-name">${country}</span>
+                        <span class="country-region">${countryData[country].region || ''}</span>
+                    `;
+                } else {
+                    option.innerHTML = `
+                        <i class="fas fa-flag" style="margin-right: 12px; color: #ccc;"></i>
+                        <span class="country-name">${country}</span>
+                    `;
+                }
+                
+                option.addEventListener("click", () => {
+                    input.value = country;
+                    dropdown.innerHTML = "";
+                    dropdown.style.display = "none";
+                    
+                    // Update the hidden Symfony field
+                    const correspondingField = input.id === 'depart' 
+                        ? document.querySelector("[name='{{ form.depart.vars.full_name }}']")
+                        : document.querySelector("[name='{{ form.Destination.vars.full_name }}']");
+                    
+                    if (correspondingField) {
+                        correspondingField.value = country;
+                        const event = new Event('change', { bubbles: true });
+                        correspondingField.dispatchEvent(event);
+                        
+                        // Clear any errors when a country is selected
+                        input.classList.remove('error-field');
+                        const errorMessage = input.parentNode.querySelector('.error-message');
+                        if (errorMessage) errorMessage.remove();
+                    }
+                });
+                dropdown.appendChild(option);
+            });
+        });
+
+        input.addEventListener("focus", function() {
+            if (countriesLoaded) {
+                showInitialSuggestions(this);
+            } else {
+                dropdown.innerHTML = "<div class='autocomplete-option loading'>Chargement des pays...</div>";
+                dropdown.style.display = "block";
+            }
+        });
+
+        document.addEventListener("click", (e) => {
+            if (e.target !== input && !dropdown.contains(e.target)) {
+                dropdown.innerHTML = "";
+                dropdown.style.display = "none";
+            }
+        });
+
+        input.addEventListener("keydown", function(e) {
+            const options = dropdown.querySelectorAll(".autocomplete-option");
+            if (options.length === 0) return;
+            
+            const active = dropdown.querySelector(".autocomplete-option.active");
+            
+            if (e.key === "ArrowDown") {
+                e.preventDefault();
+                if (!active) {
+                    options[0].classList.add("active");
+                    options[0].scrollIntoView({ block: "nearest" });
+                } else {
+                    const next = [...options].indexOf(active) + 1;
+                    if (next < options.length) {
+                        active.classList.remove("active");
+                        options[next].classList.add("active");
+                        options[next].scrollIntoView({ block: "nearest" });
+                    }
+                }
+            } else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                if (active) {
+                    const prev = [...options].indexOf(active) - 1;
+                    if (prev >= 0) {
+                        active.classList.remove("active");
+                        options[prev].classList.add("active");
+                        options[prev].scrollIntoView({ block: "nearest" });
+                    }
+                }
+            } else if (e.key === "Enter" && active) {
+                e.preventDefault();
+                active.click();
+            } else if (e.key === "Escape") {
+                dropdown.innerHTML = "";
+                dropdown.style.display = "none";
+            }
+        });
+    });
+});
+
+</script>
+<script>
+// Complete form validation script with proper error handling
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.querySelector('form[name="{{ form.vars.name }}"]');
+    const departureField = document.querySelector("[name='{{ form.depart.vars.full_name }}']");
+    const departureInput = document.getElementById("depart");
+    const arrivalField = document.querySelector("[name='{{ form.Destination.vars.full_name }}']");
+    const arrivalInput = document.getElementById("destination");
+    const descriptionField = document.querySelector("[name='{{ form.Description.vars.full_name }}']");
+
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        // Remove any existing error messages first
+        document.querySelectorAll('.error-message').forEach(el => el.remove());
+        
+        // Validate departure
+        if (!departureField.value) {
+            departureInput.classList.add('error-field');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i>Le lieu de départ est obligatoire.';
+            departureInput.parentNode.appendChild(errorDiv);
+            isValid = false;
+        }
+        
+        // Validate arrival
+        if (!arrivalField.value) {
+            arrivalInput.classList.add('error-field');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i>Le lieu d\'arrivée est obligatoire.';
+            arrivalInput.parentNode.appendChild(errorDiv);
+            isValid = false;
+        }
+        
+        // Validate description
+        if (!descriptionField.value) {
+            descriptionField.classList.add('error-field');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i>La description est obligatoire.';
+            descriptionField.parentNode.appendChild(errorDiv);
+            isValid = false;
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+            // Scroll to first error
+            const firstError = document.querySelector('.error-field');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    });
+
+    departureInput.addEventListener('input', function() {
+        this.classList.remove('error-field');
+        const errorMessage = this.parentNode.querySelector('.error-message');
+        if (errorMessage) errorMessage.remove();
+    });
+
+    arrivalInput.addEventListener('input', function() {
+        this.classList.remove('error-field');
+        const errorMessage = this.parentNode.querySelector('.error-message');
+        if (errorMessage) errorMessage.remove();
+    });
+
+    descriptionField.addEventListener('input', function() {
+        this.classList.remove('error-field');
+        const errorMessage = this.parentNode.querySelector('.error-message');
+        if (errorMessage) errorMessage.remove();
+    });
+});
+
+</script>
+<style>
+.error-field {
+    border: 2px solid #f44336 !important;
+    box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.2) !important;
+    background-color: rgba(255, 235, 235, 0.95) !important;
+}
+
+.error-field + i {
+    color: #f44336 !important;
+}
+
+.error-message {
+    color: #f44336;
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 6px;
+    display: block;
+    width: 100%;
+    text-align: left;
+    position: absolute;
+    left: 0;
+    bottom: -22px;
+    animation: errorShake 0.3s ease-in-out;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 4px 8px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.error-message i {
+    margin-right: 5px;
+}
+
+@keyframes errorShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.form-section {
+    margin-bottom: 40px;
+    position: relative;
+}
+
+/* Improve visibility of error text against dark background */
+.validation-error {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 4px 8px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+/* Custom styling for error messages */
+.error-message {
+    color: #f44336;
+    font-size: 14px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+/* Style for highlighted fields with errors */
+.form-input.has-error,
+.autocomplete-input.has-error,
+.description-textarea.has-error {
+    border-color: #f44336 !important;
+    box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.2) !important;
+}
+
+/* Additional styles retained from original file */
+:root {
+    --primary-color: #03045f;
+    --primary-light: rgba(3, 4, 95, 0.05);
+    --accent-color: #1E88E5;
+    --accent-hover: #1976D2;
+    --success-color: #4CAF50;
+    --error-color: #f44336;
+    --text-light: #fff;
+    --text-dark: #333;
+    --bg-light: #f5f7fa;
+    --border-radius: 12px;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 8px 16px rgba(0, 0, 0, 0.12);
+    --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    --sidebar-width: 260px;
+    --font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+}
+
+/* Rest of the CSS remains the same */
+  
+  body {
+    background-color: var(--bg-light);
+    width:100%;
+  }
+  
+    .main-content {
+    display: flex;
+    padding: 0 40px 20px calc(var(--sidebar-width) + 30px);
+    height: 90%;
+    transition: var(--transition);
+  }
+  
+  .container {
+    width: 1100px;
+    margin-bottom: 20px;
+    padding: 10px 0;
+    
+  }
+  
+  .page-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 30px;
+    padding: 0 0 15px 0;
+    color: var(--primary-color);
+    border-bottom: 2px solid rgba(3, 4, 95, 0.1);
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+  .page-title i {
+    margin-right: 10px;
+  }
+  
+  .page-title::before {
+    content: '';
+    width: 40px;
+    height: 4px;
+    background-color: var(--accent-color);
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    border-radius: 2px;
+  }
+  
+  .voyage-form-container {
+    background: linear-gradient(145deg, var(--primary-color), #040882);
+    border-radius: var(--border-radius);
+    padding: 40px;
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .voyage-form-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  
+  .form-section {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    position: relative;
+  }
+  
+  .form-label {
+    color: var(--text-light);
+    font-size: 16px;
+    font-weight: 600;
+    width: 220px;
+    text-align: left;
+    margin-bottom: 10px;
+    display: block;
+    letter-spacing: 0.5px;
+  }
+  
+  .form-input {
+    flex-grow: 1;
+    padding: 14px 16px;
+    border-radius: var(--border-radius);
+    border: 2px solid transparent;
+    width: 100%;
+    max-width: 700px;
+    font-size: 15px;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    background-color: rgba(255, 255, 255, 0.95);
+  }
+  .autocomplete-dropdown {
+      position: absolute;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      width: 100%;
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 1000;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin-top: 2px;
+      display: none;
+  }
+  
+  .autocomplete-option {
+      padding: 10px 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .autocomplete-option:last-child {
+      border-bottom: none;
+  }
+  
+  .autocomplete-option:hover, .autocomplete-option.active {
+      background-color: #f5f7fa;
+  }
+  
+  .autocomplete-option.loading {
+      color: #888;
+      font-style: italic;
+  }
+  
+  .autocomplete-option.error {
+      color: #d9534f;
+  }
+  
+  .autocomplete-option.no-results {
+      color: #888;
+      font-style: italic;
+      text-align: center;
+  }
+  
+  .country-flag {
+      width: 24px;
+      height: 16px;
+      margin-right: 10px;
+      object-fit: cover;
+      border: 1px solid #eee;
+  }
+  
+  .country-name {
+      flex: 1;
+      font-weight: 500;
+  }
+  
+  .country-region {
+      color: #888;
+      font-size: 0.85em;
+      margin-left: auto;
+  }
+  
+  .autocomplete-input {
+      width: 95%;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-size: 14px;
+  }
+  
+  .autocomplete-input:focus {
+      outline: none;
+      border-color: #4a90e2;
+      box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+  }
+  .form-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.2);
+    background-color: #fff;
+  }
+  
+  .input-with-icon {
+    position: relative;
+    flex-grow: 1;
+  }
+  
+  .input-with-icon .form-input,
+  .input-with-icon .autocomplete-input {
+    padding-left: 40px;
+  }
+  
+  .input-with-icon i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+    transition: var(--transition);
+    z-index: 1;
+  }
+  
+  .input-with-icon .form-input:focus + i,
+  .input-with-icon .autocomplete-input:focus + i {
+    color: var(--accent-color);
+  }
+  
+  .description-textarea {
+    
+    width: 800px;
+    height: 100px;
+    border-radius: 5px;
+    padding: 16px;
+    resize: vertical;
+    border: 2px solid transparent;
+    font-family: inherit;
+    font-size: 15px;
+    line-height: 1.5;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    background-color: rgba(255, 255, 255, 0.95);
+  }
+  
+  .description-textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.2);
+    background-color: #fff;
+  }
+  
+  .generate-description-btn {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 14px 24px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: var(--transition);
+    margin: 0 0 30px 480px;
+    display: inline-flex;
+    align-items: center;
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .generate-description-btn i {
+    margin-right: 8px;
+  }
+  
+  .generate-description-btn:hover {
+    background-color: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .generate-description-btn:active {
+    transform: translateY(0);
+  }
+  
+  .generate-description-btn:disabled {
+    background-color: #90CAF9;
+    cursor: not-allowed;
+    transform: none;
+  }
+  
+  .add-voyage-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 280px;
+    padding: 16px;
+    background-color: transparent;
+    color: white;
+    border: 2px solid white;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 40px 0 0 auto;
+    transition: var(--transition);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .add-voyage-btn i {
+    margin-right: 10px;
+    font-size: 18px;
+  }
+  
+  .add-voyage-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: var(--transition);
+  }
+  
+  .add-voyage-btn:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .add-voyage-btn:hover::before {
+    left: 100%;
+    transition: 0.7s;
+  }
+  
+  .add-voyage-btn:active {
+    transform: translateY(0);
+  }
+  
+  .alert {
+    padding: 16px;
+    margin-bottom: 25px;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    text-align: center;
+    font-size: 16px;
+    opacity: 1;
+    animation: fadeOut 5s ease-in-out forwards;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .alert i {
+    margin-right: 10px;
+    font-size: 20px;
+  }
+  
+  .success-alert {
+    background-color: var(--success-color);
+    color: white;
+    border-left: 5px solid #2E7D32;
+  }
+  
+  .error-alert {
+    background-color: var(--error-color);
+    color: white;
+    border-left: 5px solid #C62828;
+  }
+  
+  @keyframes fadeOut {
+    0% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  
+  /* Form progress indicator */
+  .form-progress {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    position: relative;
+  }
+  
+  .form-progress::before {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: rgba(255,255,255,0.2);
+    z-index: 1;
+  }
+  
+  .progress-step {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+  }
+  
+  .step-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: rgba(255,255,255,0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 8px;
+    transition: var(--transition);
+  }
+  
+  .progress-step.active .step-icon {
+    background-color: var(--accent-color);
+    box-shadow: 0 0 0 4px rgba(30, 136, 229, 0.3);
+  }
+  
+  .progress-step.complete .step-icon {
+    background-color: var(--success-color);
+  }
+  
+  .step-text {
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  /* Autocomplete dropdown */
+  .autocomplete-dropdown {
+    position: absolute;
+    background: white;
+    border: none;
+    border-radius: var(--border-radius);
+    width: 95%;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: var(--shadow-md);
+    margin-top: 4px;
+    display: none;
+    scrollbar-width: thin;
+    scrollbar-color: #ccc transparent;
+  }
+  
+  .autocomplete-dropdown::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .autocomplete-dropdown::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+  }
+</style>
 {% endblock %}

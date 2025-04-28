@@ -1,31 +1,77 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Liste des Vols</title>
     <style>
-        body { font-family: Arial, sans-serif; font-size: 12px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        h1 { text-align: center; }
-        .signature-container { 
-            margin-top: 30px;
+        body {
+            font-family: helvetica;
+            font-size: 12px;
+        }
+        .header {
+            width: 100%;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .logo {
+            width: 120px;
+            height: auto;
+        }
+        h1 {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+        }
+        table td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+        }
+        .signature-container {
+            width: 100%;
             text-align: right;
-            padding-right: 50px;
+            margin-top: 30px;
         }
         .signature-image {
             width: 150px;
             height: auto;
         }
         .signature-text {
-            margin-top: 5px;
             font-style: italic;
+            margin-top: 5px;
+        }
+        .qr-code {
+            width: 80px;
+        }
+        .date-info {
+            margin-bottom: 15px;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <h1>Liste des Vols de {{ voyage.depart }} a {{ voyage.destination }}</h1>
+    <div class="header">
+        <img src="{{ app.request.schemeAndHttpHost ~ asset('images/logo.png') }}" class="logo" />
+    </div>
+
+    <h1>Liste des Vols de {{ voyage.depart }} à {{ voyage.destination }}</h1>
+    
+    <div class="date-info">
+        Date d'exportation: {{ "now"|date('d/m/Y') }}
+    </div>
+
     <table>
         <thead>
             <tr>
@@ -52,9 +98,9 @@
             {% endfor %}
         </tbody>
     </table>
-    
+
     <div class="signature-container">
-        <img src="{{ asset('images/signature.png') }}" alt="Signature" class="signature-image">
+        <img src="{{ app.request.schemeAndHttpHost ~ asset('images/signature.png') }}" class="signature-image" />
         <p class="signature-text">Liste Des Vols Disponible Le {{ "now"|date('d/m/Y') }}</p>
     </div>
 </body>

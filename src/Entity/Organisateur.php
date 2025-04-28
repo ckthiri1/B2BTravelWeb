@@ -2,82 +2,94 @@
 
 namespace App\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-
+use App\Repository\OrganisateurRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Evennement;
+use App\Service\TwilioService;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: OrganisateurRepository::class)]
 class Organisateur
 {
-
     #[ORM\Id]
-    #[ORM\Column(type: "integer")]
-    private int $IDOr;
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: "IDOr")]
+    private ?int $idor = null;
 
-    #[ORM\Column(type: "string", length: 255)]
-    private string $NomOr;
+    #[ORM\Column(name: "NomOr", type: "string", length: 255)]
+    private ?string $nomOr = null;
 
-    #[ORM\Column(type: "string", length: 255)]
-    private string $Contact;
+    #[ORM\Column(name: "Contact", type: "string", length: 255)]
+    private ?string $contact = null;
 
-    public function getIDOr()
-    {
-        return $this->IDOr;
-    }
-
-    public function setIDOr($value)
-    {
-        $this->IDOr = $value;
-    }
-
-    public function getNomOr()
-    {
-        return $this->NomOr;
-    }
-
-    public function setNomOr($value)
-    {
-        $this->NomOr = $value;
-    }
-
-    public function getContact()
-    {
-        return $this->Contact;
-    }
-
-    public function setContact($value)
-    {
-        $this->Contact = $value;
-    }
-
-    #[ORM\OneToMany(mappedBy: "IDOr", targetEntity: Evennement::class)]
+    #[ORM\OneToMany(mappedBy: 'IdOr', targetEntity: Evennement::class)]
     private Collection $evennements;
 
-        public function getEvennements(): Collection
-        {
-            return $this->evennements;
+    public function getId(): ?int
+{
+    return $this->idor;
+}
+
+
+    public function __construct()
+    {
+        $this->evennements = new ArrayCollection();
+    }
+
+    public function getIdor(): ?int
+    {
+        return $this->idor;
+    }
+
+    public function getNomOr(): ?string
+    {
+        return $this->nomOr;
+    }
+
+    public function setNomOr(string $nomOr): static
+    {
+        $this->nomOr = $nomOr;
+        return $this;
+    }
+
+    public function getContact(): ?string
+    {
+        return $this->contact;
+    }
+
+    public function setContact(string $contact): static
+    {
+        $this->contact = $contact;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Evennement>
+     */
+    public function getEvennements(): Collection
+    {
+        return $this->evennements;
+    }
+
+    public function addEvennement(Evennement $evennement): static
+    {
+        if (!$this->evennements->contains($evennement)) {
+            $this->evennements[] = $evennement;
+            $evennement->setIdOr($this);
         }
-    
-        public function addEvennement(Evennement $evennement): self
-        {
-            if (!$this->evennements->contains($evennement)) {
-                $this->evennements[] = $evennement;
-                $evennement->setIDOr($this);
+
+        return $this;
+    }
+
+    public function removeEvennement(Evennement $evennement): static
+    {
+        if ($this->evennements->removeElement($evennement)) {
+            if ($evennement->getIdOr() === $this) {
+                $evennement->setIdOr(null);
             }
-    
-            return $this;
         }
-    
-        public function removeEvennement(Evennement $evennement): self
-        {
-            if ($this->evennements->removeElement($evennement)) {
-                // set the owning side to null (unless already changed)
-                if ($evennement->getIDOr() === $this) {
-                    $evennement->setIDOr(null);
-                }
-            }
-    
-            return $this;
-        }
+
+        return $this;
+    }
 }

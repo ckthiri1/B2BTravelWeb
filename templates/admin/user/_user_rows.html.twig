@@ -1,0 +1,44 @@
+{# templates/admin/user/_user_rows.html.twig #}
+<link rel="stylesheet" href="{{ asset('css/custom.css') }}">
+{% for user in users %}
+<tr>
+    <td>
+        <img src="{{ user.imageUrl ? asset(user.imageUrl) : asset('images/default-avatar.png') }}" 
+             class="user-avatar" 
+             alt="{{ user.prenom }} {{ user.nom }} avatar">
+    </td>
+    <td>{{ user.prenom }} {{ user.nom }}</td>
+    <td class="user-email">{{ user.email }}</td>
+    <td>
+        <span class="status-badge bg-{{ user.role == 'admin' ? 'danger' : 'primary' }}">
+            {{ user.role|capitalize }}
+        </span>
+        {% if user.isBanned %}
+            <span class="badge bg-dark">BANNED</span>
+        {% endif %}
+    </td>
+    <td>
+        <div class="btn-group" role="group">
+            <a href="{{ path('admin_user_edit', {'userId': user.userId}) }}" class="btn btn-sm btn-primary" title="Edit User">
+                <i class="fas fa-edit"></i>
+            </a>
+            
+            {% if 'ROLE_ADMIN' not in user.roles %}
+                <form method="post" action="{{ path(user.isBanned ? 'admin_user_unban' : 'admin_user_ban', {'userId': user.userId}) }}" class="d-inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token((user.isBanned ? 'unban' : 'ban') ~ user.userId) }}">
+                    <button class="btn btn-sm btn-{{ user.isBanned ? 'success' : 'warning' }}" title="{{ user.isBanned ? 'Unban User' : 'Ban User' }}">
+                        <i class="fas fa-{{ user.isBanned ? 'unlock' : 'ban' }}"></i>
+                    </button>
+                </form>
+            {% endif %}
+            
+            <form method="post" action="{{ path('admin_user_delete', {'userId': user.userId}) }}" class="d-inline">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.userId) }}">
+                <button class="btn btn-sm btn-danger" title="Delete User">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </form>
+        </div>
+    </td>
+</tr>
+{% endfor %}

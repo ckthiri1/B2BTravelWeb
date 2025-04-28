@@ -1,0 +1,9 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Verify Your Email Address</h1>
+    <p>Click this link to verify your email:</p>
+    <a href="{{ signedUrl }}">Verify Email</a>
+    <p>This link will expire at {{ expiresAt|date('F jS Y H:i') }}.</p>
+    <p>If you didn't create an account, please ignore this email.</p>
+{% endblock %}

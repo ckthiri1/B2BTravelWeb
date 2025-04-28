@@ -1,0 +1,121 @@
+{# templates/reservation/scan.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Scan Reservation{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .scan-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            text-align: center;
+        }
+        
+        #scanner {
+            width: 100%;
+            max-width: 500px;
+            margin: 1rem auto;
+            border: 2px dashed #ccc;
+            min-height: 300px;
+        }
+        
+        #result {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="scan-container">
+        <h1>Scan Reservation QR Code</h1>
+        
+        <div id="scanner"></div>
+        <button id="startScanner" class="btn btn-primary">Start Scanner</button>
+        
+        <div id="result"></div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <script>
+        const startBtn = document.getElementById('startScanner');
+        const resultDiv = document.getElementById('result');
+        let videoStream = null;
+        
+        startBtn.addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "environment" } 
+                });
+                
+                const video = document.createElement('video');
+                const scannerDiv = document.getElementById('scanner');
+                scannerDiv.innerHTML = '';
+                scannerDiv.appendChild(video);
+                
+                video.srcObject = stream;
+                video.setAttribute('playsinline', true);
+                video.play();
+                
+                startBtn.style.display = 'none';
+                
+                // Process frames for QR codes
+                const canvas = document.createElement('canvas');
+                const canvasContext = canvas.getContext('2d');
+                
+                function tick() {
+                    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                        canvas.height = video.videoHeight;
+                        canvas.width = video.videoWidth;
+                        canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        
+                        const imageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
+                        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                            inversionAttempts: 'dontInvert',
+                        });
+                        
+                        if (code) {
+                            // Found QR code
+                            fetch(`/api/verify-reservation/${code.data}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.error) {
+                                        resultDiv.innerHTML = `
+                                            <div class="alert alert-danger">
+                                                ${data.error}
+                                            </div>
+                                        `;
+                                    } else {
+                                        resultDiv.innerHTML = `
+                                            <div class="alert alert-success">
+                                                <h4>Valid Reservation</h4>
+                                                <p>Passenger: ${data.passenger}</p>
+                                                <p>Flight: ${data.flightNumber}</p>
+                                                <p>Date: ${data.date}</p>
+                                                <p>Seats: ${data.seats}</p>
+                                            </div>
+                                        `;
+                                    }
+                                });
+                        }
+                    }
+                    
+                    requestAnimationFrame(tick);
+                }
+                
+                tick();
+                
+                videoStream = stream;
+            } catch (err) {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        Error accessing camera: ${err.message}
+                    </div>
+                `;
+            }
+        });
+    </script>
+{% endblock %}

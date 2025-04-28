@@ -1,0 +1,308 @@
+{% extends 'base.html.twig' %}
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+   
+        .detail-container {
+            margin-left: 270px;
+            padding: 30px;
+            max-width: 1200px;
+        }
+        
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+    
+        
+        .detail-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-weight: 600;
+            color: #4b6cb7;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(75, 108, 183, 0.1);
+        }
+        
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        
+        .detail-item {
+            margin-bottom: 15px;
+        }
+        
+        .detail-label {
+            color: #6c757d;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .detail-value {
+            font-weight: 500;
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+        
+        .price-display {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #182848;
+            text-align: right;
+            margin: 30px 0;
+            position: relative;
+        }
+        
+        .price-display::before {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            right: 0;
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+            border-radius: 4px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .action-btn {
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+        
+        .back-btn {
+            background: rgba(75, 108, 183, 0.1);
+            color: #4b6cb7;
+            border: none;
+        }
+        
+        .back-btn:hover {
+            background: rgba(75, 108, 183, 0.2);
+        }
+        
+        .modify-btn {
+            background: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+            border: none;
+        }
+        
+        .modify-btn:hover {
+            background: rgba(40, 167, 69, 0.2);
+        }
+        
+        .action-btn i {
+            margin-right: 8px;
+            font-size: 1rem;
+        }
+        
+        /* Timeline for flight details */
+        .timeline {
+            position: relative;
+            padding-left: 26px;
+            margin: 30px 0;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, #4b6cb7, #182848);
+            border-radius: 3px;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-bottom: 30px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -33px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #4b6cb7;
+            border: 3px solid #182848;
+        }
+        
+        .timeline-time {
+            font-weight: 600;
+            color: #4b6cb7;
+            margin-bottom: 5px;
+        }
+        
+        .timeline-content {
+            background: rgba(75, 108, 183, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+          .status-badge {
+        display: inline-block;
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-left: 1rem;
+    }
+    
+    .status-waiting {
+        background-color: #fef3c7; /* Light yellow */
+        color: #92400e; /* Dark yellow/brown */
+        border: 1px solid #fcd34d; /* Medium yellow */
+    }
+    
+    .status-resolved {
+        background-color: #d1fae5; /* Light green */
+        color: #065f46; /* Dark green */
+        border: 1px solid #34d399; /* Medium green */
+    }
+    
+    .status-other {
+        background-color: #e0e7ff; /* Light blue */
+        color: #3730a3; /* Dark blue */
+        border: 1px solid #818cf8; /* Medium blue */
+    }
+    </style>
+{% endblock %}
+
+{% block body %}
+    {% include '/Sidebar/Sidebar.twig' %}
+    <div class="detail-container">
+       <div class="detail-header">
+    <h1 class="detail-title">Détails de Réservation #{{ reservation.id_resV }}</h1>
+    {% if reservation.reservationHebergements is not empty %}
+        {% set status = '' %}
+        {% for hebergement in reservation.reservationHebergements %}
+            {% set status = hebergement.status %}
+            {% if loop.first %}
+                {% if status == 'EnAttente' %}
+                    <span class="status-badge status-waiting">EN ATTENTE D'HEBERGEMENT</span>
+                {% elseif status == 'Resolue' %}
+                    <span class="status-badge status-resolved">HEBERGEMENT RESOLUE</span>
+                {% else %}
+                    <span class="status-badge status-other">{{ status|upper }}</span>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        <span class="status-badge status-waiting">EN ATTENTE D'HEBERGEMENT</span>
+    {% endif %}
+</div>
+
+<style>
+  
+</style>
+        
+        <div class="detail-card">
+            <h2 class="section-title">Informations Générales</h2>
+            
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <span class="detail-label">Référence</span>
+                    <span class="detail-value">#{{ reservation.id_resV }}</span>
+                </div>
+                
+                <div class="detail-item">
+                    <span class="detail-label">Client</span>
+                    <span class="detail-value">{{ reservation.id_user.nom }} {{ reservation.id_user.prenom }}</span>
+                </div>
+                
+                <div class="detail-item">
+                    <span class="detail-label">Date de Création</span>
+                    <span class="detail-value">{{ reservation.id_vol.dateDepart|date('d/m/Y H:i') }}</span>
+                </div>
+                
+                <div class="detail-item">
+                    <span class="detail-label">Nombre de Places</span>
+                    <span class="detail-value">{{ reservation.place }}</span>
+                </div>
+            </div>
+            
+            <div class="price-display">
+                Total: {{ reservation.prixTotal }} DT
+            </div>
+        </div>
+        
+        <div class="detail-card">
+            <h2 class="section-title">Détails du Vol</h2>
+            
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-time">Départ: {{ reservation.id_vol.dateDepart|date('d/m/Y H:i') }}</div>
+                    <div class="timeline-content">
+                        <strong>{{ reservation.id_vol.airLine }}</strong> (Vol #{{ reservation.id_vol.flightNumber }})
+                        <p>Type: {{ reservation.id_vol.typeVol }}</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-time">Arrivée: {{ reservation.id_vol.dateArrival|date('d/m/Y H:i') }}</div>
+                    <div class="timeline-content">
+                        Durée du vol: {{ reservation.id_vol.dureeVol }}
+                        <p>Prix du vol: {{ reservation.id_vol.prixVol }} DT</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    {% if reservation.reservationHebergements is not empty %}
+<div class="detail-card">
+    <h2 class="section-title">Hébergements Réservés</h2>
+    
+    <div class="detail-grid">
+        {% for hebergement in reservation.reservationHebergements %}
+        <div class="detail-item">
+            <span class="detail-label">Hébergement #{{ loop.index }}</span>
+            <div class="detail-value">
+                <strong>{{ hebergement.hebergement.nom }}</strong>
+                <p>Du {{ hebergement.date|date('d/m/Y') }} au {{ hebergement.dateFin|date('d/m/Y') }}</p>
+                <p>Prix: {{ hebergement.prix }} DT</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+        
+        <div class="action-buttons">
+            <a href="{{ path('Liste_reservations') }}" class="action-btn back-btn">
+                <i class="fas fa-arrow-left"></i> Retour à la liste
+            </a>
+        </div>
+    </div>
+{% endblock %}

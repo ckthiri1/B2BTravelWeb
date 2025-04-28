@@ -1,0 +1,235 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Navbar Styles */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            padding: 8px 20px;
+            min-height: 70px;
+            font-family: 'Inter', 'Roboto', sans-serif;
+            position: relative;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-brand img {
+            height: 55px;
+            width: 170px;
+            border-radius: 10px;
+            object-fit: contain;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            will-change: transform, box-shadow;
+        }
+
+        .navbar-brand img:hover {
+            transform: perspective(500px) rotateY(10deg) scale(1.05);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .navbar-brand img:active {
+            transform: perspective(500px) rotateY(-10deg) scale(0.98);
+        }
+
+        .navbar-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-button {
+            background-color: transparent;
+            color: #2c3e50;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            min-width: 80px;
+            text-align: center;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .nav-button::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #1a237e;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-button:hover {
+            color: #1a237e;
+        }
+
+        .nav-button:hover::before {
+            transform: scaleX(1);
+        }
+
+        .nav-button:active {
+            background-color: rgba(26, 35, 126, 0.1);
+            transform: scale(0.95);
+        }
+
+        .navbar-brand img:hover::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.3) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        /* Page Specific Styles */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .card {
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .bg-primary {
+            background-color: #1a237e !important;
+        }
+
+        .bg-success {
+            background-color: #28a745 !important;
+        }
+
+        .text-white {
+            color: white !important;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .badge {
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        .bg-warning {
+            background-color: #ffc107;
+        }
+
+        .bg-success {
+            background-color: #28a745;
+        }
+    </style>
+{% endblock %}
+
+{% block title %}Réponse à la réclamation #{{ reclamation.id }}{% endblock %}
+
+{% block body %}
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <img src="{{ asset('images/Logo.png') }}" alt="Logo">
+        </div>
+        <div class="navbar-menu">
+            <a href="{{ path('app_reclamation_index') }}" class="nav-button">
+                <i class="fas fa-list"></i> Réclamations
+            </a>
+            <a href="{{ path('app_reponse_index') }}" class="nav-button">
+                <i class="fas fa-comment"></i> Réponses
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Réponse à la réclamation #{{ reclamation.id }}</h2>
+
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                Détails de la réclamation
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">{{ reclamation.titre }}</h5>
+                <p class="card-text">{{ reclamation.description }}</p>
+                <p class="card-text">
+                    <small class="text-muted">
+                        Créée le {{ reclamation.dateR|date('d/m/Y') }} | 
+                        Statut: <span class="badge bg-{{ reclamation.status == 'resolved' ? 'success' : 'warning' }}">
+                            {{ reclamation.status }}
+                        </span>
+                    </small>
+                </p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                Réponse de l'administration
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    {{ reponse.descriptionRep }}
+                </div>
+                <p class="card-text">
+                    <small class="text-muted">
+                        Répondu le {{ reponse.dateRep|date('d/m/Y H:i') }}
+                    </small>
+                </p>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <a href="{{ path('app_reclamation_index') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Retour à la liste
+            </a>
+            
+            {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('admin_reponse_edit', {'id': reponse.id}) }}" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Modifier la réponse
+                </a>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

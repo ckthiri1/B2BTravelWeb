@@ -3,7 +3,15 @@
 {% block title %}Ajouter Rank{% endblock %}
 
 {% block stylesheets %}
+{{ parent() }}
     <link rel="stylesheet" href="{{ asset('css/CreateRank.css') }}">
+    <style>
+        .error-message {
+            color: #ff0000;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+    </style>
 {% endblock %}
 
 {% block body %}
@@ -29,39 +37,60 @@
             <!-- 🚨 END ALERTS SECTION -->
 
             <div class="rank-form-container">
-                <form method="post" action="{{ path('app_controller_rank_new') }}">
-                    {{ form_start(form) }}
+                {{ form_start(form, {'attr': {'novalidate': 'novalidate'} }) }}
 
-                     <div class="form-section">
-                        <label class="form-label">NOM RANK</label>
-                        <div>
-                            {{ form_widget(form.NomRank, { 'attr': {'class': 'input-field', 'required': 'required'} }) }}
-                            <div class="error-message">
-                                {{ form_errors(form.NomRank) }}
-                            </div>
+                <div class="form-section">
+                    {{ form_label(form.NomRank, 'NOM RANK', {'label_attr': {'class': 'form-label'}}) }}
+                    <div>
+                        {{ form_widget(form.NomRank, {'attr': {'class': 'input-field'}}) }}
+                        <div class="error-message">
+                            {{ form_errors(form.NomRank) }}
                         </div>
                     </div>
+                </div>
 
-                     <div class="form-section">
-                        <label class="form-label">POINTS</label>
-                        <div>
-                            {{ form_widget(form.points, { 'attr': {'class': 'input-field ', 'required': 'required'} }) }}
-                            <div class="error-message">
-                                {{ form_errors(form.points) }}
-                            </div>
+                <div class="form-section">
+                    {{ form_label(form.points, 'POINTS', {'label_attr': {'class': 'form-label'}}) }}
+                    <div>
+                        {{ form_widget(form.points, {'attr': {'class': 'input-field'}}) }}
+                        <div class="error-message">
+                            {{ form_errors(form.points) }}
                         </div>
                     </div>
+                </div>
 
-                    <button type="submit" class="add-rank-btn">
-                        AJOUTER RANK
-                    </button>
+                <button type="submit" class="add-rank-btn">
+                    AJOUTER RANK
+                </button>
 
-                    {{ form_end(form) }}
-                </form>
+                {{ form_end(form) }}
             </div>
-
-        
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get all input fields
+        const inputFields = document.querySelectorAll('.input-field');
+        
+        // Add event listener to each input field
+        inputFields.forEach(function(input) {
+            input.addEventListener('input', function() {
+                // Find the closest parent form-section
+                const formSection = this.closest('.form-section');
+                if (formSection) {
+                    // Find the error message div inside the form-section
+                    const errorDiv = formSection.querySelector('.error-message');
+                    if (errorDiv) {
+                        // Clear the error message
+                        errorDiv.innerHTML = '';
+                    }
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}

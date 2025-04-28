@@ -1,0 +1,121 @@
+{% extends 'base_hebergement.html.twig' %}
+
+{% block title %}Modifier l'hébergement{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <div class="edit-card shadow-lg">
+        <div class="card-header">
+            <h1 class="h2 mb-0">
+                <i class="bi bi-pencil-square me-2"></i>Modifier l'hébergement
+            </h1>
+        </div>
+
+        <div class="card-body">
+            {{ include('hebergement/_form.html.twig', {
+                'button_label': 'Mettre à jour',
+                'button_attr': {
+                    'class': 'btn btn-primary btn-lg w-100 py-3'
+                }
+            }) }}
+
+            <div class="action-buttons">
+                <a href="{{ path('app_hebergement_index') }}" class="btn btn-outline-secondary btn-hover">
+                    <i class="bi bi-arrow-left-circle me-2"></i>Retour à la liste
+                </a>
+                
+                {{ include('hebergement/_delete_form.html.twig', {
+                    'button_attr': {'class': 'btn btn-danger btn-hover'}
+                }) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .edit-card {
+        max-width: 800px;
+        margin: 2rem auto;
+        border-radius: 1rem;
+        overflow: hidden;
+        background: #ffffff;
+        border: none;
+        transition: transform 0.3s ease;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+        padding: 1.5rem 2rem;
+        border-bottom: none;
+    }
+
+    .card-header h1 {
+        color: white;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: space-between;
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 1px solid #f1f3f5;
+    }
+
+    .btn-hover {
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+    }
+
+    .btn-hover:hover {
+        transform: translateY(-1px);
+    }
+
+    .btn-lg {
+        font-size: 1.1rem;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 0 1rem;
+        }
+
+        .edit-card {
+            margin: 1rem 0;
+            border-radius: 0.75rem;
+        }
+
+        .card-header {
+            padding: 1.25rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    @media (min-width: 992px) {
+        .edit-card:hover {
+            transform: translateY(-5px);
+        }
+    }
+    
+</style>
+{% endblock %}

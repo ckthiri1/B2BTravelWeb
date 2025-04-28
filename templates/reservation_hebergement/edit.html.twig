@@ -1,0 +1,187 @@
+{% extends 'base_hebergement.html.twig' %}
+
+{% block title %}Modifier la réservation{% endblock %}
+
+{% block body %}
+
+<main class="main-content">
+    <div class="page-header">
+        <div class="header-title">
+            <h1 class="page-title"><i class="bi bi-pencil-square me-2"></i>Modifier la réservation</h1>
+            <nav aria-label="breadcrumb">
+                <a href="{{ path('app_reservation_hebergement_index') }}" class="btn btn-back">
+                    <i class="bi bi-arrow-left-circle me-2"></i>Retour à la liste
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <div class="content-wrapper">
+        <div class="edit-card glassmorphism">
+            <div class="card-body">
+                {{ include('reservation_hebergement/_form.html.twig', {
+                    'button_label': 'Mettre à jour',
+                    'button_attr': {
+                        'class': 'btn btn-primary btn-lg w-100 py-3'
+                    }
+                }) }}
+
+                <div class="action-buttons">
+                    {{ include('reservation_hebergement/_delete_form.html.twig', {
+                        'button_attr': {'class': 'btn btn-danger'}
+                    }) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</div>
+
+<style>
+    /* Variables */
+    :root {
+        --primary-color: #3b82f6;
+        --secondary-color: #6366f1;
+        --background: #f8fafc;
+        --text-dark: #1e293b;
+    }
+
+    .main-content {
+        padding: 2rem;
+        margin-left: 280px;
+        background: var(--background);
+        min-height: 100vh;
+        transition: margin 0.3s ease;
+    }
+
+    .page-header {
+        margin-bottom: 3rem;
+        max-width: 1200px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .header-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+
+    .page-title {
+        font-size: 2.25rem;
+        color: var(--text-dark);
+        margin: 0;
+        font-weight: 700;
+        letter-spacing: -0.025em;
+    }
+
+    .btn-back {
+        background: white;
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .btn-back:hover {
+        background: var(--primary-color);
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    .content-wrapper {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .edit-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 1.5rem;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .glassmorphism {
+        background: linear-gradient(145deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
+    }
+
+    .card-body {
+        padding: 2.5rem;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        padding-top: 2rem;
+        margin-top: 2rem;
+    }
+
+    .btn-danger {
+        background: #ef4444;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-danger:hover {
+        background: #dc2626;
+        transform: translateY(-1px);
+    }
+
+    @media (max-width: 1200px) {
+        .main-content {
+            margin-left: 0;
+            padding: 1.5rem;
+        }
+
+        .page-title {
+            font-size: 1.875rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-back {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .header-title {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .page-title {
+            font-size: 1.5rem;
+        }
+        
+        .card-body {
+            padding: 1rem;
+        }
+    }
+</style>
+{% endblock %}

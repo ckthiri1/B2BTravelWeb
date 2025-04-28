@@ -1,0 +1,217 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit User{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/editProfile.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block body %}
+{{ include('/Sidebar/Navbar.twig') }}
+
+<div class="profile-main-container">
+    <div class="profile-wrapper">
+        <!-- User Card -->
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="image-upload-container">
+                    {% if user.imageUrl %}
+                        <img src="{{ asset(user.imageUrl) }}" alt="Profile Picture" class="profile-image" id="imagePreview">
+                    {% else %}
+                        <div class="profile-image-default" id="imagePreview">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                    {% endif %}
+                   <label for="{{ form.profileImage.vars.id }}" class="upload-overlay">
+                    <i class="fas fa-camera"></i>
+                    <span>Changer</span>
+                    </label>
+                </div>
+                <div class="profile-badge">
+                    <span class="badge gold"><i class="fas fa-crown"></i> Gold</span>
+                </div>
+            </div>
+            
+            <div class="profile-content">
+                <h2 class="user-name">{{ user.prenom }} {{ user.nom }}</h2>
+                <p class="user-email">{{ user.email }}</p>
+                
+                <div class="profile-actions">
+                    <a href="{{ path('profile') }}" class="btn btn-cancel">
+                        <i class="fas fa-times"></i> Annuler
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Form -->
+        <div class="profile-details">
+            <div class="details-header">
+                <h1><i class="fas fa-user-edit"></i> Modifier le Profil</h1>
+            </div>
+            
+            {{ form_start(form, {'attr': {'class': 'profile-edit-form', 'novalidate': 'novalidate', 'enctype': 'multipart/form-data'}}) }}
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    {{ form_label(form.nom, 'Nom', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.nom, {
+    'attr': {
+        'class': 'form-input' ~ (form.nom.vars.errors|length ? ' is-invalid' : ''),
+        'data-error-required': 'Le nom est requis.'
+    }
+}) }}
+                    <div class="form-error">
+                        {{ form_errors(form.nom) }}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    {{ form_label(form.prenom, 'Prénom', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.prenom, {
+                    'attr': {
+                    'class': 'form-input' ~ (form.prenom.vars.errors|length ? ' is-invalid' : ''),
+                    'data-error-required': 'Le prenom est requis.'
+                    }
+                    }) }}
+                    <div class="form-error">
+                        {{ form_errors(form.prenom) }}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    {{ form_label(form.email, 'Email', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.email, {
+    'attr': {
+        'class': 'form-input' ~ (form.email.vars.errors|length ? ' is-invalid' : ''),
+        'data-error-required': 'L\'email est requis.',
+        'data-error-email': 'Veuillez entrer un email valide'
+    }
+}) }}
+                    <div class="form-error">
+                        {{ form_errors(form.email) }}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    {{ form_label(form.plainPassword, 'Nouveau mot de passe', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.plainPassword, {
+    'attr': {
+        'class': 'form-input',
+        'placeholder': 'Laisser vide pour ne pas changer',
+        'data-error-length': 'Le mot de passe doit contenir au moins 6 caractères'
+    }
+}) }}
+                    <div class="form-error">
+                        {{ form_errors(form.plainPassword) }}
+                    </div>
+                </div>
+                
+                <div class="form-group full-width" style="display: none;">
+                    {{ form_label(form.profileImage, 'Photo de profil') }}
+                    {{ form_widget(form.profileImage) }}
+                </div>
+                
+                <div class="form-group full-width">
+                    <button type="submit" class="btn btn-save">
+                        <i class="fas fa-save"></i> Enregistrer les modifications
+                    </button>
+                </div>
+            </div>
+            
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Image preview functionality
+    const imageInput = document.getElementById('{{ form.profileImage.vars.id }}');
+    const imagePreview = document.getElementById('imagePreview');
+    
+    if (imageInput && imagePreview) {
+        imageInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    if (imagePreview.tagName === 'IMG') {
+                        imagePreview.src = e.target.result;
+                    } else {
+                        const newImg = document.createElement('img');
+                        newImg.src = e.target.result;
+                        newImg.className = 'profile-image';
+                        newImg.id = 'imagePreview';
+                        imagePreview.parentNode.replaceChild(newImg, imagePreview);
+                    }
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+    
+     const form = document.querySelector('.profile-edit-form');
+    if (form) {
+        const getErrorMessage = (field) => {
+            if (field.validity.valueMissing) {
+                return field.dataset.errorRequired || 'Ce champ est requis';
+            }
+            if (field.validity.typeMismatch) {
+                return field.dataset.errorEmail || 'Format d\'email invalide';
+            }
+            if (field.validity.tooShort) {
+                return field.dataset.errorLength || 'Trop court';
+            }
+            return field.validationMessage;
+        };
+
+        const validateField = (field) => {
+            const formGroup = field.closest('.form-group');
+            const errorDiv = formGroup.querySelector('.form-error');
+            errorDiv.textContent = '';
+            field.classList.remove('is-invalid');
+
+            if (!field.checkValidity()) {
+                const errorMessage = getErrorMessage(field);
+                errorDiv.textContent = errorMessage;
+                field.classList.add('is-invalid');
+                return false;
+            }
+            return true;
+        };
+
+        // Real-time validation setup
+        const setupValidation = (field) => {
+            field.addEventListener('input', () => validateField(field));
+            field.addEventListener('blur', () => validateField(field));
+        };
+
+        const inputs = form.querySelectorAll('input, select, textarea');
+        inputs.forEach(setupValidation);
+
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+            
+            inputs.forEach(field => {
+                if (!validateField(field)) isValid = false;
+            });
+
+            if (!isValid) {
+                e.preventDefault();
+                form.querySelector('.is-invalid')?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -17,7 +17,7 @@ class VolApi
 
     public function getFlights(string $departureIata, string $arrivalIata): array
     {
-        $apiKey = '2ef89ba496f5406e913fdbc9a12a6c2c'; 
+        $apiKey = '28c1c5ab8685ba7aec10c1caee7bc5ee'; 
         
         try {
             $url = sprintf(

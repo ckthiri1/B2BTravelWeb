@@ -2,65 +2,66 @@
 
 namespace App\Entity;
 
+use App\Repository\ReponseRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
-use App\Entity\Reclamation;
-
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: ReponseRepository::class)]
+#[ORM\Table(name: "reponse")]
 class Reponse
 {
-
     #[ORM\Id]
-    #[ORM\Column(type: "integer")]
-    private int $IDRep;
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: "IDRep", type: "integer")]
+    private ?int $id = null;
 
-    #[ORM\Column(type: "string", length: 255)]
-    private string $DescriptionRep;
+    #[ORM\Column(name: "DescriptionRep", type: Types::TEXT)]
+    #[Assert\NotBlank(message: "La réponse ne peut pas être vide.")]
+    private ?string $descriptionRep = null;
 
-    #[ORM\Column(type: "date")]
-    private \DateTimeInterface $DateRep;
+    #[ORM\Column(name: "DateRep", type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $dateRep = null;
 
-        #[ORM\ManyToOne(targetEntity: Reclamation::class, inversedBy: "reponses")]
-    #[ORM\JoinColumn(name: 'IDR', referencedColumnName: 'IDR', onDelete: 'CASCADE')]
-    private Reclamation $IDR;
+    #[ORM\ManyToOne(targetEntity: Reclamation::class, inversedBy: "reponses")]
+    #[ORM\JoinColumn(name: "IDR", referencedColumnName: "IDR", nullable: false, onDelete: "CASCADE")]
+    private ?Reclamation $reclamation = null;
 
-    public function getIDRep()
+    public function getId(): ?int
     {
-        return $this->IDRep;
+        return $this->id;
     }
 
-    public function setIDRep($value)
+    public function getDescriptionRep(): ?string
     {
-        $this->IDRep = $value;
+        return $this->descriptionRep;
     }
 
-    public function getDescriptionRep()
+    public function setDescriptionRep(string $descriptionRep): static
     {
-        return $this->DescriptionRep;
+        $this->descriptionRep = $descriptionRep;
+        return $this;
     }
 
-    public function setDescriptionRep($value)
+    public function getDateRep(): ?\DateTimeInterface
     {
-        $this->DescriptionRep = $value;
+        return $this->dateRep;
     }
 
-    public function getDateRep()
+    public function setDateRep(\DateTimeInterface $dateRep): static
     {
-        return $this->DateRep;
+        $this->dateRep = $dateRep;
+        return $this;
     }
 
-    public function setDateRep($value)
+    public function getReclamation(): ?Reclamation
     {
-        $this->DateRep = $value;
+        return $this->reclamation;
     }
 
-    public function getIDR()
+    public function setReclamation(?Reclamation $reclamation): static
     {
-        return $this->IDR;
-    }
-
-    public function setIDR($value)
-    {
-        $this->IDR = $value;
+        $this->reclamation = $reclamation;
+        return $this;
     }
 }

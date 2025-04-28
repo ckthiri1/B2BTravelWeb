@@ -1,25 +1,496 @@
-{# templates/home/index.html.twig #}
 {% extends 'base.html.twig' %}
 
 {% block stylesheets %}
     {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+   
+    <style>
+        :root {
+            --primary: #2A3F54;
+            --secondary: #1a237e;
+            --accent: #3498DB;
+            --light: #F7F9FC;
+            --dark: #1A2B3C;
+            --text: #4A4A4A;
+            --text-light: #7F8C8D;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .home-container {
+            background-color: var(--light);
+            min-height: 100vh;
+        }
+
+        .banner-container {
+            position: relative;
+            height: 60vh;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .banner-image {
+            height: 100%;
+            width: 100%;
+            position: relative;
+        }
+
+        .banner-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.8);
+        }
+
+        .banner-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(42, 63, 84, 0.2), rgba(42, 63, 84, 0.7));
+        }
+
+        .search-section {
+            position: relative;
+            margin-top: -140px;
+            z-index: 15;
+            padding: 0 3rem;
+        }
+
+        .search-form {
+            background: white;
+            border-radius: 12px;
+            padding: 2.8rem;
+            box-shadow: var(--shadow);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            color: var(--primary);
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--secondary);
+            border-radius: 2px;
+        }
+
+        .search-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .search-input {
+            width: 90%;
+            padding: 1rem 1rem;
+            border: 2px solid #e0e6ed;
+            border-radius: 8px;
+            font-size: 1rem;
+            color: var(--text);
+            transition: var(--transition);
+            background-color: var(--light);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(26, 187, 156, 0.2);
+        }
+
+        .search-button {
+            grid-column: 1 / -1;
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .search-button:hover {
+            background-color: #0a2463;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(26, 187, 156, 0.2);
+        }
+
+        .results-container {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Weather styles */
+        .weather-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 1rem;
+        }
+
+        .weather-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .weather-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .weather-card h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .weather-icon {
+            width: 50px;
+            height: 50px;
+        }
+
+        .weather-temp {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--secondary);
+            margin: 0.5rem 0;
+        }
+
+        .weather-details {
+            margin-top: 0.5rem;
+            color: var(--text-light);
+        }
+
+        @media (max-width: 768px) {
+            .weather-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Weather Description Styles */
+        .weather-description-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .weather-description-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(26, 35, 126, 0.1);
+        }
+
+        .weather-description-title {
+            color: var(--secondary);
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            line-height: 1.3;
+        }
+
+        .weather-description-intro {
+            color: var(--text);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .weather-steps {
+            background: rgba(26, 35, 126, 0.05);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .weather-steps h3 {
+            color: var(--primary);
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .weather-steps-list {
+            list-style-position: inside;
+            padding-left: 0;
+        }
+
+        .weather-steps-list li {
+            color: var(--text);
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 0.5rem;
+            padding-left: 1rem;
+        }
+
+        .weather-benefits {
+            border-top: 2px solid rgba(26, 35, 126, 0.1);
+            padding-top: 1.5rem;
+        }
+
+        .benefit-text {
+            color: var(--text);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .weather-description-card {
+                padding: 1.5rem;
+            }
+
+            .weather-description-title {
+                font-size: 1.5rem;
+            }
+
+            .weather-steps-list li {
+                font-size: 1rem;
+            }
+        }
+
+        /* Quote Section Styles */
+        .quote-section {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+
+        .quote-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quote-text {
+            font-size: 1.5rem;
+            color: var(--primary);
+            font-style: italic;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .quote-author {
+            color: var(--secondary);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .quote-refresh {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--secondary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .quote-refresh:hover {
+            transform: rotate(180deg);
+            color: var(--primary);
+        }
+
+        .quote-loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .quote-loading.active {
+            display: block;
+        }
+
+        .quote-notification {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            min-width: 320px;
+            max-width: 400px;
+            background: #e6f0fa; /* pastel blue */
+            color: #1a237e; /* theme dark blue */
+            border-radius: 18px 18px 30px 18px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 1.5px 0 #b6d0ee inset;
+            padding: 2.2rem 2.2rem 2.2rem 1.5rem;
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(120%);
+            transition: opacity 0.3s, transform 0.6s cubic-bezier(.68,-0.55,.27,1.55);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .quote-notification.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(0);
+        }
+        .quote-notification .pin {
+            position: absolute;
+            top: 10px;
+            left: 18px;
+            font-size: 1.3rem;
+            color: #3b82f6;
+        }
+        .quote-notification .quote-text {
+            font-size: 1.15rem;
+            font-style: italic;
+            margin-bottom: 0.7rem;
+            min-height: 40px;
+            color: #1a237e;
+            text-align: left;
+        }
+        .quote-notification .quote-author {
+            color: #2563eb;
+            font-size: 0.95rem;
+            font-weight: bold;
+            text-align: right;
+            width: 100%;
+        }
+        .quote-notification .quote-refresh {
+            position: absolute;
+            top: 10px;
+            right: 18px;
+            background: none;
+            border: none;
+            color: #2563eb;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .quote-notification .quote-refresh:hover {
+            color: #60a5fa;
+        }
+        .quote-notification .emoji-row {
+            display: flex;
+            gap: 0.7rem;
+            margin-top: 0.7rem;
+            margin-bottom: -0.5rem;
+            align-items: center;
+            justify-content: flex-start;
+            width: 100%;
+        }
+        .quote-notification .emoji-btn {
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: transform 0.15s, filter 0.15s;
+            filter: grayscale(0.3);
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+        .quote-notification .emoji-btn:hover {
+            transform: scale(1.25) rotate(-8deg);
+            filter: grayscale(0) drop-shadow(0 2px 6px #60a5fa44);
+        }
+        .quote-notification .emoji-count {
+            font-size: 0.95rem;
+            color: #2563eb;
+            margin-left: 0.1rem;
+        }
+
+        /* Animation pluie d'emojis */
+        .emoji-rain {
+            position: absolute;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .emoji-rain span {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.85;
+            animation: emoji-fall 1.2s linear forwards;
+            will-change: transform, opacity;
+        }
+        @keyframes emoji-fall {
+            0% { transform: translateY(-20px) scale(1.2) rotate(-10deg); opacity: 1; }
+            80% { opacity: 1; }
+            100% { transform: translateY(120px) scale(1.1) rotate(10deg); opacity: 0; }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .banner-container {
+                height: 50vh;
+            }
+            
+            .search-section {
+                margin-top: -60px;
+            }
+            
+            .search-form {
+                padding: 1.5rem;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .banner-container {
+                height: 40vh;
+            }
+            
+            .search-section {
+                margin-top: -40px;
+                padding: 0 1rem;
+            }
+            
+            .search-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 {% endblock %}
 
 {% block body %}
-    
     {{ include('/Sidebar/Navbar.twig') }}
 
     <div class="home-container">
         <div class="banner-container">
             <div class="banner-image">
                 <img src="{{ asset('images/HomeFond.jpg') }}" alt="Travel Banner">
+                <div class="banner-overlay"></div>
             </div>
         </div>
 
         <div class="search-section">
             <form id="search-form" action="{{ path('app_search_flights') }}" method="POST" class="search-form">
-                <h2 class="section-title">VOLS</h2>
+                <h2 class="section-title" data-translate="unique.key">Trouvez votre vol parfait</h2>
 
                 <div class="search-grid">
                     <select name="departure_city" class="search-input" required>
@@ -45,215 +516,300 @@
                     <input type="date" name="departure_date" id="departure-date" class="search-input" required>
                     <input type="date" name="return_date" id="return-date" class="search-input">
 
-
-
-                    <button type="submit" class="search-button">Rechercher</button>
+                    <button type="submit" class="search-button">
+                        <i class="fas fa-search mr-2"></i> Rechercher
+                    </button>
                 </div>
             </form>
         </div>
 
-    <div id="results-container" class="results-container">
-    {% include 'Interface User/results.html.twig' with { 'outboundFlights': [], 'returnFlights': [], 'tripType': 'ALLER SIMPLE' } %}
-</div>
-
+        <div id="results-container" class="results-container"></div>
     </div>
-    <footer class="footer-container">
-    <div class="footer-content">
-        <div class="footer-section">
-            <img src="{{ asset('images/LogoDashboard.jpg') }}" alt="Company Logo" class="footer-logo">
-            <p>Votre partenaire de confiance pour des voyages inoubliables. Découvrez le monde avec nous.</p>
-        </div>
-        
-        <div class="footer-section">
-            <h4>Navigation</h4>
-            <ul class="footer-links">
-                <li><a href="#">Accueil</a></li>
-                <li><a href="#">Recherche de Vols</a></li>
-                <li><a href="#">Destinations</a></li>
-                <li><a href="#">Promotions</a></li>
-            </ul>
-        </div>
-        
-        <div class="footer-section">
-            <h4>Services</h4>
-            <ul class="footer-links">
-                <li><a href="#">Réservation</a></li>
-                <li><a href="#">Assistance Voyage</a></li>
-                <li><a href="#">Programme Fidélité</a></li>
-                <li><a href="#">Conditions de Voyage</a></li>
-            </ul>
-        </div>
-        
-        <div class="footer-section">
-            <h4>Contact</h4>
-            <div class="footer-contact">
-                <p>+216 22388893</p>
-                <p>contact@B2BTRAVEL.com</p>
-                <p>123 Rue du Voyage, 75000 Tunis</p>
+     <!-- Description météo -->
+        <div class="weather-description-container">
+            <div class="weather-description-card">
+                <h2 class="weather-description-title">🌦️ Consultez la météo de vos villes de départ et d'arrivée !</h2>
+                <p class="weather-description-intro">Avant de réserver votre vol, vérifiez facilement la météo en temps réel pour mieux organiser votre voyage.</p>
                 
-                <div class="footer-social">
-                    <a href="https://www.facebook.com/profile.php?id=61572449858624" class="social-icon">
-                        <i class="fab fa-facebook-f"></i>
-                    </a>
-                    <a href="#" class="social-icon">
-                        <i class="fab fa-twitter"></i>
-                    </a>
-                    <a href="#" class="social-icon">
-                        <i class="fab fa-instagram"></i>
-                    </a>
-                    <a href="#" class="social-icon">
-                        <i class="fab fa-linkedin-in"></i>
-                    </a>
+                <div class="weather-steps-container" style="display: flex; align-items: flex-start; gap: 2rem;">
+            <!-- Étapes à gauche -->
+            <div style="flex: 1;">
+                <h3>Voici comment faire :</h3>
+                <ol class="weather-steps-list">
+                    <li>Sélectionnez votre ville de départ. 🛫</li>
+                    <li>Sélectionnez votre ville d'arrivée. 🛬</li>
+                    <li>Visualisez instantanément les conditions météorologiques : température, vent, précipitations... 🌡️🌧️</li>
+                </ol>
+            </div>
+        
+            <!-- Cartes météo à droite -->
+            <div style="flex: 1; display: flex; gap: 1rem; justify-content: center;">
+        <div class="weather-card" style="background: linear-gradient(to bottom, #4facfe, #00f2fe); border-radius: 15px; padding: 1rem; text-align: center; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); width: 100px; color: white;">
+                    <h4 style="margin-bottom: 0.5rem;">Ensoleillé</h4>
+                    <div style="font-size: 2rem;">☀️</div>
+                                <p style="margin-top: 0.5rem; font-weight: bold; font-size: 1.2rem;">--°C</p>
+
+                </div>
+        <div class="weather-card" style="background: linear-gradient(to bottom, #4facfe, #00f2fe); border-radius: 15px; padding: 1rem; text-align: center; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); width: 100px; color: white;">
+                    <h4 style="margin-bottom: 0.5rem;">Éclaircies</h4>
+                    <div style="font-size: 2rem;">🌤️</div>
+                                <p style="margin-top: 0.5rem; font-weight: bold; font-size: 1.2rem;">--°C</p>
+
+                </div>
+        <div class="weather-card" style="background: linear-gradient(to bottom, #4facfe, #00f2fe); border-radius: 15px; padding: 1rem; text-align: center; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); width: 100px; color: white;">
+                    <h4 style="margin-bottom: 0.5rem;">Pluvieux</h4>
+                    <div style="font-size: 2rem;">⛈️</div>
+                                <p style="margin-top: 0.5rem; font-weight: bold; font-size: 1.2rem;">--°C</p>
+
                 </div>
             </div>
         </div>
+                <div class="weather-benefits">
+                    <p class="benefit-text">Adaptez votre voyage en fonction de la météo !</p>
+                    <p class="benefit-text">Planifiez votre séjour en toute sérénité grâce à notre outil météo pratique.</p>
+                </div>
+            </div>
+        </div>
+        
+
+        <!-- Weather Display -->
+        <div class="weather-container">
+            <div class="weather-grid">
+                <div class="weather-card" id="departure-weather">
+                    <h3>Météo au départ</h3>
+                    <div class="weather-content">
+                        <p>Sélectionnez une ville de départ</p>
+                    </div>
+                </div>
+                <div class="weather-card" id="arrival-weather">
+                    <h3>Météo à l'arrivée</h3>
+                    <div class="weather-content">
+                        <p>Sélectionnez une ville d'arrivée</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="results-container" class="results-container"></div>
     </div>
-    <style>
-    .footer-container {
-        background-color:#13117D;
-        color: white;
-        padding: 60px 0;
-    }
 
-    .footer-content {
-        max-width: 1540px;
-        margin: 0 auto;
-        display: grid;
-        grid-template-columns: 2fr 1fr 1fr 1fr;
-        gap: 30px;
-        padding: 0 20px;
-    }
-
-    .footer-section {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .footer-logo {
-        max-width: 200px;
-        margin-bottom: 20px;
-    }
-
-    .footer-section h4 {
-        font-size: 16px;
-        margin-bottom: 20px;
-        text-transform: uppercase;
-        border-bottom: 2px solid #ffffff33;
-        padding-bottom: 10px;
-    }
-
-    .footer-links {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .footer-links li {
-        margin-bottom: 10px;
-    }
-
-    .footer-links a {
-        color: #ffffff99;
-        text-decoration: none;
-        transition: color 0.3s ease;
-    }
-
-    .footer-links a:hover {
-        color: white;
-    }
-
-    .footer-contact p {
-        color: #ffffff99;
-        margin-bottom: 10px;
-    }
-
-    .footer-social {
-        display: flex;
-        gap: 15px;
-        margin-top: 15px;
-    }
-
-    .social-icon {
-        color: white;
-        font-size: 24px;
-        transition: color 0.3s ease;
-    }
-
-    .social-icon:hover {
-        color: #e0e0e0;
-    }
-
-    .footer-bottom {
-        background-color: #121858;
-        color: #ffffff99;
-        text-align: center;
-        padding: 15px 0;
-        font-size: 14px;
-    }
-
-    @media (max-width: 768px) {
-        .footer-content {
-            grid-template-columns: 1fr;
-            text-align: center;
-        }
-
-        .footer-social {
-            justify-content: center;
-        }
-    }
-    </style>
-    <div class="footer-bottom">
-        <p>&copy; 2024 Votre Agence de Voyage. Tous droits réservés.</p>
+    <!-- Quote Notification -->
+    <div class="quote-notification" id="quoteNotification">
+        <span class="pin">📌</span>
+        <button class="quote-refresh" onclick="fetchNewQuote()" title="Nouvelle citation">
+            <i class="fas fa-sync-alt"></i>
+        </button>
+        <div class="quote-content">
+            <p class="quote-text" id="quoteText">Chargement de la citation...</p>
+            <p class="quote-author" id="quoteAuthor"></p>
+            <div class="emoji-row">
+                <button class="emoji-btn" onclick="likeQuote('like')" title="Like"><span>👍</span><span class="emoji-count" id="likeCount">0</span></button>
+                <button class="emoji-btn" onclick="likeQuote('heart')" title="Love"><span>❤️</span><span class="emoji-count" id="heartCount">0</span></button>
+                <button class="emoji-btn" onclick="likeQuote('smile')" title="Smile"><span>😄</span><span class="emoji-count" id="smileCount">0</span></button>
+            </div>
+        </div>
+        <div class="emoji-rain" id="emojiRain"></div>
     </div>
-</footer>
 {% endblock %}
 
- {% block javascripts %}
+{% block javascripts %}
     {{ parent() }}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <script>
         $(document).ready(function () {
+            // AJAX form submission
             $("#search-form").submit(function (event) {
-                event.preventDefault(); // Prevent default form submission
-
+                event.preventDefault();
+                
+                // Add loading state
+                const submitBtn = $(this).find('button[type="submit"]');
+                const originalText = submitBtn.html();
+                submitBtn.html('<i class="fas fa-spinner fa-spin"></i> Recherche en cours...');
+                submitBtn.prop('disabled', true);
+                
                 $.ajax({
                     url: "{{ path('app_search_flights') }}",
                     type: "POST",
                     data: $(this).serialize(),
                     success: function (response) {
-                        $("#results-container").html(response); // Load only the results
+                        $("#results-container").html(response);
+                        // Smooth scroll to results
+                        $('html, body').animate({
+                            scrollTop: $("#results-container").offset().top - 100
+                        }, 500);
                     },
                     error: function (xhr) {
                         console.error("Erreur AJAX :", xhr.responseText);
-                        alert("Une erreur s'est produite, veuillez réessayer.");
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erreur',
+                            text: "Une erreur s'est produite, veuillez réessayer.",
+                            confirmButtonColor: '#2A3F54'
+                        });
+                    },
+                    complete: function() {
+                        submitBtn.html(originalText);
+                        submitBtn.prop('disabled', false);
                     }
                 });
             });
+
+            // Date input handling
+            const departureInput = document.getElementById("departure-date");
+            const returnInput = document.getElementById("return-date");
+            const today = new Date().toISOString().split("T")[0];
+            
+            departureInput.min = today;
+            returnInput.min = today;
+
+            departureInput.addEventListener("change", function () {
+                const depDate = departureInput.value;
+                returnInput.min = depDate;
+
+                if (returnInput.value && returnInput.value < depDate) {
+                    returnInput.value = "";
+                }
+            });
+
+            // Add animation to form elements
+            $('.search-input').each(function(index) {
+                $(this).css('opacity', '0').delay(100 * index).animate({opacity: 1}, 300);
+            });
+        
+
+        // Weather API functionality
+            function updateWeather(city, type) {
+                if (!city) {
+                    $(`#${type}-weather .weather-content`).html('<p>Sélectionnez une ville ' + (type === 'departure' ? 'de départ' : "d'arrivée") + '</p>');
+                    return;
+                }
+                
+                // Show loading state
+                $(`#${type}-weather .weather-content`).html('<p><i class="fas fa-spinner fa-spin"></i> Chargement de la météo...</p>');
+                
+                $.ajax({
+                    url: `/api/weather/${encodeURIComponent(city)}`,
+                    method: 'GET',
+                    success: function(data) {
+                        console.log(`Weather data for ${city}:`, data);
+                        const weatherCard = $(`#${type}-weather .weather-content`);
+                        
+                        if (data.error) {
+                            weatherCard.html(`
+                                <div style="color: #e74c3c; padding: 10px;">
+                                    <i class="fas fa-exclamation-circle"></i> ${data.message}
+                                </div>
+                            `);
+                            return;
+                        }
+                        
+                        weatherCard.html(`
+                            <img src="https://openweathermap.org/img/wn/${data.icon}@2x.png" alt="Weather icon" class="weather-icon">
+                            <div class="weather-temp">${data.temperature}°C</div>
+                            <div class="weather-details">
+                                <p>${data.description}</p>
+                                <p>Humidité: ${data.humidity}%</p>
+                                <p>Vent: ${data.wind_speed} km/h</p>
+                            </div>
+                        `);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(`Failed to fetch weather for ${city}:`, error);
+                        let errorMessage = "Impossible de charger la météo";
+                        
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            if (response.message) {
+                                errorMessage = response.message;
+                            }
+                        } catch (e) {
+                            console.error('Error parsing error response:', e);
+                        }
+                        
+                        $(`#${type}-weather .weather-content`).html(`
+                            <div style="color: #e74c3c; padding: 10px;">
+                                <i class="fas fa-exclamation-circle"></i> ${errorMessage}
+                            </div>
+                        `);
+                    }
+                });
+            }
+
+            // Add event listeners for city selection
+            $('select[name="departure_city"]').change(function() {
+                updateWeather($(this).val(), 'departure');
+            });
+
+            $('select[name="arrival_city"]').change(function() {
+                updateWeather($(this).val(), 'arrival');
+            });
         });
-        document.addEventListener("DOMContentLoaded", function () {
-    const departureInput = document.getElementById("departure-date");
-    const returnInput = document.getElementById("return-date");
 
-    // Today's date in YYYY-MM-DD
-    const today = new Date().toISOString().split("T")[0];
-
-    // Set today's date as min for departure
-    departureInput.min = today;
-    returnInput.min = today;
-
-    departureInput.addEventListener("change", function () {
-        const departureDate = departureInput.value;
-
-        // Set the min of return date to departure date
-        returnInput.min = departureDate;
-
-        // If return date is before departure, reset it
-        if (returnInput.value && returnInput.value < departureDate) {
-            returnInput.value = "";
+        // Fonction pour récupérer une nouvelle citation
+        async function fetchNewQuote() {
+            const quoteText = document.getElementById('quoteText');
+            const quoteAuthor = document.getElementById('quoteAuthor');
+            const notification = document.getElementById('quoteNotification');
+            // Réinitialise les compteurs d'emojis
+            document.getElementById('likeCount').textContent = '0';
+            document.getElementById('heartCount').textContent = '0';
+            document.getElementById('smileCount').textContent = '0';
+            // Affiche la notification avec animation
+            notification.classList.add('show');
+            quoteText.textContent = 'Chargement...';
+            quoteAuthor.textContent = '';
+            try {
+                const response = await fetch('/api/quote');
+                const data = await response.json();
+                quoteText.textContent = `"${data.q}"`;
+                quoteAuthor.textContent = `- ${data.a}`;
+            } catch (error) {
+                quoteText.textContent = 'Désolé, une erreur est survenue lors du chargement de la citation.';
+                quoteAuthor.textContent = '';
+            }
+            // Masque la notification après 7 secondes (modifiable)
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 7000);
         }
-    });
-});
+        // Gestion des emojis (compteurs fictifs)
+        function likeQuote(type) {
+            const countSpan = document.getElementById(type + 'Count');
+            let count = parseInt(countSpan.textContent, 10) || 0;
+            countSpan.textContent = count + 1;
+        }
 
+        // Affiche la notification à l'arrivée sur la page
+        document.addEventListener('DOMContentLoaded', fetchNewQuote);
+
+        // Ajoute une pluie d'emojis si beaucoup de réactions
+        function triggerEmojiRain(type) {
+            const rain = document.getElementById('emojiRain');
+            rain.innerHTML = '';
+            let emojis = [];
+            if (type === 'like') emojis = ['👍','👍','👍','👍','👍','👍','👍','👍','👍'];
+            if (type === 'heart') emojis = ['❤️','💖','❤️','💘','❤️','❤️','❤️','💘','❤️'];
+            if (type === 'smile') emojis = ['😄','😁','😆','😃','😄','😁','😃','😄','😁'];
+            for (let i = 0; i < 10; i++) {
+                const span = document.createElement('span');
+                span.textContent = emojis[i % emojis.length];
+                span.style.left = (10 + Math.random() * 70) + '%';
+                span.style.animationDelay = (Math.random() * 0.3) + 's';
+                rain.appendChild(span);
+            }
+            setTimeout(() => { rain.innerHTML = ''; }, 1400);
+        }
+
+        // Modifie la fonction likeQuote pour déclencher la pluie après 5 clics
+        function likeQuote(type) {
+            const countSpan = document.getElementById(type + 'Count');
+            let count = parseInt(countSpan.textContent, 10) || 0;
+            countSpan.textContent = count + 1;
+            if (count + 1 === 5) { // Déclenche la pluie à 5 réactions
+                triggerEmojiRain(type);
+            }
+        }
+        
     </script>
-    
 {% endblock %}

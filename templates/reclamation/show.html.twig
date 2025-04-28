@@ -1,0 +1,223 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Navbar Styling */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            padding: 8px 20px;
+            min-height: 70px;
+            font-family: 'Inter', 'Roboto', sans-serif;
+            position: relative;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-brand img {
+            height: 55px;
+            width: 170px;
+            border-radius: 10px;
+            object-fit: contain;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            will-change: transform, box-shadow;
+        }
+
+        .navbar-brand img:hover {
+            transform: perspective(500px) rotateY(10deg) scale(1.05);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .navbar-brand img:active {
+            transform: perspective(500px) rotateY(-10deg) scale(0.98);
+        }
+
+        .navbar-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-button {
+            background-color: transparent;
+            color: #2c3e50;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            min-width: 80px;
+            text-align: center;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .nav-button::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #1a237e;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-button:hover {
+            color: #1a237e;
+        }
+
+        .nav-button:hover::before {
+            transform: scaleX(1);
+        }
+
+        .nav-button:active {
+            background-color: rgba(26, 35, 126, 0.1);
+            transform: scale(0.95);
+        }
+
+        .navbar-brand img:hover::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.3) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        /* Additional styling for the content */
+        .main-content {
+            padding: 20px;
+        }
+
+        .detail-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .detail-value {
+            color: #555;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 5px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-back {
+            background-color: #f8f9fa;
+            color: #007bff;
+            border: 1px solid #007bff;
+        }
+
+        .btn-edit {
+            background-color: #ffc107;
+            color: #fff;
+            border: 1px solid #ffc107;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+            color: #fff;
+            border: 1px solid #dc3545;
+        }
+
+        .btn:hover {
+            opacity: 0.8;
+        }
+    </style>
+{% endblock %}
+
+{% block title %}Détails de la Réclamation{% endblock %}
+
+{% block body %}
+    <!-- Navbar Section -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <img src="{{ asset('images/LogoDashboard.jpg') }}" alt="Logo">
+        </div>
+        <div class="navbar-menu">
+            <a href="{{ path('app_dashboard') }}" class="nav-button"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="{{ path('app_reclamation_index') }}" class="nav-button"><i class="fas fa-exclamation-circle"></i> Réclamations</a>
+            <a href="{{ path('app_reponse_index') }}" class="nav-button"><i class="fas fa-comment"></i> Réponses</a>
+            <a href="{{ path('app_parametres') }}" class="nav-button"><i class="fas fa-cog"></i> Paramètres</a>
+            <a href="{{ path('app_logout') }}" class="nav-button"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+        </div>
+    </nav>
+
+    <!-- Main Content Section -->
+    <div class="main-content">
+        <h1>Détails de la Réclamation #{{ reclamation.id }}</h1>
+
+        <div class="detail-card">
+            <div class="detail-item">
+                <span class="detail-label">Titre :</span>
+                <span class="detail-value">{{ reclamation.titre }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Description :</span>
+                <span class="detail-value">{{ reclamation.description }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Date :</span>
+                <span class="detail-value">{{ reclamation.dateR|date('d/m/Y H:i') }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Statut :</span>
+                <span class="detail-value">{{ reclamation.status }}</span>
+            </div>
+
+            <!-- Action Buttons Section -->
+            <div class="action-buttons">
+                <a href="{{ path('app_reclamation_index') }}" class="btn btn-back">
+                    <i class="fas fa-arrow-left"></i> Retour
+                </a>
+                <a href="{{ path('app_reclamation_edit', {'id': reclamation.id}) }}" class="btn btn-edit">
+                    <i class="fas fa-edit"></i> Modifier
+                </a>
+                <form method="post" action="{{ path('app_reclamation_delete', {'id': reclamation.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette réclamation ?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reclamation.id) }}">
+                    <button type="submit" class="btn btn-delete">
+                        <i class="fas fa-trash"></i> Supprimer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

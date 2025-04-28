@@ -1,0 +1,144 @@
+{{ form_start(form) }}
+<div class="row g-3 mb-4">
+    <div class="col-12 col-md-6">
+        {{ form_row(form.hebergement, {
+            label: 'Hébergement',
+            attr: {
+                class: 'hebergement-select form-select',
+                'data-price-url': path('app_hebergement_prix', {id: '__id__'}),
+                'data-initial-price': form.hebergement.vars.data ? form.hebergement.vars.data.prix : 0
+            }
+        }) }}
+    </div>
+
+    <div class="col-12 col-md-6">
+        {{ form_row(form.date, {
+            label: 'Date de début',
+            attr: {class: 'date-start'}
+        }) }}
+    </div>
+
+    <div class="col-12 col-md-6">
+        {{ form_row(form.dateFin, {
+            label: 'Date de fin',
+            attr: {class: 'date-end'}
+        }) }}
+    </div>
+
+    <div class="col-12 col-md-6">
+        <div class="form-group">
+            <label>Prix total calculé</label>
+            <div class="input-group">
+                <span class="total-price-display form-control bg-light">
+                    {{ form.prix.vars.value|default(0) }} €
+                </span>
+                {{ form_widget(form.prix, {
+                    attr: {
+                        class: 'total-price-input',
+                        readonly: true
+                    }
+                }) }}
+            </div>
+            <small class="text-muted">
+                (Prix/nuit × {{ '<span class="days-count">0</span> jours'|raw }})
+            </small>
+        </div>
+    </div>
+
+    <div class="col-12">
+        {{ form_row(form.status, {
+            label: 'Statut',
+            attr: {class: 'form-select'}
+        }) }}
+    </div>
+</div>
+
+<button class="btn btn-primary w-100 py-3">
+    <i class="bi bi-check-circle me-2"></i>
+    {{ button_label|default('Enregistrer') }}
+</button>
+{{ form_end(form) }}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const elements = {
+        hebergement: document.querySelector('.hebergement-select'),
+        dateStart: document.querySelector('.date-start'),
+        dateEnd: document.querySelector('.date-end'),
+        priceDisplay: document.querySelector('.total-price-display'),
+        daysDisplay: document.querySelector('.days-count'),
+        priceInput: document.querySelector('.total-price-input')
+    };
+
+    function formatPrice(value) {
+        return new Intl.NumberFormat('fr-FR', { 
+            style: 'currency', 
+            currency: 'EUR',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(value);
+    }
+
+    // Initialisation avec le prix existant
+    let currentPrice = parseFloat(elements.priceInput.value) || 0;
+    elements.priceDisplay.textContent = formatPrice(currentPrice);
+
+    async function fetchHebergementPrice(id) {
+        try {
+            const response = await fetch(
+                elements.hebergement.dataset.priceUrl.replace('__id__', id),
+                { headers: { 'Accept': 'application/json' } }
+            );
+            
+            if (!response.ok) throw new Error('Erreur de connexion');
+            return await response.json();
+            
+        } catch (error) {
+            console.error('Erreur:', error);
+            return { prix: 0 };
+        }
+    }
+
+    async function calculateTotal() {
+        try {
+            if (!elements.hebergement.value || !elements.dateStart.value || !elements.dateEnd.value) return;
+
+            const startDate = new Date(elements.dateStart.value);
+            const endDate = new Date(elements.dateEnd.value);
+            
+            if (startDate > endDate) {
+                elements.priceDisplay.textContent = 'Dates invalides';
+                return;
+            }
+
+            // Calcul des jours
+            const timeDiff = endDate.getTime() - startDate.getTime();
+            const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+            elements.daysDisplay.textContent = diffDays;
+
+            // Récupération du prix
+            const data = await fetchHebergementPrice(elements.hebergement.value);
+            const total = data.prix * diffDays;
+
+            // Mise à jour
+            currentPrice = total;
+            elements.priceInput.value = total;
+            elements.priceDisplay.textContent = formatPrice(total);
+
+        } catch (error) {
+            console.error('Erreur:', error);
+            elements.priceDisplay.textContent = formatPrice(currentPrice);
+        }
+    }
+
+    // Gestion des événements
+    [elements.hebergement, elements.dateStart, elements.dateEnd].forEach(element => {
+        element.addEventListener('change', calculateTotal);
+    });
+
+    // Calcul initial si données existantes
+    if (elements.hebergement.value && elements.dateStart.value && elements.dateEnd.value) {
+        calculateTotal();
+    }
+});
+</script>

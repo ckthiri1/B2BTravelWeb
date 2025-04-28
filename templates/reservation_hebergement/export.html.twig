@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Export PDF des Réservations</title>
+    <style>
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        th { background-color: #f8f9fa; }
+        .text-center { text-align: center; }
+        .badge { padding: 5px 10px; border-radius: 20px; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <h1 class="text-center">Liste des Réservations</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Hébergement</th>
+                <th>Statut</th>
+                <th>Date Début</th>
+                <th>Date Fin</th>
+                <th>Prix</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reservation in reservations %}
+            <tr>
+                <td>{{ reservation.hebergement.nom ?? 'N/A' }}</td>
+                <td>
+                    <span class="badge">{{ reservation.status == 'EnAttente' ? 'En attente' : 'Résolue' }}</span>
+                </td>
+                <td>{{ reservation.date|date('d/m/Y') }}</td>
+                <td>{{ reservation.dateFin|date('d/m/Y') }}</td>
+                <td>{{ reservation.prix }} €</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

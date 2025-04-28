@@ -1,0 +1,107 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Évènements Disponibles{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f4f4f8;
+            margin: 0;
+            font-family: 'Inter', 'Roboto', sans-serif;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 100px auto 50px auto;
+            background: white;
+            padding: 30px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 12px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1a237e;
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background-color: #1a237e;
+            color: white;
+        }
+
+        td {
+            color: #333;
+        }
+
+        .no-events {
+            text-align: center;
+            padding: 30px;
+            color: #888;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="navbar">
+        <div class="navbar-brand">
+            <img src="{{ asset('images/Logo.png') }}" alt="Logo">
+        </div>
+        <div class="navbar-menu">
+            <a href="{{ path('home') }}" class="nav-button">Accueil</a>
+            <a href="{{ path('evennement_public') }}" class="nav-button">Évènements</a>
+            <a href="#" class="nav-button">Contact</a>
+            <a href="#" class="nav-button">Déconnexion</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Liste des Évènements</h1>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Lieu</th>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Type</th>
+                    <th>Organisateur</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event in evennements %}
+                    <tr>
+                        <td>{{ event.nomE }}</td>
+                        <td>{{ event.local }}</td>
+                        <td>{{ event.dateE ? event.dateE|date('Y-m-d H:i') : '' }}</td>
+                        <td>{{ event.desE }}</td>
+                        <td>{{ event.eventType }}</td>
+                        <td>
+                            {{ event.idOr ? event.idOr.nomOr ~ ' (' ~ event.idOr.contact ~ ')' : 'Non défini' }}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="no-events">Aucun évènement disponible pour le moment.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

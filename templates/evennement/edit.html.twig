@@ -1,0 +1,119 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier l’Évènement{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .form-container {
+            width: 60%;
+            margin: 40px auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 12px;
+        }
+
+        .form-container h1 {
+            text-align: center;
+            color: #1a237e;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        .submit-btn {
+            background-color: #1a237e;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .submit-btn:hover {
+            background-color: #3949ab;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="sidebar">
+    <div class="logo">
+        <img src="{{ asset('images/LogoDashboard.jpg') }}" alt="Logo B2B Travel">
+    </div>
+    <ul class="nav">
+        <li><a href="{{ path('home') }}"><i class="fas fa-home"></i> Accueil</a></li>
+        <li><a href="{{ path('app_evennement_index') }}"><i class="fas fa-list"></i> Liste</a></li>
+    </ul>
+    <a href="#" class="logout-btn">Déconnexion</a>
+</div>
+
+<div class="dashboard-content">
+    <div class="form-container">
+        <h1>Modifier l’Évènement</h1>
+
+        {{ form_start(form) }}
+
+            <div class="form-group">
+                {{ form_label(form.nomE) }}
+                {{ form_widget(form.nomE) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.local) }}
+                {{ form_widget(form.local) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.dateE) }}
+                {{ form_widget(form.dateE) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.desE) }}
+                {{ form_widget(form.desE) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.eventType) }}
+                {{ form_widget(form.eventType) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.idOr) }}
+                {{ form_widget(form.idOr) }}
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <button type="submit" class="submit-btn">Modifier</button>
+            </div>
+
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}

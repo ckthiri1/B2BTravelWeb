@@ -1,9 +1,212 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Dashboard Admin{% endblock %}
+{% block title %}Admin Dashboard{% endblock %}
 
 {% block stylesheets %}
+    {{ parent() }}
     <link rel="stylesheet" href="{{ asset('css/Dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.css">
+    <style>
+        :root {
+            --primary-blue: #4361ee;
+            --secondary-blue: #3a0ca3;
+            --light-blue: #f0f7ff;
+            --white: #ffffff;
+            --gray-light: #f8f9fa;
+            --gray-medium: #e9ecef;
+            --gray-dark: #6c757d;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --info: #4895ef;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f5f7fa;
+        }
+
+        .dashboard-content {
+            flex: 1;
+            padding: 2rem;
+            margin-left: 280px;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2b2d42;
+            margin: 0;
+        }
+
+        .dashboard-date {
+            color: var(--gray-dark);
+            font-size: 1rem;
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            font-size: 1.1rem;
+            color: var(--gray-dark);
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .card p {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0;
+            color: #2b2d42;
+        }
+
+        .card-blue { border-left: 4px solid var(--primary-blue); }
+        .card-lightblue { border-left: 4px solid var(--info); }
+        .card-yellow { border-left: 4px solid var(--warning); }
+        .card-orange { border-left: 4px solid #f77f00; }
+        .card-red { border-left: 4px solid var(--danger); }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card-header h2 {
+            font-size: 1.2rem;
+            color: #2b2d42;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        .recent-activity {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1rem;
+        }
+
+        .icon-blue { background-color: rgba(67, 97, 238, 0.1); color: var(--primary-blue); }
+        .icon-green { background-color: rgba(76, 201, 240, 0.1); color: var(--success); }
+        .icon-red { background-color: rgba(247, 37, 133, 0.1); color: var(--danger); }
+        .icon-orange { background-color: rgba(248, 150, 30, 0.1); color: var(--warning); }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-content p {
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .activity-time {
+            color: var(--gray-dark);
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 1200px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+        }
+
+        .user-stats {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-label {
+            color: var(--gray-dark);
+        }
+
+        .stat-value {
+            font-weight: 600;
+        }
+    </style>
 {% endblock %}
 
 {% block body %}
@@ -11,64 +214,297 @@
     {% include '/Sidebar/Sidebar.twig' %}
 
     <div class="dashboard-content">
-        <h1>Dashboard Admin</h1>
+        <div class="dashboard-header">
+            <h1>Admin Dashboard</h1>
+            <div class="dashboard-date">{{ "now"|date("F j, Y") }}</div>
+        </div>
 
         <div class="cards-container">
-            <div class="card card-blue" >
+            <div class="card card-blue">
                 <h2>Users</h2>
-                <p>22+</p>
+                <p id="user-count">Loading...</p>
+                <small id="user-trend"></small>
             </div>
 
-       <div class="card card-lightblue">
-        <h2>Voyages</h2>
-        <p id="voyage-count">Chargement...</p>
-      </div>
-     <script>
-    fetch('/voyage/count')
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('voyage-count').textContent = data.voyageCount + ' Voyages';
-        })
-        .catch(error => {
-            console.error('Erreur lors de la récupération du nombre de voyages:', error);
-            document.getElementById('voyage-count').textContent = 'Erreur de chargement';
-        });
-     </script>
-
+            <div class="card card-lightblue">
+                <h2>Voyages</h2>
+                <p id="voyage-count">Loading...</p>
+                <small id="voyage-trend"></small>
+            </div>
 
             <div class="card card-lightblue">
-    <h2>Ranks</h2>
-    <p id="rank-count">Chargement...</p>
-</div>
-
-<script>
-    fetch('/rank/count')
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('rank-count').textContent = data.rankCount + ' Ranks';
-        })
-        .catch(error => {
-            console.error('Erreur lors de la récupération du nombre de ranks:', error);
-            document.getElementById('rank-count').textContent = 'Erreur de chargement';
-        });
-</script>
-
+                <h2>Ranks</h2>
+                <p id="rank-count">Loading...</p>
+                <small id="rank-trend"></small>
+            </div>
 
             <div class="card card-yellow">
                 <h2>Reservations</h2>
                 <p>66+</p>
+                <small>12 pending</small>
             </div>
 
-            <div class="card card-orange" >
+            <div class="card card-orange">
                 <h2>Events</h2>
                 <p>77+</p>
+                <small>3 upcoming</small>
             </div>
 
-            <div class="card card-red" >
+            <div class="card card-red">
                 <h2>Réclamations</h2>
                 <p>11</p>
+                <small>2 unread</small>
+            </div>
+        </div>
+
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <h2>Voyage Statistics</h2>
+                    <select id="voyage-period" class="period-select">
+                        <option value="week">This Week</option>
+                        <option value="month" selected>This Month</option>
+                        <option value="year">This Year</option>
+                    </select>
+                </div>
+                <div class="chart-container">
+                    <canvas id="voyageChart"></canvas>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <h2>Rank Distribution</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="rankChart"></canvas>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <h2>User Statistics</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="userStatsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="recent-activity">
+            <h2>Recent Activity</h2>
+            <div class="activity-item">
+                <div class="activity-icon icon-blue">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div class="activity-content">
+                    <p>New user registered: John Doe</p>
+                    <p class="activity-time">2 hours ago</p>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon icon-green">
+                    <i class="fas fa-plane"></i>
+                </div>
+                <div class="activity-content">
+                    <p>New voyage created: Paris to Rome</p>
+                    <p class="activity-time">5 hours ago</p>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon icon-orange">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <div class="activity-content">
+                    <p>User promoted to Gold rank</p>
+                    <p class="activity-time">Yesterday</p>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon icon-red">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <div class="activity-content">
+                    <p>New complaint received</p>
+                    <p class="activity-time">Yesterday</p>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Fetch user count
+    fetch('/user/count')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('user-count').textContent = data.userCount;
+            document.getElementById('user-trend').textContent = data.trend > 0 
+                ? `↑ ${data.trend}% from last month` 
+                : data.trend < 0 
+                    ? `↓ ${Math.abs(data.trend)}% from last month` 
+                    : 'No change';
+
+            // Create pie chart for user statistics
+            const ctx = document.getElementById('userStatsChart').getContext('2d');
+            const userStatsChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Active Users', 'Banned Users'],
+                    datasets: [{
+                        data: [data.unbannedUsers, data.bannedUsers],
+                        backgroundColor: [
+                            'rgba(67, 97, 238, 0.8)',  // Blue for active users
+                            'rgba(247, 37, 133, 0.8)'  // Red for banned users
+                        ],
+                        borderColor: [
+                            'rgba(67, 97, 238, 1)',
+                            'rgba(247, 37, 133, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching user count:', error);
+            document.getElementById('user-count').textContent = 'Error';
+        });
+
+    // Fetch voyage count
+    fetch('/voyage/count')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('voyage-count').textContent = data.voyageCount;
+            document.getElementById('voyage-trend').textContent = data.trend > 0 
+                ? `↑ ${data.trend}% from last month` 
+                : data.trend < 0 
+                    ? `↓ ${Math.abs(data.trend)}% from last month` 
+                    : 'No change';
+        })
+        .catch(error => {
+            console.error('Error fetching voyage count:', error);
+            document.getElementById('voyage-count').textContent = 'Error';
+        });
+
+    // Fetch rank count
+    fetch('/rank/count')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('rank-count').textContent = data.rankCount;
+            document.getElementById('rank-trend').textContent = data.trend > 0 
+                ? `↑ ${data.trend}% from last month` 
+                : data.trend < 0 
+                    ? `↓ ${Math.abs(data.trend)}% from last month` 
+                    : 'No change';
+        })
+        .catch(error => {
+            console.error('Error fetching rank count:', error);
+            document.getElementById('rank-count').textContent = 'Error';
+        });
+
+    // Voyage Chart
+    const voyageCtx = document.getElementById('voyageChart').getContext('2d');
+    const voyageChart = new Chart(voyageCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+            datasets: [{
+                label: 'Voyages Created',
+                data: [12, 19, 15, 27, 24, 32, 29],
+                borderColor: '#4361ee',
+                backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                borderWidth: 2,
+                tension: 0.3,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+
+    // Rank Chart
+    const rankCtx = document.getElementById('rankChart').getContext('2d');
+    const rankChart = new Chart(rankCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Bronze', 'Silver', 'Gold', 'Platinum'],
+            datasets: [{
+                data: [15, 22, 8, 5],
+                backgroundColor: [
+                    '#cd7f32',
+                    '#c0c0c0',
+                    '#ffd700',
+                    '#e5e4e2'
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right'
+                }
+            },
+            cutout: '70%'
+        }
+    });
+
+    // Period selector for voyage chart
+    document.getElementById('voyage-period').addEventListener('change', function() {
+        // In a real app, you would fetch new data based on the selected period
+        console.log('Period changed to:', this.value);
+    });
+});
+</script>
 {% endblock %}

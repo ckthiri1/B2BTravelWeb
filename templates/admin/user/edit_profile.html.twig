@@ -1,0 +1,145 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit User{% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/edit_profile.css') }}">
+{% endblock %}
+{% block body %}
+<div class="main-container">
+  <div class="profile-container">
+    <!-- Left Panel -->
+    <div class="left-panel">
+      <div class="user-card">
+        {% if user.imageUrl %}
+          <img src="{{ asset(user.imageUrl) }}" alt="Profile Picture" class="profile-image">
+        {% else %}
+          <div class="text-muted mb-2">
+            <i class="fas fa-user-circle fa-5x"></i>
+          </div>
+        {% endif %}
+        <h2 class="user-name">{{ user.prenom }} {{ user.nom }}</h2>
+        <div class="rank-section">
+          <span class="rank-label">Rank :</span>
+          <span class="gold-rank">Gold</span>
+        </div>
+        <div class="action-buttons">
+          <a href="{{ path('app_logout') }}" class="logout-btn">Se déconnecter</a>
+          
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="right-panel">
+      <h1 class="profile-title">Modifier le profil</h1>
+
+      {# We disable native HTML5 validation using novalidate #}
+      {{ form_start(form, {
+    'action': path('admin_profile_edit', {'userId': user.userId}),
+    'method': 'POST',
+    'attr': {'novalidate': 'novalidate', 'class': 'needs-validation'}
+}) }}
+
+      <div class="form-group detail-group">
+        {{ form_label(form.nom, 'Nom', {'label_attr': {'class': 'detail-label'}}) }}
+        {# Remove required attribute and add our data-validate marker #}
+        {{ form_widget(form.nom, {'attr': {'class': 'form-input', 'data-validate': 'true'}}) }}
+        <div class="invalid-feedback">
+          {{ form_errors(form.nom) ? form_errors(form.nom) : 'Ce champ est requis.' }}
+        </div>
+      </div>
+
+      <div class="form-group detail-group">
+        {{ form_label(form.prenom, 'Prénom', {'label_attr': {'class': 'detail-label'}}) }}
+        {{ form_widget(form.prenom, {'attr': {'class': 'form-input', 'data-validate': 'true'}}) }}
+        <div class="invalid-feedback">
+          {{ form_errors(form.prenom) ? form_errors(form.prenom) : 'Ce champ est requis.' }}
+        </div>
+      </div>
+
+      <div class="form-group detail-group">
+        {{ form_label(form.email, 'Email', {'label_attr': {'class': 'detail-label'}}) }}
+        {{ form_widget(form.email, {'attr': {'class': 'form-input', 'data-validate': 'true'}}) }}
+        <div class="invalid-feedback">
+          {{ form_errors(form.email) ? form_errors(form.email) : 'Ce champ est requis.' }}
+        </div>
+      </div>
+
+      <div class="form-group detail-group">
+        {{ form_label(form.role, 'Rôle', {'label_attr': {'class': 'detail-label'}}) }}
+        {{ form_widget(form.role, {'attr': {'class': 'form-input'}}) }}
+      </div>
+
+      <div class="form-group detail-group">
+        {{ form_label(form.plainPassword, 'Mot de passe', {'label_attr': {'class': 'detail-label'}}) }}
+        {{ form_widget(form.plainPassword, {'attr': {'class': 'form-input'}}) }}
+        <div class="invalid-feedback">
+          {{ form_errors(form.plainPassword) }}
+        </div>
+      </div>
+
+      <div class="form-group detail-group">
+        {{ form_label(form.profileImage, 'Image de profil', {'label_attr': {'class': 'detail-label'}}) }}
+        {{ form_widget(form.profileImage, {'attr': {'class': 'form-input'}}) }}
+        <small class="form-text">Formats acceptés: JPEG/PNG (max 2MB)</small>
+        <div class="invalid-feedback">
+          {{ form_errors(form.profileImage) }}
+        </div>
+      </div>
+
+      <div class="form-group detail-group">
+        {{ form_label(form.nbrVoyage, 'Nombre de voyages', {'label_attr': {'class': 'detail-label'}}) }}
+        {{ form_widget(form.nbrVoyage, {'attr': {'class': 'form-input'}}) }}
+        <div class="invalid-feedback">
+          {{ form_errors(form.nbrVoyage) }}
+        </div>
+      </div>
+
+      <div class="action-buttons" style="margin-top: 2rem;">
+        <button class="edit-btn" type="submit" style="width: 100%;">
+          <i class="fas fa-save me-2"></i>Enregistrer les modifications
+        </button>
+      </div>
+      {{ form_end(form) }}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Custom client-side validation
+  const form = document.querySelector('form.needs-validation');
+  form.addEventListener('submit', function(e) {
+    let valid = true;
+    const fields = form.querySelectorAll('.form-input[data-validate="true"]');
+    fields.forEach(function(field) {
+      const feedback = field.parentNode.querySelector('.invalid-feedback');
+      if (!field.value.trim()) {
+        valid = false;
+        field.classList.add('is-invalid');
+        // Display the feedback container
+        if (feedback) {
+          feedback.style.display = 'block';
+          // Set default error if not provided by server
+          if (!feedback.textContent.trim()) {
+            feedback.textContent = "Ce champ est requis.";
+          }
+        }
+      } else {
+        field.classList.remove('is-invalid');
+        if (feedback) {
+          feedback.style.display = 'none';
+        }
+      }
+    });
+    if (!valid) {
+      e.preventDefault();
+    }
+  });
+});
+</script>
+{% endblock %}

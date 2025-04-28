@@ -1,0 +1,313 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Face Login{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    {# Add meta tags for camera permissions #}
+    <meta http-equiv="permissions-policy" content="camera=*">
+    <style>
+        .face-login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .camera-container {
+            position: relative;
+            width: 100%;
+            max-width: 640px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        #video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        #canvas {
+            display: none;
+        }
+
+        .capture-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 20px 0;
+            transition: background-color 0.3s ease;
+        }
+
+        .capture-button:hover {
+            background-color: #218838;
+        }
+
+        .capture-button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .status-message {
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            text-align: center;
+            display: none;
+        }
+
+        .status-message.loading {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+
+        .status-message.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 8px 16px;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-button:hover {
+            background-color: #5a6268;
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="face-login-container">
+    <a href="{{ path('app_login') }}" class="back-button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"></path>
+        </svg>
+        Back to Login
+    </a>
+
+    <h1>Face Recognition Login</h1>
+    <p>Please position your face in front of the camera and click 'Capture'</p>
+
+    <div class="camera-container">
+        <video id="video" autoplay playsinline muted></video>
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <button id="capture" class="capture-button" disabled>
+        <i class="fas fa-camera"></i>
+        Capture
+    </button>
+
+    <div id="loading" class="status-message loading">
+        <i class="fas fa-spinner fa-spin"></i>
+        Processing face recognition...
+    </div>
+
+    <div id="success" class="status-message success">
+        <i class="fas fa-check-circle"></i>
+        Face recognized successfully! Redirecting...
+    </div>
+
+    <div id="error" class="status-message error">
+        <i class="fas fa-exclamation-circle"></i>
+        <span id="error-message">Face not recognized. Please try again.</span>
+    </div>
+
+    <div id="debug-info" style="margin-top: 20px; padding: 10px; background: #f0f0f0; border-radius: 4px;">
+        <p>Camera Status: <span id="camera-status">Initializing...</span></p>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const captureButton = document.getElementById('capture');
+    const loadingMessage = document.getElementById('loading');
+    const successMessage = document.getElementById('success');
+    const errorMessage = document.getElementById('error');
+    const errorText = document.getElementById('error-message');
+    const cameraStatus = document.getElementById('camera-status');
+
+    // Update camera status
+    function updateCameraStatus(status) {
+        console.log('Camera status:', status);
+        cameraStatus.textContent = status;
+    }
+
+    // Access the camera with more detailed error handling
+    async function setupCamera() {
+        updateCameraStatus('Checking browser support...');
+        
+        try {
+            // First check if getUserMedia is supported
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                throw new Error('Your browser does not support camera access. Please try a different browser.');
+            }
+
+            updateCameraStatus('Requesting camera access...');
+
+            // Request camera access with specific constraints
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: true,  // Simplified video constraints
+                audio: false
+            });
+
+            updateCameraStatus('Camera access granted, setting up video...');
+
+            // Attach stream to video element
+            video.srcObject = stream;
+            
+            // Wait for video to be ready
+            await new Promise((resolve) => {
+                video.onloadedmetadata = () => {
+                    updateCameraStatus('Video metadata loaded...');
+                    resolve();
+                };
+            });
+
+            // Start playing the video
+            await video.play();
+            
+            // Enable capture button only when video is playing
+            captureButton.disabled = false;
+            updateCameraStatus('Camera ready! You can now capture your image.');
+            console.log('Camera setup successful');
+
+        } catch (err) {
+            console.error('Camera setup error:', err);
+            let errorMsg = 'Error accessing camera. ';
+            
+            if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                errorMsg += 'Please grant camera permissions in your browser settings.';
+                updateCameraStatus('Camera permission denied');
+            } else if (err.name === 'NotFoundError') {
+                errorMsg += 'No camera device found. Please connect a camera.';
+                updateCameraStatus('No camera found');
+            } else if (err.name === 'NotReadableError') {
+                errorMsg += 'Camera is in use by another application.';
+                updateCameraStatus('Camera in use by another app');
+            } else {
+                errorMsg += err.message || 'Please ensure you have granted camera permissions.';
+                updateCameraStatus('Camera error: ' + err.name);
+            }
+            
+            errorText.textContent = errorMsg;
+            errorMessage.style.display = 'block';
+            captureButton.disabled = true;
+        }
+    }
+
+    // Capture image from video
+    function captureImage() {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        return canvas.toDataURL('image/jpeg');
+    }
+
+    // Send image to server
+    async function sendImage(imageData) {
+        try {
+            loadingMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+
+            const formData = new FormData();
+            const blob = await fetch(imageData).then(r => r.blob());
+            formData.append('face_image', blob, 'face.jpg');
+
+            console.log('Sending image to server...');
+            const response = await fetch('{{ path("face_login") }}', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            });
+
+            console.log('Response status:', response.status);
+            console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
+            // Try to get the response text first
+            const responseText = await response.text();
+            console.log('Raw response:', responseText);
+
+            let data;
+            try {
+                // Try to parse as JSON
+                data = JSON.parse(responseText);
+            } catch (e) {
+                console.error('Failed to parse JSON:', e);
+                throw new Error('Server returned an invalid response. Response was: ' + responseText.substring(0, 100) + '...');
+            }
+
+            if (response.ok && data.success) {
+                successMessage.style.display = 'block';
+                loadingMessage.style.display = 'none';
+                // Redirect to profile page after successful login
+                setTimeout(() => {
+                    window.location.href = '{{ path("profile") }}';
+                }, 2000);
+            } else {
+                throw new Error(data.error || 'Face recognition failed');
+            }
+        } catch (err) {
+            console.error('Error:', err);
+            loadingMessage.style.display = 'none';
+            errorMessage.style.display = 'block';
+            errorText.textContent = err.message;
+        }
+    }
+
+    // Event listeners
+    captureButton.addEventListener('click', () => {
+        const imageData = captureImage();
+        sendImage(imageData);
+    });
+
+    // Initialize camera when page loads
+    console.log('Starting camera setup...');
+    updateCameraStatus('Starting camera initialization...');
+    setupCamera().catch(err => {
+        console.error('Failed to setup camera:', err);
+        updateCameraStatus('Camera setup failed: ' + err.message);
+    });
+});
+</script>
+{% endblock %} 

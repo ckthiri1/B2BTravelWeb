@@ -2,26 +2,45 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
+use App\Entity\Vol;
 use App\Entity\Voyage;
+use App\Repository\UserRepository;
 use App\Repository\VolRepository;
+use App\Repository\VoyageRepository;
 use App\Service\VolApi;
-use Dompdf\Dompdf;
-use Dompdf\Options;
+use Doctrine\ORM\EntityManagerInterface;
+
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 class VolController extends AbstractController
 {
     private $logger;
+    private $entityManager;
+    private $voyageRepository;
+    private $volRepository;
+    private $userRepository;
+    
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger,  EntityManagerInterface $entityManager,  VoyageRepository $voyageRepository,
+    VolRepository $volRepository,
+    UserRepository $userRepository)
     {
         $this->logger = $logger;
+
+        $this->entityManager = $entityManager;
+        $this->voyageRepository = $voyageRepository;
+        $this->volRepository = $volRepository;
+        $this->userRepository = $userRepository;
     }
 
     #[Route('/voyage/{id}/flights', name: 'app_voyage_flights')]
@@ -115,32 +134,161 @@ class VolController extends AbstractController
         ];
     }
 
-    #[Route('/voyage/{id}/flights/pdf', name: 'app_vol_export_pdf')]
-    public function exportFlightsPdf(Voyage $voyage, VolApi $flightService): Response
-    {
-    $flights = $flightService->getFlights(
-        $flightService->getIataCode($voyage->getDepart()),
-        $flightService->getIataCode($voyage->getDestination())
-    );
 
+#[Route('/voyage/{id}/flights/pdf', name: 'app_vol_export_pdf')]
+public function exportFlightsPdf(Voyage $voyage, VolApi $flightService): Response
+{
+    $departureIata = $flightService->getIataCode($voyage->getDepart());
+    $arrivalIata = $flightService->getIataCode($voyage->getDestination());
+    
+    $flights = $flightService->getFlights($departureIata, $arrivalIata);
+    
+    // Get absolute file paths - ADD THIS CODE HERE
+    $projectDir = $this->getParameter('kernel.project_dir');
+    $logoPath = $projectDir . '/public/images/logo.png';
+    $qrPath = $projectDir . '/public/images/qrcode.png';
+    $signaturePath = $projectDir . '/public/images/signature.png';
+    
+    // Create new TCPDF document
+    $pdf = new \TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+    
+    // Set document information
+    $pdf->SetCreator(PDF_CREATOR);
+    $pdf->SetAuthor('Your Travel Agency');
+    $pdf->SetTitle('Flight List');
+    $pdf->SetSubject('Flights from ' . $voyage->getDepart() . ' to ' . $voyage->getDestination());
+    
+    // Remove default header/footer
+    $pdf->setPrintHeader(false);
+    $pdf->setPrintFooter(false);
+    
+    // Set margins
+    $pdf->SetMargins(15, 15, 15);
+    
+    // Set auto page breaks
+    $pdf->SetAutoPageBreak(TRUE, 15);
+    
+    // Add a page
+    $pdf->AddPage('L', 'A4');
+    
+    // Set font
+    $pdf->SetFont('helvetica', '', 10);
+    
+    // Generate HTML content - UPDATE THIS LINE
     $html = $this->renderView('vol/pdf.html.twig', [
         'flights' => $flights,
-        'voyage' => $voyage
+        'voyage' => $voyage,
+        'logo_path' => $logoPath,
+        'qr_path' => $qrPath,
+        'signature_path' => $signaturePath,
     ]);
-
-    $pdfOptions = new Options();
-    $pdfOptions->set('defaultFont', 'Arial');
-
-    $dompdf = new Dompdf($pdfOptions);
-    $dompdf->loadHtml($html);
-    $dompdf->setPaper('A4', 'landscape');
-    $dompdf->render();
-
-    $response = new Response($dompdf->output());
-    $response->headers->set('Content-Type', 'application/pdf');
-    $response->headers->set('Content-Disposition', ResponseHeaderBag::DISPOSITION_ATTACHMENT . '; filename="flights.pdf"');
-
-    return $response;
+    
+    // Output the HTML content
+    $pdf->writeHTML($html, true, false, true, false, '');
+    
+    // Close and output PDF document
+    $pdfContent = $pdf->Output('flights.pdf', 'S');
+    
+    return new Response(
+        $pdfContent,
+        200,
+        [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="flights-' . $voyage->getDepart() . '-' . $voyage->getDestination() . '.pdf"',
+        ]
+    );
 }
+
+#[Route('/reservation/vol', name: 'reservation_vol', methods: ['POST'])]
+public function reserverVol(
+    Request $request, 
+    EntityManagerInterface $entityManager,
+    Security $security
+): JsonResponse {
+    try {
+        // Verify Content-Type is application/json
+        if ($request->getContentType() !== 'json' || !$request->getContent()) {
+            return new JsonResponse(['error' => 'Invalid Content-Type or empty body'], 400);
+        }
+
+        // Get authenticated user
+        $user = $security->getUser();
+        if (!$user) {
+            return new JsonResponse(['error' => 'Authentication required'], 401);
+        }
+
+        // Decode JSON data
+        $data = json_decode($request->getContent(), true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return new JsonResponse(['error' => 'Invalid JSON format'], 400);
+        }
+
+        // Validate required fields
+        $requiredFields = ['airline', 'flightNumber', 'price', 'departureTime', 'arrivalTime', 'depart', 'destination'];
+        foreach ($requiredFields as $field) {
+            if (empty($data[$field])) {
+                return new JsonResponse(['error' => "Missing required field: $field"], 400);
+            }
+        }
+
+        // Parse dates
+        $departureDatetime = new \DateTime($data['departureTime']);
+        $arrivalDatetime = new \DateTime($data['arrivalTime']);
+
+        // Find or create voyage
+        $voyage = $entityManager->getRepository(Voyage::class)->findOneBy([
+            'depart' => $data['depart'],
+            'Destination' => $data['destination']
+        ]);
+        
+        if (!$voyage) {
+            $voyage = new Voyage();
+            $voyage->setDepart($data['depart']);
+            $voyage->setDestination($data['destination']);
+            $voyage->setDescription("Vol de {$data['depart']} à {$data['destination']}");
+            $entityManager->persist($voyage);
+        }
+
+        // Create new flight
+        $vol = new Vol();
+        
+        // Generate new flight ID
+        $lastVol = $entityManager->getRepository(Vol::class)
+            ->findOneBy([], ['volID' => 'DESC']);
+        $newVolId = $lastVol ? $lastVol->getVolID() + 1 : 1;
+        
+        // Set flight properties
+        $vol->setVolID($newVolId);
+        $vol->setDateDepart($departureDatetime);
+        $vol->setDateArrival($arrivalDatetime);
+        $vol->setAirLine($data['airline']);
+        $vol->setFlightNumber((int)$data['flightNumber']);
+        $vol->setDureeVol($departureDatetime->diff($arrivalDatetime)->format('%h hours %i minutes'));
+        $vol->setPrixVol((int)preg_replace('/[^0-9]/', '', $data['price']));
+        $vol->setTypeVol($data['typeVol'] ?? 'ALLER');
+        $vol->setIdVoyage($voyage);
+        $vol->setUser($user);
+        $vol->setStatus('NON_RESERVER');
+        
+        
+        $entityManager->persist($vol);
+        $entityManager->persist($user);
+        $entityManager->flush();
+        
+        return new JsonResponse([
+            'success' => true,
+            'message' => 'Flight reserved successfully',
+            'volId' => $vol->getVolID(),
+            'flightNumber' => $data['flightNumber']
+        ]);
+        
+    } catch (\Exception $e) {
+        return new JsonResponse([
+            'error' => 'Reservation error',
+            'message' => $e->getMessage()
+        ], 500);
+    }
+}
+
 
 }

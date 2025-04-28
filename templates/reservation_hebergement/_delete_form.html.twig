@@ -1,0 +1,10 @@
+<form method="post" 
+      action="{{ path('app_reservation_hebergement_delete', {'idResH': reservation_hebergement.idResH}) }}" 
+      class="d-inline"
+      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette réservation ?');">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reservation_hebergement.idResH) }}">
+    <button class="btn btn-danger">
+        <i class="fas fa-trash me-2"></i>
+        Supprimer
+    </button>
+</form>

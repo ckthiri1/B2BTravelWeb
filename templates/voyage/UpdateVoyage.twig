@@ -5,23 +5,41 @@
     <div class="modal-content">
         <h2 class="modal-title">Modifier Voyage</h2>
         
-        {{ form_start(form, {'attr': {'class': 'update-voyage-form'}}) }}
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger">
+                {{ message }}
+            </div>
+        {% endfor %}
+        
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
+        
+        {{ form_start(form, {'attr': {'class': 'update-voyage-form', 'novalidate': 'novalidate'}}) }}
             <div class="form-group">
                 {{ form_label(form.depart, 'Lieu de départ', {'label_attr': {'class': 'form-label'}}) }}
                 {{ form_widget(form.depart, {'attr': {'class': 'form-input'}}) }}
-                {{ form_errors(form.depart) }}
+                <div class="error-message">
+                    {{ form_errors(form.depart) }}
+                </div>
             </div>
 
             <div class="form-group">
                 {{ form_label(form.Destination, 'Destination', {'label_attr': {'class': 'form-label'}}) }}
                 {{ form_widget(form.Destination, {'attr': {'class': 'form-input'}}) }}
-                {{ form_errors(form.Destination) }}
+                <div class="error-message">
+                    {{ form_errors(form.Destination) }}
+                </div>
             </div>
 
             <div class="form-group">
                 {{ form_label(form.Description, 'Description', {'label_attr': {'class': 'form-label'}}) }}
                 {{ form_widget(form.Description, {'attr': {'class': 'form-textarea'}}) }}
-                {{ form_errors(form.Description) }}
+                <div class="error-message">
+                    {{ form_errors(form.Description) }}
+                </div>
             </div>
 
             <div class="modal-actions">
@@ -131,6 +149,8 @@
             background: #e74c3c;
             color: white;
             border: none;
+            text-decoration: none;
+            display: inline-block;
         }
 
         .btn-update {
@@ -144,6 +164,34 @@
             transform: scale(1.05);
         }
 
+        /* Error message styling */
+        .error-message {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        /* Flash messages styling */
+        .alert {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -155,4 +203,41 @@
             }
         }
     </style>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get all input fields
+        const inputFields = document.querySelectorAll('.form-input, .form-textarea');
+        
+        // Add event listener to each input field
+        inputFields.forEach(function(input) {
+            input.addEventListener('input', function() {
+                // Find the closest parent form-group
+                const formGroup = this.closest('.form-group');
+                if (formGroup) {
+                    // Find the error message div inside the form-group
+                    const errorDiv = formGroup.querySelector('.error-message');
+                    if (errorDiv) {
+                        // Clear the error message when user starts typing
+                        errorDiv.innerHTML = '';
+                    }
+                }
+            });
+        });
+
+        // Add animation for alerts
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            // Auto-dismiss alerts after 5 seconds
+            setTimeout(function() {
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.style.display = 'none';
+                }, 300);
+            }, 5000);
+        });
+    });
+</script>
 {% endblock %}

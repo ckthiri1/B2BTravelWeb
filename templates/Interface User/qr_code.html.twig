@@ -1,0 +1,386 @@
+{# templates/reservation/qr_code.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Reservation QR Code{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .qr-page {
+            display: flex;
+            min-height: calc(100vh - 80px);
+            background: #f8f9fa;
+            padding: 2rem;
+        }
+        
+        .qr-card {
+            display: flex;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        
+        .qr-section {
+            flex: 1;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a237e 0%, #303f9f 100%);
+            color: white;
+        }
+        
+        .qr-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .qr-code-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .qr-instructions {
+            text-align: center;
+            max-width: 300px;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        
+        .details-section {
+            flex: 1.5;
+            padding: 3rem;
+        }
+        
+        .reservation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .reservation-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: #1a237e;
+        }
+        
+        .status-badge {
+            background: #4caf50;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .info-card {
+            background: #f9f9f9;
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid #1a237e;
+        }
+        
+        .info-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .info-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .flight-card {
+            margin-top: 2rem;
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 1.5rem;
+        }
+        
+        .flight-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        
+        .airline-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .airline-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .flight-route {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1.5rem 0;
+            position: relative;
+        }
+        
+        .flight-route::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            height: 2px;
+            background: #eee;
+            z-index: 1;
+        }
+        
+        .location {
+            text-align: center;
+            z-index: 2;
+            background: white;
+            padding: 0 1rem;
+        }
+        
+        .city {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .date-time {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .route-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f0f2ff;
+            border-radius: 8px;
+        }
+        
+        .route-point {
+            text-align: center;
+        }
+        
+        .route-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .route-value {
+            font-weight: 600;
+            color: #1a237e;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: #1a237e;
+            color: white;
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            background: #0d153d;
+        }
+        
+        .btn-outline {
+            background: white;
+            color: #1a237e;
+            border: 1px solid #1a237e;
+        }
+        
+        .btn-outline:hover {
+            background: #f0f2ff;
+        }
+        
+        @media (max-width: 992px) {
+            .qr-card {
+                flex-direction: column;
+            }
+            
+            .qr-section {
+                padding: 2rem;
+            }
+            
+            .details-section {
+                padding: 2rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+        
+        @media print {
+            .action-buttons {
+                display: none;
+            }
+            
+            .qr-page {
+                padding: 0;
+                background: white;
+            }
+            
+            .qr-card {
+                box-shadow: none;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    {{ include('/Sidebar/Navbar.twig') }}
+
+    <div class="qr-page">
+        <div class="qr-card">
+            <div class="qr-section">
+                <h2 class="qr-title">Your Boarding Pass</h2>
+                <div class="qr-code-container" id="qrCode"></div>
+                <p class="qr-instructions">
+                    Scan this QR code at the airport for quick check-in and boarding.
+                    You can also show this digital pass to security personnel.
+                </p>
+            </div>
+            
+            <div class="details-section">
+                <div class="reservation-header">
+                    <h1 class="reservation-title">Reservation Details</h1>
+                    <span class="status-badge">Reserved</span>
+                </div>
+                
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-label">Reservation ID</div>
+                        <div class="info-value">{{ reservation.id_resV }}</div>
+                    </div>
+                    
+                    <div class="info-card">
+                        <div class="info-label">Passenger</div>
+                        <div class="info-value">{{ reservation.id_user.nom }} {{ reservation.id_user.prenom }}</div>
+                    </div>
+                    
+                    <div class="info-card">
+                        <div class="info-label">Total Price</div>
+                        <div class="info-value">{{ reservation.prixTotal }} DT</div>
+                    </div>
+                    
+                    <div class="info-card">
+                        <div class="info-label">Seats Reserved</div>
+                        <div class="info-value">{{ reservation.place }}</div>
+                    </div>
+                </div>
+                
+                <!-- Added route information section -->
+                <div class="route-info">
+                    <div class="route-point">
+                        <div class="route-label">Departure</div>
+                        <div class="route-value">{{ reservation.id_vol.idVoyage.depart }}</div>
+                    </div>
+                    <div class="route-point">
+                        <div class="route-label">Destination</div>
+                        <div class="route-value">{{ reservation.id_vol.idVoyage.Destination }}</div>
+                    </div>
+                </div>
+                
+                <div class="flight-card">
+                    <div class="flight-header">
+                        <div class="airline-info">
+                            <img src="{{ asset('images/avionicon.jpeg') }}" alt="Airline Logo" class="airline-logo">
+                            <div>
+                                <div class="info-value">{{ reservation.id_vol.airLine }}</div>
+                                <div class="info-label">Flight {{ reservation.id_vol.flightNumber }}</div>
+                            </div>
+                        </div>
+                        <div class="info-value">{{ reservation.id_vol.typeVol }}</div>
+                    </div>
+                    
+                    <div class="flight-route">
+                        <div class="location">
+                            <div class="city">DEPARTURE</div>
+                            <div class="date-time">{{ reservation.id_vol.dateDepart|date('Y-m-d ') }}</div>
+                        </div>
+                        
+                        <div class="location">
+                            <div class="city">ARRIVAL</div>
+                            <div class="date-time">{{ reservation.id_vol.dateArrival|date('Y-m-d ') }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-label" style="text-align: center;">
+                        Flight Duration: {{ reservation.id_vol.dureeVol }}
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="window.print()">
+                        <i class="bi bi-printer"></i> Print Boarding Pass
+                    </button>
+                    <a href="{{ path('flight_history') }}" class="btn btn-outline">
+                        <i class="bi bi-clock-history"></i> View All Reservations
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <script>
+        new QRCode(document.getElementById("qrCode"), {
+            text: "{{ qrContent|escape('js') }}",
+            width: 200,
+            height: 200,
+            colorDark: "#1a237e",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+    </script>
+{% endblock %}

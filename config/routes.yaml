@@ -1,5 +1,91 @@
 controllers:
-    resource:
-        path: ../src/Controller/
-        namespace: App\Controller
-    type: attribute
+  resource:
+    path: ../src/Controller/
+    namespace: App\Controller
+  type: attribute
+app_verify_email:
+  path: /verify
+  controller: App\Controller\User\RegistrationController::verifyUserEmail
+app_register:
+  path: /register
+  controller: App\Controller\User\RegistrationController::register
+
+app_login:
+  path: /login
+  controller: App\Controller\User\LoginController::index
+
+app_logout:
+  path: /logout
+
+admin_dashboard:
+  path: /admin/dashboard
+  controller: App\Controller\User\DashboardController::adminDashboard
+
+profile:
+  path: /profile
+  controller: App\Controller\User\ProfileController::index
+
+admin_user_index:
+  path: /admin/user
+  controller: App\Controller\User\Admin\UserAdminController::index
+  methods: GET
+
+admin_user_new:
+  path: /admin/user/new
+  controller: App\Controller\User\Admin\UserAdminController::new
+
+admin_user_edit:
+  path: /admin/user/{userId}/edit
+  controller: App\Controller\User\Admin\UserAdminController::edit
+
+admin_profile:
+  path: /admin/user/admin_profile
+  controller: App\Controller\User\Admin\AdminProfileController::index
+
+admin_profile_edit:
+  path: /admin/user/{userId}/edit
+  controller: App\Controller\User\Admin\AdminProfileController::edit
+  methods: [GET, POST]
+
+admin_user_delete:
+  path: /admin/user/{userId}
+  controller: App\Controller\User\Admin\UserAdminController::delete
+  methods: POST
+
+forgot_password:
+  path: /forgot-password
+  controller: App\Controller\User\ForgotPasswordController::show
+  methods: [GET]
+
+forgot_password_handle:
+  path: /forgot-password
+  controller: App\Controller\User\ForgotPasswordController::handle
+  methods: [POST]
+
+reset_password:
+  path: /reset-password/{token}
+  controller: App\Controller\User\ResetPasswordController::reset
+  methods: [GET, POST]
+
+# config/routes.yaml
+connect_google_start:
+  path: /connect/google
+  controller: App\Controller\User\LoginController::connectGoogleStart
+
+connect_google_check:
+  path: /connect/google/check
+  controller: App\Controller\User\LoginController::connectGoogleCheck
+
+mini_calendar_data:
+  path: /mini-calendar-data
+  controller: App\EventCalendarBundle\Controller\CalendarController::getCalendarData
+
+face_login:
+  path: /face-login
+  controller: App\Controller\User\FaceRecognitionController::loginFace
+  methods: [GET, POST]
+
+register_face:
+  path: /register-face
+  controller: App\Controller\User\FaceRecognitionController::registerFace
+  methods: [POST]

@@ -1,0 +1,41 @@
+{# templates/hebergement/pdf.html.twig #}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Export des hébergements</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        h1 { color: #2c3e50; text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background-color: #3b82f6; color: white; padding: 12px; }
+        td { padding: 10px; border: 1px solid #ddd; }
+        .badge { background-color: #e9ecef; padding: 5px 10px; border-radius: 15px; }
+    </style>
+</head>
+<body>
+    <h1>Liste des hébergements - {{ date_export|date('d/m/Y H:i') }}</h1>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Type</th>
+                <th>Adresse</th>
+                <th>Prix/nuit</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for hebergement in hebergements %}
+            <tr>
+                <td>{{ hebergement.nom }}</td>
+                <td><span class="badge">{{ hebergement.type }}</span></td>
+                <td>{{ hebergement.adresse }}</td>
+                <td>{{ hebergement.prix }} €</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

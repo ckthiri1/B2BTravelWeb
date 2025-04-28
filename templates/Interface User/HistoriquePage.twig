@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight History</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+    /* All your existing styles remain the same */
+    :root {
+        --primary: #1a237e;
+        --secondary: #3e92cc;
+        --accent: #d8315b;
+        --light: #f5f5f5;
+        --gray: #ececec;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--gray);
+        color: #333;
+    }
+
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 1.5rem;
+        position: relative;
+        display: inline-block;
+    }
+
+    .page-title::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -10px;
+        width: 50%;
+        height: 4px;
+        background: var(--secondary);
+        border-radius: 2px;
+    }
+
+    .history-container {
+        max-width: 100%;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .history-header {
+        background-color: #1a237e;
+        color: white;
+        padding: 1.5rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+    }
+
+    .flight-card {
+        background-color: white;
+        border-left: 4px solid var(--secondary);
+        margin: 1rem;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .status-reserved {
+        background-color: #28a745;
+        color: white;
+    }
+
+    :root {
+        --primary: #0a2463;
+        --secondary: #3e92cc;
+        --accent: #d8315b;
+        --light: #f5f5f5;
+        --gray: #ececec;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--gray);
+        color: #333;
+    }
+
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 1.5rem;
+        position: relative;
+        display: inline-block;
+    }
+
+    .page-title::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -10px;
+        width: 50%;
+        height: 4px;
+        background: var(--secondary);
+        border-radius: 2px;
+    }
+
+    .reservation-container {
+        max-width: 100%;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .reservation-header {
+        background-color: var(--primary);
+        color: white;
+        padding: 1.5rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .flight-card {
+        background-color: white;
+        border-left: 4px solid var(--secondary);
+        margin: 1rem;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .flight-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .flight-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .flight-details {
+        flex: 1;
+    }
+
+    .airline-info {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .airline-info img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .flight-route {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 1.5rem 2rem;
+    }
+
+    .flight-route::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 50%;
+        height: 2px;
+        background-color: var(--gray);
+        z-index: 1;
+    }
+
+    .flight-route .point {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: white;
+        border: 2px solid var(--secondary);
+        position: relative;
+        z-index: 2;
+    }
+
+    .flight-route .plane-icon {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 2;
+        color: var(--primary);
+        font-size: 1.2rem;
+    }
+
+    .location {
+        text-align: center;
+        width: 100px;
+    }
+
+    .location .city {
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .location .date {
+        font-size: 0.8rem;
+        color: #666;
+    }
+
+    .duration {
+        text-align: center;
+        position: relative;
+        z-index: 2;
+        background: white;
+        padding: 0.3rem 0.8rem;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--primary);
+        border: 1px solid var(--gray);
+    }
+
+    .flight-actions {
+        display: flex;
+        flex-direction: column; /* Changed to column layout */
+        align-items: flex-end; /* Align buttons to the right */
+        gap: 0.75rem; /* Add some vertical spacing between buttons */
+    }
+
+    .seat-selection {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .seat-input {
+        width: 60px;
+        text-align: center;
+        padding: 0.5rem;
+        border-radius: 4px;
+        border: 1px solid var(--gray);
+        font-weight: 600;
+    }
+
+    .price {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary);
+        white-space: nowrap;
+        margin-bottom: 1rem; /* Add space between price and buttons */
+    }
+
+    .btn-delete {
+        background-color: transparent;
+        color: var(--accent);
+        border: 1px solid var(--accent);
+        padding: 0.5rem 0.8rem;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-delete:hover {
+        background-color: var(--accent);
+        color: white;
+    }
+
+    .total-section {
+        background-color: var(--light);
+        padding: 1.5rem;
+        border-top: 1px solid var(--gray);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .total-price {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    .btn-reserve {
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        padding: 0.8rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(10, 36, 99, 0.2);
+    }
+
+    .btn-reserve:hover {
+        background-color: #081e50;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(10, 36, 99, 0.3);
+    }
+
+    .scroll-area {
+        max-height: 65vh;
+        overflow-y: auto;
+        padding: 0.5rem;
+    }
+
+    .scroll-area::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .scroll-area::-webkit-scrollbar-track {
+        background: var(--gray);
+        border-radius: 10px;
+    }
+
+    .scroll-area::-webkit-scrollbar-thumb {
+        background: var(--gray);
+        border-radius: 10px;
+    }
+
+    @media(max-width: 768px) {
+        .flight-info {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .flight-actions {
+            width: 100%;
+            align-items: stretch; /* Make buttons full width on mobile */
+        }
+
+        .flight-route {
+            margin: 1.5rem 1rem;
+        }
+    }
+
+    /* Delete Confirmation Modal Styles */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .modal-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .modal-container {
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        width: 90%;
+        max-width: 400px;
+        transform: translateY(-20px);
+        transition: transform 0.3s ease;
+    }
+
+    .modal-overlay.active .modal-container {
+        transform: translateY(0);
+    }
+
+    .modal-header {
+        background-color: var(--primary);
+        color: white;
+        padding: 1.2rem;
+        border-radius: 12px 12px 0 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-header h3 {
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .modal-icon {
+        font-size: 2.5rem;
+        color: var(--accent);
+        margin-bottom: 1rem;
+    }
+
+    .modal-message {
+        margin-bottom: 1.5rem;
+        font-size: 1.1rem;
+        color: #555;
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        padding: 0 1.5rem 1.5rem;
+    }
+
+    .modal-btn {
+        padding: 0.6rem 1.5rem;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .modal-btn-cancel {
+        background-color: white;
+        color: var(--primary);
+        border: 1px solid var(--primary);
+    }
+
+    .modal-btn-cancel:hover {
+        background-color: var(--light);
+    }
+
+    .modal-btn-confirm {
+        background-color: var(--accent);
+        color: white;
+        border: 1px solid var(--accent);
+    }
+
+    .modal-btn-confirm:hover {
+        background-color: #c12a50;
+        transform: translateY(-1px);
+    }
+
+    .pricing-summary {
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        margin-top: 2rem;
+        overflow: hidden;
+    }
+
+    .pricing-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .pricing-row:last-child {
+        border-bottom: none;
+    }
+
+    .pricing-label {
+        font-size: 1rem;
+        color: #666;
+        display: flex;
+        align-items: center;
+    }
+
+    .pricing-value {
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .subtotal-row {
+        background-color: #f9f9f9;
+    }
+
+    .discount-row {
+        background-color: #fff9fa;
+    }
+
+    .discount-badge {
+        background-color: var(--accent);
+        color: white;
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        margin-left: 0.75rem;
+        font-weight: 600;
+    }
+
+    .discount-value {
+        color: var(--accent);
+    }
+
+    .total-row {
+        background-color: var(--primary);
+        color: white;
+    }
+
+    .total-label {
+        color: white;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .total-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .btn-reserve {
+        width: 100%;
+        margin-top: 1.5rem;
+        padding: 1rem;
+        font-size: 1.1rem;
+    }
+    .btn-history {
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        padding: 0.5rem 1.25rem;
+        border-radius: 50px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        box-shadow: 0 2px 8px rgba(10, 36, 99, 0.2);
+    }
+
+    .btn-history:hover {
+        background-color: #082055;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(10, 36, 99, 0.3);
+        color: white;
+    }
+
+    .btn-history i {
+        font-size: 1.1rem;
+        transition: transform 0.3s ease;
+    }
+
+    .btn-history:hover i {
+        transform: translateX(2px);
+    }
+
+    /* New styles for the stacked buttons */
+    .action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        width: 100%;
+    }
+
+    .action-buttons .btn {
+        width: 100%;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .payment-details {
+    margin-top: 1rem;
+}
+
+.payment-details .card {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+}
+
+.payment-details p {
+    margin-bottom: 0.3rem;
+    font-size: 0.9rem;
+}
+
+.payment-details .badge {
+    font-size: 0.75rem;
+    padding: 0.35em 0.65em;
+}
+    </style>
+</head>
+<body>
+    {{ include('/Sidebar/Navbar.twig') }}
+    <div class="container-fluid p-4">
+        <h1 class="page-title text-center">FLIGHT HISTORY</h1>
+
+        <div class="history-container">
+            <div class="history-header">
+                Your Reserved Flights
+            </div>
+
+            <div class="scroll-area">
+                {% if reservations is defined and reservations is not empty %}
+               {% for reservation in reservations %}
+    <div class="flight-card">
+        <div class="flight-info">
+            <div class="flight-details">
+                <div class="airline-info">
+                    <img src="{{ asset('images/avionicon.jpeg') }}" alt="Airline Logo">
+                    <div>
+                        <div class="fw-bold">{{ reservation.id_vol.airLine }}</div>
+                        <div class="text-muted small">Flight {{ reservation.id_vol.flightNumber }} • {{ reservation.id_vol.typeVol }}</div>
+                        <span class="status-badge status-reserved">RESERVED</span>
+                        {% if reservation.paymentStatus %}
+                            <span class="badge bg-{{ reservation.paymentStatus == 'completed' ? 'success' : 'warning' }}">
+                                {{ reservation.paymentStatus|upper }}
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Payment Details Section -->
+                <div class="payment-details mt-3">
+                    <div class="card p-3">
+                        <h6 class="fw-bold">Payment Information</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Reservation Code:</strong> {{ reservation.reservationCode }}</p>
+                                <p class="mb-1"><strong>Payment Method:</strong> {{ reservation.paymentMethod ?? 'N/A' }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Transaction ID:</strong> {{ reservation.transactionId ?? 'N/A' }}</p>
+                                <p class="mb-1"><strong>Paid:</strong> {{ reservation.prixTotal }} DT</p>
+                            </div>
+                        </div>
+                        {% if reservation.paymentDate %}
+                            <p class="mb-0 text-muted small">
+                                Paid on {{ reservation.paymentDate|date('M j, Y H:i') }}
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="flight-route">
+                    <!-- Your existing flight route display -->
+                </div>
+            </div>
+            
+            <div class="flight-actions">
+                <div class="price">{{ reservation.prixTotal }} DT</div>
+                <div class="action-buttons">
+                    {% if reservation.reservationHebergements|length < 4 %}
+                        <a href="{{ path('app_reservation_hebergement_new_from_voyage', {'idResV': reservation.id_resV}) }}" 
+                           class="btn btn-primary">
+                           <i class="bi bi-house-door"></i> Book Accommodation
+                        </a>
+                    {% endif %}
+                    {% if reservation.reservationHebergements|length > 0 %}
+                        <a href="{{ path('DetailHebergementUser', {'idResV': reservation.id_resV}) }}" 
+                           class="btn btn-outline-success">
+                           <i class="bi bi-eye"></i> View Accommodations
+                        </a>
+                    {% endif %}
+                    <a href="{{ path('reservation_qrcode', {'id': reservation.id_resV}) }}" 
+                       class="btn btn-dark">
+                       <i class="bi bi-qr-code"></i> View QR Code
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+                {% else %}
+                    <div class="alert alert-info m-3">No reserved flights found in your history.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

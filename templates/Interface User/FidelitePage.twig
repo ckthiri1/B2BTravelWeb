@@ -3,115 +3,181 @@
 {% block stylesheets %}
   {{ parent() }}
   <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
+    :root {
+        --primary: #1a237e;
+        --primary-light: #534bae;
+        --secondary: #f5c702;
+        --dark: #03045f;
+        --light: #f8f9fa;
+        --gray: #e9ecef;
+        --success: #28a745;
+    }
+    
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: var(--light);
+    }
+
     .fidelite-container {
-        background-color: #e3e3e3;
         min-height: 100vh;
         position: relative;
+        background: linear-gradient(135deg, var(--light) 0%, #e6f7ff 100%);
+    }
+
+    .header-container {
+        position: relative;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
     }
 
     .header-image {
         width: 100%;
         height: 350px;
         object-fit: cover;
-        border-radius: 20px;
-        position: relative;
+        filter: brightness(0.9);
+    }
+
+    .header-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 2rem;
+        background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+        color: white;
     }
 
     .content-panel {
-        background-color: #03045f;
-        padding: 20px;
-    }
-
-    .white-panel {
         background-color: white;
-        border-radius: 20px;
-        padding: 20px;
-        position: relative;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        margin-bottom: 2rem;
     }
 
     .info-section {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
     }
 
     .info-card {
         background-color: white;
-        border-radius: 20px;
-        padding: 20px;
-        width: 48%;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .info-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
     }
 
     .info-item {
         display: flex;
         align-items: center;
-        margin-bottom: 20px;
+        margin-bottom: 1.25rem;
+        padding: 0.75rem;
+        border-radius: 8px;
+        background-color: var(--gray);
     }
 
     .info-icon {
-        width: 26px;
-        height: 26px;
-        margin-right: 10px;
+        width: 24px;
+        height: 24px;
+        margin-right: 12px;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
     }
 
     .info-text {
-        font-weight: bold;
-        font-size: 20px;
+        font-weight: 500;
+        font-size: 1rem;
+        color: var(--dark);
     }
 
     .rank-section {
-        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(140deg, #0a2463 0%, var(--primary-light) 200%);
+        color: white;
     }
 
     .rank-text {
-        color: #f5c702;
-        font-size: 30px;
-        font-weight: bold;
+        color: var(--secondary);
+        font-size: 1.75rem;
+        font-weight: 700;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        margin: 0.5rem 0;
     }
 
     .chatbot-btn {
-        background-color: #03045f;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
         color: white;
-        border-radius: 30px;
-        padding: 10px 20px;
+        border: none;
+        border-radius: 50px;
+        padding: 0.75rem 1.5rem;
         display: flex;
         align-items: center;
         gap: 10px;
         position: absolute;
         top: 20px;
         right: 20px;
+        box-shadow: 0 4px 12px rgba(26, 35, 126, 0.3);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+
+    .chatbot-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(26, 35, 126, 0.4);
     }
 
     .chatbot-icon {
-        width: 30px;
-        height: 30px;
+        width: 24px;
+        height: 24px;
+        filter: brightness(0) invert(1);
     }
 
-    /* New class to align the text to the right */
-    .right-align {
-        text-align: right;
-    }
-    
-    /* Updated Chat Container Styles */
+    /* Modern Chat Container */
     .chat-container {
         position: fixed;
         bottom: 20px;
         right: 20px;
-        width: 320px;
+        width: 380px;
+        max-width: 90%;
+        height: 500px;
         background: white;
-        border-radius: 15px;
-        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
         display: none;
         overflow: hidden;
         z-index: 1000;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        transform: translateY(20px);
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+    
+    .chat-container.active {
+        transform: translateY(0);
+        opacity: 1;
     }
 
     .chat-header {
-        background-color: #1a237e;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
         color: white;
-        padding: 12px;
-        font-weight: bold;
+        padding: 1rem 1.5rem;
+        font-weight: 600;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -120,95 +186,128 @@
     .chat-header-title {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
+        font-size: 1.1rem;
     }
     
     .chat-header-avatar {
-        width: 32px;
-        height: 32px;
+        width: 36px;
+        height: 36px;
         border-radius: 50%;
-        background-color: #ffffff;
+        background-color: white;
         display: flex;
         align-items: center;
         justify-content: center;
+        padding: 5px;
     }
     
     .close-chat {
         cursor: pointer;
-        font-size: 18px;
+        font-size: 1.5rem;
+        transition: transform 0.2s ease;
+    }
+    
+    .close-chat:hover {
+        transform: scale(1.2);
     }
 
     #chat-messages {
         height: 300px;
         overflow-y: auto;
-        padding: 15px;
-        background-color: #f0f0f0;
+        padding: 1.5rem;
+        background-color: #f9f9f9;
+        scroll-behavior: smooth;
     }
 
     .message {
-        margin-bottom: 10px;
+        margin-bottom: 15px;
         max-width: 80%;
         word-wrap: break-word;
-        padding: 8px 12px;
+        padding: 12px 16px;
         border-radius: 18px;
         position: relative;
         clear: both;
+        line-height: 1.4;
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     .user {
-        background-color:#1a237e;
+        background: var(--primary);
         color: white;
         float: right;
         border-bottom-right-radius: 4px;
+        box-shadow: 0 2px 8px rgba(26, 35, 126, 0.2);
     }
 
     .bot {
-        background-color: #e4e6eb;
-        color: black;
+        background: white;
+        color: #333;
         float: left;
         border-bottom-left-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border: 1px solid #eee;
     }
 
     .chat-input-container {
         display: flex;
         align-items: center;
-        padding: 10px;
-        background-color: #f0f0f0;
-        border-top: 1px solid #e0e0e0;
+        padding: 1rem;
+        background-color: white;
+        border-top: 1px solid #eee;
     }
 
     #chat-input {
         flex-grow: 1;
-        border: none;
-        border-radius: 20px;
-        padding: 8px 15px;
-        background-color: white;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        border: 1px solid #ddd;
+        border-radius: 50px;
+        padding: 0.75rem 1.25rem;
+        background-color: #f9f9f9;
         outline: none;
+        font-family: 'Poppins', sans-serif;
+        transition: all 0.3s ease;
+    }
+    
+    #chat-input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.1);
     }
 
     #chat-send {
-        background: transparent;
+        background: var(--primary);
+        color: white;
         border: none;
-        color: #1a237e;
-        font-weight: bold;
-        padding: 8px 15px;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        margin-left: 10px;
         cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
     }
     
     #chat-send:hover {
-        color: #1a237e;
+        background: var(--primary-light);
+        transform: scale(1.05);
     }
     
     .typing-indicator {
         display: inline-block;
-        padding: 8px 12px;
-        background-color: #e4e6eb;
+        padding: 12px 16px;
+        background-color: white;
         border-radius: 18px;
-        margin-bottom: 10px;
+        margin-bottom: 15px;
         float: left;
         clear: both;
         border-bottom-left-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border: 1px solid #eee;
     }
     
     .typing-indicator span {
@@ -217,7 +316,7 @@
         background-color: #90949c;
         display: inline-block;
         border-radius: 50%;
-        margin: 0 1px;
+        margin: 0 2px;
         animation: typing 1s infinite ease-in-out;
     }
     
@@ -230,9 +329,44 @@
     }
     
     @keyframes typing {
-        0% { transform: translateY(0px); }
-        50% { transform: translateY(-5px); }
-        100% { transform: translateY(0px); }
+        0% { transform: translateY(0px); opacity: 0.4; }
+        50% { transform: translateY(-3px); opacity: 1; }
+        100% { transform: translateY(0px); opacity: 0.4; }
+    }
+    
+    .note-text {
+        color: var(--primary);
+        font-size: 0.875rem;
+        text-align: right;
+        margin-top: 1rem;
+        font-style: italic;
+        opacity: 0.8;
+    }
+    
+    .rank-icon {
+        width: 40px;
+        height: 40px;
+        margin-left: 10px;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    }
+    
+    /* Modern scrollbar */
+    #chat-messages::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    #chat-messages::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+    
+    #chat-messages::-webkit-scrollbar-thumb {
+        background: var(--primary);
+        border-radius: 10px;
+    }
+    
+    #chat-messages::-webkit-scrollbar-thumb:hover {
+        background: var(--primary-light);
     }
 </style>
 {% endblock %}
@@ -242,98 +376,115 @@
     {# Include the navbar #}
     {{ include('/Sidebar/Navbar.twig') }}
     
-    <div class="content-panel">
-        <div class="white-panel">
-            <div style="position: relative;">
-                <img src="{{ asset('images/HomeFond.jpg') }}" alt="Header Image" class="header-image">
-                <button class="chatbot-btn" onclick="openChatbot()">
-                    <img src="{{ asset('images/chatbot-icon.jpg') }}" class="chatbot-icon">
-                    Assistance Bot
-                </button>
+    <div class="container py-4">
+        <div class="header-container">
+            <img src="{{ asset('images/loyaltyprogram.png') }}" alt="Header Image" class="header-image">
+            <div class="header-overlay">
+                <h2 class="mb-1">Loyalty Program</h2>
+                <p class="mb-0">Track your rewards and benefits</p>
             </div>
-            
-            <div class="chat-container">
-                <div class="chat-header">
-                    <div class="chat-header-title">
-                        <div class="chat-header-avatar">
-                            <img src="{{ asset('images/chatbot-icon.jpg') }}" alt="Bot" style="width: 20px; height: 20px;">
-                        </div>
-                        <span>Assistant Bot</span>
-                    </div>
-                    <span class="close-chat" onclick="closeChatbot()">×</span>
-                </div>
-                <div id="chat-messages"></div>
-                <div class="chat-input-container">
-                    <input type="text" id="chat-input" placeholder="Posez une question..." />
-                    <button id="chat-send">Envoyer</button>
-                </div>
-            </div>
-            
+            <button class="chatbot-btn" onclick="openChatbot()">
+                    <img src="{{ asset('images/chatbot-icon.jpg') }}" alt="Bot" style="width: 24px; height: 24px;">
+                <span>Assistant Bot</span>
+            </button>
+        </div>
+        
+        <div class="content-panel">
             <div class="info-section">
                 <div class="info-card">
                     <div class="info-item">
                         <img src="{{ asset('images/airplane-travel-day-on-page-with-number-4-of-a-calendar.png') }}" class="info-icon">
-                        <span class="info-text">Nombre De Voyage Effectuée :</span>
+                        <span class="info-text">Trips Completed:</span>
                         <span class="info-text" id="txtNbVoyage">{{ user.nbrVoyage }}</span>
                     </div>
 
                     <div class="info-item">
                         <img src="{{ asset('images/card (1).png') }}" class="info-icon">
-                        <span class="info-text">Point Fidélité :</span>
+                        <span class="info-text">Loyalty Points:</span>
                         <span class="info-text" id="txtPoints"> {{ fidelite.points }}</span>
                     </div>
 
                     <div class="info-item">
                         <img src="{{ asset('images/discount-solid-36.png') }}" class="info-icon">
-                        <span class="info-text">Remise :</span>
+                        <span class="info-text">Discount:</span>
                         <span class="info-text" id="txtRemise"> {{ fidelite.remise }}%</span>
                     </div>
                 </div>
 
                 <div class="info-card rank-section">
-                    <div class="info-item">
-                        <img src="{{ asset('images/rankings.png') }}" class="info-icon">
-                        <span class="info-text">RANK :</span>
+                    <div class="info-item" style="background-color: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);">
+                        <img src="{{ asset('images/rankings.png') }}" class="info-icon" style="filter: brightness(0) invert(1);">
+                        <span class="info-text" style="color: white;">YOUR RANK:</span>
                         <span class="rank-text" id="txtRank">
-    {{ fidelite.idRank ? fidelite.idRank.nomRank : 'Aucun rang' }}
-</span>
-
-                        <img src="{{ asset('images/high-quality (1).png') }}" style="width: 30px; height: 30px; margin-left: 10px;">
+                            {{ fidelite.idRank ? fidelite.idRank.nomRank : 'No rank' }}
+                        </span>
+                        <img src="{{ asset('images/high-quality (1).png') }}" class="rank-icon">
                     </div>
                 </div>
             </div>
 
-            <div class="right-align mt-3">
-                <span style="color: #1a237e; font-size: 14px;">
-                    Nb : 3 voyage = 1 Point De Fidélité
-                </span>
+            <p class="note-text">
+                Note: 3 trips = 1 Loyalty Point
+            </p>
+        </div>
+    </div>
+    
+    <!-- Modern Chatbot -->
+    <div class="chat-container" id="chatbot-container">
+        <div class="chat-header">
+            <div class="chat-header-title">
+                <div class="chat-header-avatar">
+                    <img src="{{ asset('images/chatbot-icon.jpg') }}" alt="Bot" style="width: 24px; height: 24px;">
+                </div>
+                <span>Travel Assistant</span>
             </div>
+            <span class="close-chat" onclick="closeChatbot()">×</span>
+        </div>
+        <div id="chat-messages"></div>
+        <div class="chat-input-container">
+            <input type="text" id="chat-input" placeholder="Ask a question..." />
+            <button id="chat-send">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22 2L11 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
         </div>
     </div>
 </div>
 {% endblock %}
+
 {% block javascripts %}
 <script>
     function openChatbot() {
-        document.querySelector('.chat-container').style.display = 'block';
+        const chat = document.getElementById('chatbot-container');
+        chat.style.display = 'block';
+        setTimeout(() => {
+            chat.classList.add('active');
+        }, 10);
+        
         // Add welcome message when chat opens
         setTimeout(function() {
-            appendMessage("Bonjour ! Comment puis-je vous aider aujourd'hui ?", 'bot');
+            appendMessage("Hello! I'm your travel assistant. How can I help you today?", 'bot');
         }, 500);
     }
     
     function closeChatbot() {
-        document.querySelector('.chat-container').style.display = 'none';
+        const chat = document.getElementById('chatbot-container');
+        chat.classList.remove('active');
+        setTimeout(() => {
+            chat.style.display = 'none';
+        }, 300);
     }
 
-    window.onload = function () {
+    document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('chat-send').addEventListener('click', sendMessage);
         document.getElementById('chat-input').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 sendMessage();
             }
         });
-    };
+    });
     
     function sendMessage() {
         let input = document.getElementById('chat-input');
@@ -347,23 +498,25 @@
         // Show typing indicator
         showTypingIndicator();
         
-        fetch("{{ path('chatbot_query') }}", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ question: message })
-        })
-        .then(response => response.json())
-        .then(data => {
+        // Simulate API call
+        setTimeout(() => {
             // Hide typing indicator
             hideTypingIndicator();
-            appendMessage(data.response, 'bot');
-        })
-        .catch(() => {
-            hideTypingIndicator();
-            appendMessage("Service indisponible", 'bot');
-        });
+            
+            // Simple response logic (replace with actual API call)
+            let response;
+            if (message.toLowerCase().includes('discount') || message.toLowerCase().includes('remise')) {
+                response = `Your current discount is ${document.getElementById('txtRemise').textContent}.`;
+            } else if (message.toLowerCase().includes('point') || message.toLowerCase().includes('loyalty')) {
+                response = `You have ${document.getElementById('txtPoints').textContent} loyalty points.`;
+            } else if (message.toLowerCase().includes('rank') || message.toLowerCase().includes('status')) {
+                response = `Your current rank is ${document.getElementById('txtRank').textContent}.`;
+            } else {
+                response = "I'm your travel assistant. I can help you with information about your loyalty program status, discounts, and points.";
+            }
+            
+            appendMessage(response, 'bot');
+        }, 1000);
     }
 
     function appendMessage(text, sender) {

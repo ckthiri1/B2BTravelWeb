@@ -1,0 +1,178 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des Organisateurs{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/SideBarr.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .dashboard-content .content {
+            position: relative;
+            z-index: 2;
+        }
+
+        h1 {
+            color: #1a237e;
+            font-size: 32px;
+            text-align: center;
+            margin: 30px 0;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .search-bar {
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        .search-bar input[type="text"] {
+            padding: 10px;
+            width: 350px;
+            border: 1px solid #ccc;
+            border-radius: 25px;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        .search-bar button {
+            padding: 10px 20px;
+            background-color: #1a237e;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .search-bar button:hover {
+            background-color: #303f9f;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 30px;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        table thead {
+            background-color: #1a237e;
+            color: white;
+            text-align: left;
+        }
+
+        table th, table td {
+            padding: 20px 15px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        table tbody tr {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        table tbody tr:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        table tbody td {
+            color: #333;
+        }
+
+        .action-links a {
+            margin: 0 10px;
+            text-decoration: none;
+            color: #007bff;
+            font-size: 18px;
+        }
+
+        .action-links a:hover {
+            color: #0056b3;
+        }
+
+        .action-links a.delete {
+            color: #dc3545;
+        }
+
+        .action-links a.delete:hover {
+            color: #c82333;
+        }
+
+        @media (max-width: 768px) {
+            .search-bar input[type="text"], .search-bar button {
+                width: 80%;
+            }
+
+            table th, table td {
+                font-size: 14px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="sidebar">
+        <div class="logo">
+            <img src="{{ asset('images/LogoDashboard.jpg') }}" alt="Logo B2B Travel">
+        </div>
+        <ul class="nav">
+            <li><a href="{{ path('EvennementHome') }}"><i class="fas fa-home"></i> Accueil</a></li>
+            <li><a href="{{ path('organisateur_create') }}"><i class="fas fa-plus-circle"></i> Créer Organisateur</a></li>
+        </ul>
+        <a href="#" class="logout-btn">Déconnexion</a>
+    </div>
+
+    <div class="dashboard-content">
+        <div class="content">
+            <h1>Liste des Organisateurs</h1>
+
+            <div class="search-bar">
+                <form method="get" action="{{ path('organisateur_index') }}">
+                    <input type="text" name="search" placeholder="Rechercher un organisateur..." value="{{ app.request.get('search') }}">
+                    <button type="submit">🔍 Rechercher</button>
+                </form>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nom</th>
+                        <th>Contact</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for organisateur in organisateurs %}
+                        <tr>
+                            <td>{{ organisateur.idor }}</td>
+                            <td>{{ organisateur.nomOr }}</td>
+                            <td>{{ organisateur.contact }}</td>
+                            <td class="action-links">
+                                <a href="{{ path('organisateur_edit', { id: organisateur.idor }) }}" title="Modifier">
+                                    <i class="fas fa-pen-to-square"></i>
+                                </a>
+                                <a href="{{ path('organisateur_delete', { id: organisateur.idor }) }}"
+                                   title="Supprimer"
+                                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet organisateur ?');"
+                                   class="delete">
+                                    <i class="fas fa-xmark"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="4" style="padding: 20px; text-align: center;">Aucun organisateur trouvé.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

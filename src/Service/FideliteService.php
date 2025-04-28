@@ -33,37 +33,35 @@ class FideliteService
         return $this->fideliteRepository->findOneBy(['idUser' => $userId]);
     }
     
-  public function updateFidelite(User $user): void
-{
-    $oldFidelite = $this->getFideliteByUser($user->getUser_id());
-    $oldRank = $oldFidelite !== null ? $oldFidelite->getIdRank() : null;
-
-    $fidelite = $this->calculateFidelite($user);
-
-    if ($oldFidelite !== null) {
-        $oldFidelite->setPoints($fidelite->getPoints());
-        $oldFidelite->setRemise($fidelite->getRemise());
-        $oldFidelite->setIdRank($fidelite->getIdRank());
-
-        $this->entityManager->persist($oldFidelite);
-        $this->entityManager->flush();
-
-        // ✅ Compare entities directly
-        if ($oldRank !== null && $oldRank !== $fidelite->getIdRank()) {
-            $this->sendRankUpgradeEmail($user, $oldRank, $fidelite->getIdRank());
+    public function updateFidelite(User $user): void
+    {
+        $oldFidelite = $this->getFideliteByUser($user->getUserId());
+        $oldRank = $oldFidelite !== null ? $oldFidelite->getIdRank() : null;
+    
+        $fidelite = $this->calculateFidelite($user);
+    
+        if ($oldFidelite !== null) {
+            $oldFidelite->setPoints($fidelite->getPoints());
+            $oldFidelite->setRemise($fidelite->getRemise());
+            $oldFidelite->setIdRank($fidelite->getIdRank());
+    
+            $this->entityManager->persist($oldFidelite);
+            $this->entityManager->flush();
+    
+            if ($oldRank !== null && $oldRank !== $fidelite->getIdRank()) {
+                $this->sendRankUpgradeEmail($user, $oldRank, $fidelite->getIdRank());
+            }
         }
     }
-}
-
     
-    public function addFidelite(User $user): void
-    {
-        $fidelite = $this->calculateFidelite($user);
-        $fidelite->setIdUser($user);
-        
-        $this->entityManager->persist($fidelite);
-        $this->entityManager->flush();
-    }
+public function addFidelite(User $user): void
+{
+    $fidelite = $this->calculateFidelite($user);
+    $fidelite->setIdUser($user);
+    
+    $this->entityManager->persist($fidelite);
+    $this->entityManager->flush();
+}
     
     private function sendRankUpgradeEmail(User $user, Rank $oldRank, Rank $newRank): void
     {
@@ -78,7 +76,7 @@ class FideliteService
     public function calculateFidelite(User $user): Fidelite
 {
     $points = (int)($user->getNbrVoyage() / 3);
-    $remise = ($points / 3) * 0.3;
+    $remise = ($points / 3) * 1.5;
 
     $rankId = 1; 
 

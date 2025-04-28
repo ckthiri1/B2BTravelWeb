@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Event Calendar{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>Event Calendar</h1>
+    <div id="calendar"></div>
+</div>
+
+<!-- Include FullCalendar CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
+
+<!-- Include FullCalendar JS -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        events: [
+            // You can add events here or fetch them via AJAX
+            {
+                title: 'Sample Event',
+                start: new Date()
+            }
+        ]
+    });
+    calendar.render();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,302 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Register | YourAppName{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/registration.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<div class="registration-container">
+    <div class="form-section">
+        <div class="auth-header">
+            <div class="logo-container">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo" class="logo">
+            </div>
+            <h1>Create Account</h1>
+            <p>Join us today to get started</p>
+        </div>
+
+        {{ form_start(registrationForm, {'attr': {'novalidate': 'novalidate', 'class': 'auth-form', 'autocomplete': 'off'}}) }}
+            <div class="form-grid">
+                <div class="form-group">
+                    {{ form_label(registrationForm.nom, 'Last Name', {'label_attr': {'class': 'form-label'}}) }}
+                    <div class="input-wrapper">
+                        {{ form_widget(registrationForm.nom, {
+    'attr': {
+        'class': 'form-input',
+        'placeholder': 'Doe',
+        'data-error': 'Please enter your last name',
+        'required': true,
+        'minlength': 2,
+        'maxlength': 50
+    }
+}) }}
+                        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <div class="invalid-feedback">
+                        {{ form_errors(registrationForm.nom)|striptags }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(registrationForm.prenom, 'First Name', {'label_attr': {'class': 'form-label'}}) }}
+                    <div class="input-wrapper">
+                       {{ form_widget(registrationForm.prenom, {
+    'attr': {
+        'class': 'form-input',
+        'placeholder': 'Jhon',
+        'data-error': 'Please enter your First name',
+        'required': true,
+        'minlength': 2,
+        'maxlength': 50
+    }
+}) }}
+                        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <div class="invalid-feedback">
+                       {{ form_errors(registrationForm.prenom)|striptags }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                {{ form_label(registrationForm.email, null, {'label_attr': {'class': 'form-label'}}) }}
+                <div class="input-wrapper">
+                   {{ form_widget(registrationForm.email, {
+    'attr': {
+        'class': 'form-input',
+        'placeholder': 'your@email.com',
+        'data-error-required': 'Please enter your email',
+        'required': true,
+        'data-error-email': 'Please enter a valid email address'
+    }
+}) }}
+                    <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                </div>
+                <div class="invalid-feedback">
+                    {{ form_errors(registrationForm.email)|striptags }}
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    {{ form_label(registrationForm.plainPassword.first, 'Password', {'label_attr': {'class': 'form-label'}}) }}
+                    <div class="input-wrapper">
+                       {{ form_widget(registrationForm.plainPassword.first, {
+    'attr': {
+        'class': 'form-input',
+        'placeholder': '••••••••',
+        'data-error-required': 'Please enter a password',
+        'required': true,
+        'data-error-length': 'Password must be at least 6 characters'
+    }
+}) }}
+                        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <button type="button" class="password-toggle" aria-label="Toggle password visibility">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="invalid-feedback">
+                        {{ form_errors(registrationForm.plainPassword.first)|striptags }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(registrationForm.plainPassword.second, 'Confirm Password', {'label_attr': {'class': 'form-label'}}) }}
+                    <div class="input-wrapper">
+                        {{ form_widget(registrationForm.plainPassword.second, {
+    'attr': {
+        'class': 'form-input',
+        'placeholder': '••••••••',
+        'data-error-required': 'Please confirm your password',
+        'required': true,
+        'data-error-match': 'Passwords do not match'
+    }
+}) }}
+                        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                    </div>
+                    <div class="invalid-feedback">
+                        {{ form_errors(registrationForm.plainPassword.second)|striptags }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                {{ form_label(registrationForm.profileImage, 'Profile Picture', {'label_attr': {'class': 'form-label'}}) }}
+                <div class="file-upload-wrapper">
+                    {{ form_widget(registrationForm.profileImage, {
+    'attr': {
+        'class': 'file-upload-input',
+        'data-error-type': 'Please upload a valid image (JPEG/PNG)',
+        'required': true,
+        'data-error-size': 'File size must be less than 2MB'
+    }
+}) }}
+                    <label for="{{ registrationForm.profileImage.vars.id }}" class="file-upload-label">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"></path>
+                            <line x1="16" y1="5" x2="22" y2="5"></line>
+                            <line x1="19" y1="2" x2="19" y2="8"></line>
+                            <circle cx="9" cy="9" r="2"></circle>
+                            <path d="M21 15l-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
+                        </svg>
+                        <span>Choose a file</span>
+                    </label>
+                    <div class="file-upload-name">No file chosen</div>
+                </div>
+                <div class="invalid-feedback">
+                    Please upload a valid image (JPEG/PNG, max 2MB)
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <span>Register</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14M12 5l7 7-7 7"></path>
+                </svg>
+            </button>
+
+            <div class="auth-footer">
+                <p>Already have an account? <a href="{{ path('app_login') }}">Sign in</a></p>
+            </div>
+        {{ form_end(registrationForm) }}
+    </div>
+    
+    <div class="image-section">
+        <div class="image-overlay"></div>
+        <div class="image-content">
+            <h2>Welcome Aboard</h2>
+            <p>Join our community of travelers and start your journey today</p>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const form = document.querySelector('.auth-form');
+    if (form) {
+        // Validate field function
+        const validateField = (field) => {
+            const errorDiv = field.closest('.form-group').querySelector('.invalid-feedback');
+            errorDiv.textContent = '';
+            field.classList.remove('is-invalid');
+
+            // Check validity
+            if (!field.checkValidity()) {
+                field.classList.add('is-invalid');
+                errorDiv.textContent = field.dataset.error || field.validationMessage;
+                return false;
+            }
+            return true;
+        };
+
+        // Password match validation
+        const validatePasswordMatch = () => {
+            const password = document.getElementById('{{ registrationForm.plainPassword.first.vars.id }}');
+            const confirm = document.getElementById('{{ registrationForm.plainPassword.second.vars.id }}');
+            const errorDiv = confirm.closest('.form-group').querySelector('.invalid-feedback');
+
+            if (password.value !== confirm.value) {
+                confirm.classList.add('is-invalid');
+                errorDiv.textContent = confirm.dataset.errorMatch;
+                return false;
+            }
+            return true;
+        };
+
+        // Set up validation for all inputs
+        const inputs = form.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('input', () => validateField(input));
+            input.addEventListener('blur', () => validateField(input));
+        });
+
+        // File input validation
+        const fileInput = document.getElementById('{{ registrationForm.profileImage.vars.id }}');
+        if (fileInput) {
+            fileInput.addEventListener('change', () => validateField(fileInput));
+        }
+
+        // Form submission
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+            
+            // Validate all fields
+            inputs.forEach(input => {
+                if (!validateField(input)) isValid = false;
+            });
+
+            // Validate password match
+            if (!validatePasswordMatch()) isValid = false;
+
+            if (!isValid) {
+                e.preventDefault();
+                form.querySelector('.is-invalid')?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+        });
+    }
+
+
+    // Password toggle functionality
+    const passwordToggle = document.querySelector('.password-toggle');
+    const passwordInput = document.getElementById('{{ registrationForm.plainPassword.first.vars.id }}');
+    
+    if (passwordToggle && passwordInput) {
+        passwordToggle.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            // Toggle icon
+            this.innerHTML = type === 'password' ? 
+                `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>` :
+                `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>`;
+        });
+    }
+
+    // File upload display
+    const fileInput = document.getElementById('{{ registrationForm.profileImage.vars.id }}');
+    const fileNameDisplay = document.querySelector('.file-upload-name');
+    
+    if (fileInput && fileNameDisplay) {
+        fileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                fileNameDisplay.textContent = this.files[0].name;
+            } else {
+                fileNameDisplay.textContent = 'No file chosen';
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

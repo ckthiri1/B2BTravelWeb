@@ -1,0 +1,544 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profil{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/profile.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .profile-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .profile-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 30px;
+            border: 3px solid #007bff;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-face {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-face:hover {
+            background-color: #218838;
+            color: white;
+        }
+
+        .face-registration-container {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .face-preview {
+            width: 200px;
+            height: 200px;
+            border: 2px dashed #ccc;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .face-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            display: none;
+        }
+
+        .face-preview .placeholder {
+            text-align: center;
+            color: #666;
+        }
+
+        .face-preview .upload-icon {
+            font-size: 48px;
+            color: #007bff;
+        }
+
+        .face-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .face-status {
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .face-status.registered {
+            color: #28a745;
+        }
+
+        .face-status.not-registered {
+            color: #dc3545;
+        }
+
+        .face-registration-section {
+            margin-top: 2rem;
+            padding: 2.5rem;
+            background: linear-gradient(145deg, #f8f9fa, #ffffff);
+            border-radius: 15px;
+            border: 1px solid #e9ecef;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .face-registration-section:hover {
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .section-title i {
+            color: #3498db;
+            font-size: 2rem;
+        }
+
+        .face-registration-content {
+            display: flex;
+            gap: 3rem;
+            align-items: flex-start;
+        }
+
+        .face-preview-container {
+            flex: 1;
+            max-width: 350px;
+            text-align: center;
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .face-preview {
+            width: 100%;
+            max-width: 350px;
+            height: 350px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 3px dashed #e0e0e0;
+            background: #fafafa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .face-preview:hover {
+            border-color: #3498db;
+        }
+
+        .face-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .face-preview img:hover {
+            transform: scale(1.02);
+        }
+
+        .face-preview-placeholder {
+            text-align: center;
+            color: #7f8c8d;
+            padding: 2rem;
+        }
+
+        .face-preview-placeholder i {
+            font-size: 4rem;
+            color: #bdc3c7;
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .face-upload-btn {
+            background: #fff;
+            border: 2px solid #3498db;
+            color: #3498db;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.1);
+        }
+
+        .face-upload-btn:hover {
+            background: #3498db;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
+        }
+
+        .face-registration-info {
+            flex: 2;
+            background: #fff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .registration-steps {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 2rem 0;
+        }
+
+        .registration-steps li {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.2rem;
+            margin-bottom: 1.2rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s ease;
+        }
+
+        .registration-steps li:hover {
+            transform: translateX(5px);
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .registration-steps i {
+            color: #3498db;
+            font-size: 1.2rem;
+            margin-top: 0.3rem;
+        }
+
+        .registration-steps span {
+            color: #2c3e50;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        #registerFaceBtn {
+            background: #3498db;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
+        }
+
+        #registerFaceBtn:hover:not(:disabled) {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        #registerFaceBtn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .loading i {
+            animation: spin 1s linear infinite;
+            color: #3498db;
+            font-size: 1.5rem;
+        }
+
+        .registration-status {
+            padding: 1.2rem;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+            display: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .registration-status.success {
+            background-color: #d4edda;
+            color: #155724;
+            display: block;
+            border-left: 4px solid #28a745;
+        }
+
+        .registration-status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            display: block;
+            border-left: 4px solid #dc3545;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .face-registration-content {
+                flex-direction: column;
+                gap: 2rem;
+            }
+
+            .face-preview-container {
+                max-width: 100%;
+            }
+
+            .face-registration-info {
+                width: 100%;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+{{ include('/Sidebar/Navbar.twig') }}
+
+<div class="profile-main-container">
+    <div class="profile-wrapper">
+        <!-- User Card -->
+        <div class="profile-card">
+            <div class="profile-header">
+                {% if user.imageUrl %}
+                    <img src="{{ asset(user.imageUrl) }}" alt="Profile Picture" class="profile-image">
+                {% else %}
+                    <div class="profile-image-default">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                {% endif %}
+                <div class="profile-badge">
+                    <span class="badge gold"><i class="fas fa-crown"></i> Gold</span>
+                </div>
+            </div>
+            
+            <div class="profile-content">
+                <h2 class="user-name">{{ user.prenom }} {{ user.nom }}</h2>
+                <p class="user-email">{{ user.email }}</p>
+                
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-plane"></i>
+                        <div>
+                            <span class="stat-value">{{ user.nbrVoyage ?? 0 }}</span>
+                            <span class="stat-label">Voyages</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="profile-actions">
+                    <a href="{{ path('user_edit', {'userId': user.userId}) }}" class="btn btn-edit">
+                        <i class="fas fa-pen"></i> Modifier
+                    </a>
+                    <a href="{{ path('app_logout') }}" class="btn btn-logout">
+                        <i class="fas fa-sign-out-alt"></i> Déconnexion
+                    </a>
+                    <a href="{{ path('face_login') }}" class="btn-face">
+                        <i class="fas fa-camera"></i> Login with Face below
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Details -->
+        <div class="profile-details">
+            <div class="details-header">
+                <h1><i class="fas fa-user-tie"></i> Profil Utilisateur</h1>
+            </div>
+            
+            <div class="details-grid">
+                <div class="detail-card">
+                    <div class="detail-icon">
+                        <i class="fas fa-id-card"></i>
+                    </div>
+                    <div class="detail-content">
+                        <h3>Informations Personnelles</h3>
+                        <div class="detail-item">
+                            <span class="detail-label">Nom Complet:</span>
+                            <span class="detail-value">{{ user.prenom }} {{ user.nom }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Email:</span>
+                            <span class="detail-value">{{ user.email }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="detail-card">
+                    <div class="detail-icon">
+                        <i class="fas fa-plane"></i>
+                    </div>
+                    <div class="detail-content">
+                        <h3>Activité</h3>
+                        <div class="detail-item">
+                            <span class="detail-label">Voyages:</span>
+                            <span class="detail-value">{{ user.nbrVoyage ?? 0 }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Dernière activité:</span>
+                            <span class="detail-value">{{ "now"|date("d/m/Y") }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="detail-card">
+                    <div class="detail-icon">
+                        <i class="fas fa-award"></i>
+                    </div>
+                    <div class="detail-content">
+                        <h3>Statut</h3>
+                        <div class="detail-item">
+                            <span class="detail-label">Rang:</span>
+                            <span class="detail-value badge gold">Gold</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Membre depuis:</span>
+                            <span class="detail-value">2024</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="face-registration-container">
+    <h2>Face Registration</h2>
+    <p>Register your face for quick and secure login</p>
+    
+    <div class="face-preview" id="facePreview">
+        <div class="placeholder">
+            <i class="fas fa-user-circle upload-icon"></i>
+            <p>Upload a clear photo of your face</p>
+        </div>
+        <img id="previewImage" src="#" alt="Face Preview">
+    </div>
+
+    <div class="face-actions">
+        <input type="file" id="faceInput" accept="image/*" style="display: none;">
+        <button class="btn btn-primary" onclick="document.getElementById('faceInput').click()">
+            <i class="fas fa-upload"></i> Upload Photo
+        </button>
+        <button class="btn btn-success" id="registerFace" disabled>
+            <i class="fas fa-save"></i> Register Face
+        </button>
+    </div>
+
+    <div class="face-status {{ user.faceEmbedding ? 'registered' : 'not-registered' }}" id="faceStatus">
+        {{ user.faceEmbedding ? 'Face registered' : 'Face not registered' }}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const faceInput = document.getElementById('faceInput');
+            const previewImage = document.getElementById('previewImage');
+            const facePreview = document.getElementById('facePreview');
+            const registerButton = document.getElementById('registerFace');
+            const faceStatus = document.getElementById('faceStatus');
+
+            faceInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        previewImage.src = e.target.result;
+                        previewImage.style.display = 'block';
+                        facePreview.querySelector('.placeholder').style.display = 'none';
+                        registerButton.disabled = false;
+                    }
+                    
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+
+            registerButton.addEventListener('click', function() {
+                const formData = new FormData();
+                formData.append('face_image', faceInput.files[0]);
+
+                fetch('{{ path('register_face') }}', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        faceStatus.textContent = 'Face registered';
+                        faceStatus.classList.remove('not-registered');
+                        faceStatus.classList.add('registered');
+                        registerButton.disabled = true;
+                        alert('Face registered successfully!');
+                    }
+                })
+                .catch(error => {
+                    alert('Error: ' + error.message);
+                });
+            });
+        });
+    </script>
+{% endblock %}

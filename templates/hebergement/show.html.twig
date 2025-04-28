@@ -1,0 +1,183 @@
+{% extends 'base_hebergement.html.twig' %}
+
+{% block title %}Détails de l'hébergement{% endblock %}
+
+{% block body %}
+<style>
+    .details-container {
+        background: var(--card-bg);
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    [data-theme="dark"] .details-container {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+    }
+
+    .details-header {
+        background: var(--navy-blue);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px 15px 0 0;
+        margin: -2rem -2rem 2rem -2rem;
+    }
+
+    .details-content {
+        padding: 0 1rem;
+    }
+
+    .info-group {
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: var(--bg-secondary);
+        border-radius: 10px;
+        transition: transform 0.3s ease;
+    }
+
+    .info-group:hover {
+        transform: translateY(-5px);
+    }
+
+    [data-theme="dark"] .info-group {
+        background: var(--input-bg);
+    }
+
+    .info-label {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-value {
+        color: var(--text-primary);
+        font-size: 1.1rem;
+        font-weight: 500;
+    }
+
+    .price-tag {
+        font-size: 2rem;
+        color: #2ecc71;
+        font-weight: bold;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-edit {
+        background: var(--navy-blue);
+        color: white;
+        border: none;
+    }
+
+    .btn-edit:hover {
+        background: var(--navy-blue-dark);
+        transform: translateY(-2px);
+    }
+
+    .btn-back {
+        background: transparent;
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+    }
+
+    .btn-back:hover {
+        background: var(--hover-bg);
+        transform: translateY(-2px);
+    }
+
+    .btn-delete {
+        background: #dc3545;
+        color: white;
+        border: none;
+    }
+
+    .btn-delete:hover {
+        background: #c82333;
+        transform: translateY(-2px);
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+        .details-container {
+            padding: 1rem;
+        }
+
+        .details-header {
+            padding: 1.5rem;
+            margin: -1rem -1rem 1.5rem -1rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="container py-4">
+    <div class="details-container">
+        <div class="details-header">
+            <h1 class="mb-0">{{ hebergement.nom }}</h1>
+            <span class="badge bg-light text-dark mt-2">{{ hebergement.type }}</span>
+        </div>
+
+        <div class="details-content">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="info-group">
+                        <div class="info-label">
+                            <i class="bi bi-geo-alt-fill me-2"></i>Adresse
+                        </div>
+                        <div class="info-value">{{ hebergement.adresse }}</div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="info-group">
+                        <div class="info-label">
+                            <i class="bi bi-cash me-2"></i>Prix par nuit
+                        </div>
+                        <div class="price-tag">{{ hebergement.prix }}€</div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="info-group">
+                        <div class="info-label">
+                            <i class="bi bi-card-text me-2"></i>Description
+                        </div>
+                        <div class="info-value">{{ hebergement.description }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <a href="{{ path('app_hebergement_edit', {'id': hebergement.id}) }}" class="btn btn-edit">
+                    <i class="bi bi-pencil-square me-2"></i>Modifier
+                </a>
+                <a href="{{ path('app_hebergement_index') }}" class="btn btn-back">
+                    <i class="bi bi-arrow-left me-2"></i>Retour à la liste
+                </a>
+                {{ include('hebergement/_delete_form.html.twig') }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

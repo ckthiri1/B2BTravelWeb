@@ -12,4 +12,15 @@ class VoyageRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Voyage::class);
     }
+
+    public function findByDepartAndDestination(string $depart, string $destination)
+    {
+        return $this->createQueryBuilder('v')
+            ->where('v.depart = :depart')
+            ->andWhere('v.Destination = :destination')
+            ->setParameter('depart', $depart)
+            ->setParameter('destination', $destination)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

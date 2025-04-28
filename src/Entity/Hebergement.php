@@ -2,121 +2,132 @@
 
 namespace App\Entity;
 
+use App\Repository\HebergementRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
-use Doctrine\Common\Collections\Collection;
-use App\Entity\Reservation_hebergement;
-
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: HebergementRepository::class)]
+#[ORM\Table(name: 'hebergement')]
 class Hebergement
 {
+    public const TYPE_HOTEL = 'Hotel';
+    public const TYPE_HOSTEL = 'Hostel';
+    public const TYPE_MAISON = 'Maison';
 
     #[ORM\Id]
-    #[ORM\Column(type: "integer")]
-    private int $id_hebergement;
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: 'id_hebergement')] 
+private ?int $id = null;
 
-    #[ORM\Column(type: "string", length: 255)]
-    private string $nom;
+    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le nom est obligatoire")]
+    #[Assert\Length(
+        min: 2,
+        max: 50,
+        minMessage: "Le nom doit contenir au moins {{ limit }} caractères",
+        maxMessage: "Le nom ne peut dépasser {{ limit }} caractères"
+    )]
+    #[Assert\Regex(
+        pattern: "/^[a-zA-ZÀ-ÿ0-9\s\-\']+$/u",
+        message: "Caractères spéciaux non autorisés"
+    )]
+    private ?string $nom = null;
 
-    #[ORM\Column(type: "string", length: 255)]
-    private string $adresse;
+    #[ORM\Column(length: 255)]
+    #[Assert\Regex(
+        pattern: "/^\d+\s+[a-zA-ZÀ-ÿ0-9\s\-\,'.]{5,}$/",
+        message: "Format d'adresse invalide (ex: 12 Rue de Paris)"
+    )]
+    private ?string $adresse = null;
 
-    #[ORM\Column(type: "string")]
-    private string $type;
+    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le type est obligatoire")]
+    #[Assert\Choice(
+        choices: ['Hotel', 'Hostel', 'Maison'],
+        message: "Type invalide"
+    )]
+    private ?string $type = null;
 
-    #[ORM\Column(type: "string", length: 255)]
-    private string $description;
+    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "La description est obligatoire")]
+    #[Assert\Length(
+        min: 10,
+        max: 255,
+        minMessage: "La description doit contenir au moins {{ limit }} caractères"
+    )]
+    private ?string $description = null;
 
-    #[ORM\Column(type: "integer")]
-    private int $prix;
+    #[ORM\Column]
+     #[Assert\NotBlank(message: "Le prix est obligatoire")]
+    #[Assert\PositiveOrZero(message: "Le prix doit être positif")]
+    #[Assert\GreaterThanOrEqual(
+        value: 10,
+        message: "Le prix minimum est de 10 €"
+    )]
+    private ?int $prix = null;
 
-    public function getId_hebergement()
+
+
+    // Getters and setters...
+    public function getId(): ?int
     {
-        return $this->id_hebergement;
+        return $this->id;
     }
 
-    public function setId_hebergement($value)
-    {
-        $this->id_hebergement = $value;
-    }
-
-    public function getNom()
+    public function getNom(): ?string
     {
         return $this->nom;
     }
 
-    public function setNom($value)
+    public function setNom(string $nom): static
     {
-        $this->nom = $value;
+        $this->nom = $nom;
+        return $this;
     }
 
-    public function getAdresse()
+    public function getAdresse(): ?string
     {
         return $this->adresse;
     }
 
-    public function setAdresse($value)
+    public function setAdresse(string $adresse): static
     {
-        $this->adresse = $value;
+        $this->adresse = $adresse;
+        return $this;
     }
 
-    public function getType()
+    public function getType(): ?string
     {
         return $this->type;
     }
 
-    public function setType($value)
+    public function setType(string $type): static
     {
-        $this->type = $value;
+        $this->type = $type;
+        return $this;
     }
 
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    public function setDescription($value)
+    public function setDescription(string $description): static
     {
-        $this->description = $value;
+        $this->description = $description;
+        return $this;
     }
 
-    public function getPrix()
+    public function getPrix(): ?int
     {
         return $this->prix;
     }
 
-    public function setPrix($value)
+    public function setPrix(int $prix): static
     {
-        $this->prix = $value;
+        $this->prix = $prix;
+        return $this;
     }
 
-    #[ORM\OneToMany(mappedBy: "idH", targetEntity: Reservation_hebergement::class)]
-    private Collection $reservation_hebergements;
-
-        public function getReservation_hebergements(): Collection
-        {
-            return $this->reservation_hebergements;
-        }
-    
-        public function addReservation_hebergement(Reservation_hebergement $reservation_hebergement): self
-        {
-            if (!$this->reservation_hebergements->contains($reservation_hebergement)) {
-                $this->reservation_hebergements[] = $reservation_hebergement;
-                $reservation_hebergement->setIdH($this);
-            }
-    
-            return $this;
-        }
-    
-        public function removeReservation_hebergement(Reservation_hebergement $reservation_hebergement): self
-        {
-            if ($this->reservation_hebergements->removeElement($reservation_hebergement)) {
-                // set the owning side to null (unless already changed)
-                if ($reservation_hebergement->getIdH() === $this) {
-                    $reservation_hebergement->setIdH(null);
-                }
-            }
-    
-            return $this;
-        }
+    // Add similar getters/setters for other properties...
 }

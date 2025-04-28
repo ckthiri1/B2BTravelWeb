@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Détails Évènement Signé</title>
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 12px; }
+        h1 { text-align: center; color: #1a237e; }
+        .item { margin-bottom: 8px; }
+        .signature { margin-top: 40px; text-align: center; }
+    </style>
+</head>
+<body>
+    <h1>Détails de l’Évènement</h1>
+
+    <div class="item"><strong>Nom :</strong> {{ evennement.nomE }}</div>
+    <div class="item"><strong>Lieu :</strong> {{ evennement.local }}</div>
+    <div class="item"><strong>Date :</strong> {{ evennement.dateE|date('Y-m-d H:i') }}</div>
+    <div class="item"><strong>Description :</strong> {{ evennement.desE }}</div>
+    <div class="item"><strong>Type :</strong> {{ evennement.eventType }}</div>
+    <div class="item"><strong>Organisateur :</strong> {{ evennement.idOr.nomOr }}</div>
+
+    {% if signature %}
+        <div class="signature">
+            <p><strong>Signature :</strong></p>
+            <img src="{{ signature }}" style="width: 300px; border: 1px solid #ccc;"/>
+        </div>
+    {% endif %}
+</body>
+</html>

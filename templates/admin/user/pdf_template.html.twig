@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Users List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            max-width: 200px;
+            max-height: 100px;
+            margin-bottom: 20px;
+        }
+        .title {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .date {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 12px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        .user-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: right;
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+        @page {
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="{{ logoPath }}" alt="Logo" class="logo">
+        <h1 class="title">Users List</h1>
+        <div class="date">Generated on: {{ "now"|date("d/m/Y H:i") }}</div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 5%">Image</th>
+                <th style="width: 25%">Name</th>
+                <th style="width: 30%">Email</th>
+                <th style="width: 20%">Role</th>
+                <th style="width: 20%">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>
+                        {% if user.imageUrl %}
+                            <img src="{{ app.request.schemeAndHttpHost ~ '/uploads/profile_images/' ~ user.imageUrl }}" 
+                                 alt="User Avatar" 
+                                 class="user-avatar"
+                                 style="max-width: 30px; max-height: 30px;">
+                        {% else %}
+                            <div style="width: 30px; height: 30px; background: #e9ecef; border-radius: 50%;"></div>
+                        {% endif %}
+                    </td>
+                    <td>{{ user.prenom }} {{ user.nom }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.role }}</td>
+                    <td>{{ user.isBanned ? 'Inactive' : 'Active' }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="footer">
+        Total Users: {{ users|length }}
+    </div>
+</body>
+</html> 

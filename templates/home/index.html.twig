@@ -1,0 +1,172 @@
+{% extends 'base.html.twig' %}
+{% block title %}Accueil{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/SideBarr.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .dashboard-content {
+            margin-left: 250px;
+            padding: 60px;
+            background-color: #f4f4f8;
+            min-height: 100vh;
+        }
+
+        .dashboard-content h1 {
+            color: #1a237e;
+            font-size: 36px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .dashboard-content p {
+            text-align: center;
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 40px;
+        }
+
+        .stats-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card, .circle-stat {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            flex: 1 1 300px;
+            max-width: 380px;
+            text-align: center;
+        }
+
+        .top-organisateur {
+            background-color: #fff9db;
+        }
+
+        .stat-card h2 {
+            color: #1a237e;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .circle {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 15px;
+            background: radial-gradient(circle at top left, #bbdefb, #e3f2fd);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1a237e;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .countdown-box {
+            font-size: 20px;
+            color: #1a237e;
+            background-color: #e8eaf6;
+            padding: 12px 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+            display: inline-block;
+        }
+
+        .sidebar .nav li a.active {
+            font-weight: bold;
+            background-color: #e8eaf6;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="sidebar">
+    <div class="logo">
+        <img src="{{ asset('images/LogoDashboard.jpg') }}" alt="Logo B2B Travel">
+    </div>
+    <ul class="nav">
+        <li><a href="{{ path('Dashboard') }}"><i class="fas fa-home"> </i> Dashboard Admin</a></li>
+
+        <li><a href="{{ path('organisateur_index') }}"><i class="fas fa-users"></i> Organisateur</a></li>
+        <li><a href="{{ path('app_evennement_index') }}"><i class="fas fa-calendar-alt"></i> Évènements</a></li>
+    </ul>
+    <a href="#" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+</div>
+
+<div class="dashboard-content">
+    <h1>Bienvenue sur le tableau de bord</h1>
+    <p>Utilisez la barre latérale pour naviguer entre les sections.</p>
+
+    <div class="stats-wrapper">
+
+        {# 🏆 TOP ORGANISATEUR #}
+        <div class="stat-card top-organisateur">
+            <h2>🏆 Top Organisateur</h2>
+            {% if topOrganisateur %}
+                <p>
+                    <strong>{{ topOrganisateur.nomOr }}</strong>
+                    <i class="fas fa-medal" style="color: gold;"></i><br>
+                    <span style="color: gray;">{{ topOrganisateur.eventCount }} évènement(s)</span>
+                </p>
+            {% else %}
+                <p>Aucun organisateur trouvé.</p>
+            {% endif %}
+        </div>
+
+        {# ⏳ COMPTE À REBOURS VERS LE PROCHAIN ÉVÈNEMENT #}
+        <div class="stat-card">
+            {% if nextEvent %}
+                <h2>⏳ Prochain Évènement</h2>
+                <p><strong>{{ nextEvent.nomE }}</strong></p>
+                <p>📍 {{ nextEvent.local }}</p>
+                <p>📅 {{ nextEvent.dateE|date('Y-m-d H:i') }}</p>
+                <div id="countdown" class="countdown-box">Chargement...</div>
+            {% else %}
+                <p>Aucun évènement à venir.</p>
+            {% endif %}
+        </div>
+
+        {# 📅 TOTAL DES ÉVÈNEMENTS #}
+        <div class="circle-stat">
+            <div class="circle">
+                <i class="fas fa-calendar-check" style="margin-right: 5px;"></i> {{ totalEvents }}
+            </div>
+            <span style="color: #1a237e;">Total Évènements</span>
+        </div>
+
+    </div>
+</div>
+
+{% if nextEvent %}
+<script>
+    const targetDate = new Date("{{ nextEvent.dateE|date('Y-m-d H:i:s') }}").getTime();
+
+    const interval = setInterval(function () {
+        const now = new Date().getTime();
+        const distance = targetDate - now;
+
+        const countdown = document.getElementById("countdown");
+
+        if (distance < 0) {
+            clearInterval(interval);
+            countdown.innerHTML = "🎉 C'est maintenant !";
+            return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        countdown.innerHTML = `${days}j ${hours}h ${minutes}m ${seconds}s`;
+    }, 1000);
+</script>
+{% endif %}
+{% endblock %}

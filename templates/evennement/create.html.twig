@@ -1,0 +1,246 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer un Évènement{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/SideBarr.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('leaflet/leaflet.css') }}" />
+    <style>
+        form div.form-group {
+            margin-bottom: 15px;
+        }
+
+        form label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        form input, form select, form textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        form button {
+            padding: 10px 20px;
+            background-color: #1a237e;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        form button:hover {
+            background-color: #0d165d;
+        }
+
+        #map {
+            height: 300px;
+            margin-top: 15px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .status-message {
+            font-size: 1em;
+            margin-top: 10px;
+            color: #28a745; /* Green for success */
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="sidebar">
+        <div class="logo">
+            <img src="{{ asset('images/LogoDashboard.jpg') }}" alt="Logo B2B Travel">
+        </div>
+        <ul class="nav">
+            <li><a href="{{ path('EvennementHome') }}"><i class="fas fa-home"></i> Acceuil</a></li>
+            <li><a href="{{ path('app_evennement_index') }}"><i class="fas fa-list"></i> Liste</a></li>
+        </ul>
+        <a href="#" class="logout-btn">Déconnexion</a>
+    </div>
+
+    <div class="dashboard-content">
+        <h1 style="text-align: center; color: #1a237e;">Créer un Évènement</h1>
+
+        <div style="width: 60%; margin: auto; margin-top: 30px; background: white; padding: 30px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 10px;">
+           {{ form_start(form) }}
+    <div class="form-group">
+        {{ form_label(form.nomE) }}
+        {{ form_widget(form.nomE, {'attr': {'id': 'evennement_nomE'}}) }}  <!-- Ensure correct ID -->
+        {% if not form.nomE.vars.valid %}
+            <div class="error-message">• {{ form_errors(form.nomE) }}</div>
+        {% endif %}
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.local) }}
+        {{ form_widget(form.local, {'attr': {'id': 'evennement_local'}}) }} <!-- Ensure correct ID -->
+        <div id="map"></div>
+        {% if not form.local.vars.valid %}
+            <div class="error-message">• {{ form_errors(form.local) }}</div>
+        {% endif %}
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.dateE) }}
+        {{ form_widget(form.dateE, {'attr': {'id': 'evennement_dateE'}}) }} <!-- Ensure correct ID -->
+        {% if not form.dateE.vars.valid %}
+            <div class="error-message">• {{ form_errors(form.dateE) }}</div>
+        {% endif %}
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.desE) }}
+        {{ form_widget(form.desE, {'attr': {'id': 'evennement_desE'}}) }} <!-- Ensure correct ID -->
+        {% if not form.desE.vars.valid %}
+            <div class="error-message">• {{ form_errors(form.desE) }}</div>
+        {% endif %}
+        <button type="button" id="generate-description" style="margin-top: 10px;">Générer une description</button>
+        <div id="description-status" class="status-message"></div>
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.idOr) }}
+        {{ form_widget(form.idOr) }}
+        {% if not form.idOr.vars.valid %}
+            <div class="error-message">• {{ form_errors(form.idOr) }}</div>
+        {% endif %}
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.eventType) }}
+        {{ form_widget(form.eventType) }}
+        {% if not form.eventType.vars.valid %}
+            <div class="error-message">• {{ form_errors(form.eventType) }}</div>
+        {% endif %}
+    </div>
+
+    <button type="submit">Créer</button>
+{{ form_end(form) }}
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+ // Replace the existing event listener code with this fixed version
+// Replace the existing event listener code with this fixed version
+document.addEventListener('DOMContentLoaded', function() {
+    const generateButton = document.getElementById('generate-description');
+    
+    // Check if button exists before adding event listener
+    if (generateButton) {
+        generateButton.addEventListener('click', async function() {
+            const nomE = document.querySelector('#evennement_nomE').value;
+            const dateE = document.querySelector('#evennement_dateE').value;
+            const status = document.getElementById('description-status');
+            const desE = document.querySelector('#evennement_desE');
+            
+            // Validate inputs
+            if (!nomE || !dateE) {
+                status.textContent = "Veuillez remplir le nom et la date de l'événement";
+                status.style.color = "red";
+                return;
+            }
+
+            status.textContent = "Génération en cours...";
+            status.style.color = "#28a745";
+
+            try {
+                console.log("Sending request to generate description");
+                const response = await fetch('/generate-description', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ 
+                        nomE: nomE,
+                        dateE: dateE 
+                    }),
+                });
+
+                console.log("Response status:", response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log("Received data:", data);
+
+                if (data.description) {
+                    desE.value = data.description;
+                    status.textContent = "Description générée avec succès !";
+                } else {
+                    status.textContent = "Échec de la génération. Essayez à nouveau.";
+                    status.style.color = "red";
+                }
+            } catch (err) {
+                console.error('Error:', err);
+                let errorMsg = "Erreur lors de la génération";
+                
+                if (err.message.includes("500")) {
+                    errorMsg += " - Le service de génération est indisponible";
+                } else if (err.message.includes("403")) {
+                    errorMsg += " - Problème d'authentification";
+                } else if (err.message.includes("404")) {
+                    errorMsg += " - Route non trouvée";
+                }
+                
+                status.textContent = errorMsg;
+                status.style.color = "red";
+                
+                // Show error details for 5 seconds
+                setTimeout(() => {
+                    status.textContent = "";
+                }, 5000);
+            }
+        });
+    } else {
+        console.error("Generate description button not found");
+    }
+});
+
+
+</script>
+
+<script src="{{ asset('leaflet/leaflet.js') }}"></script>
+<script>
+   document.addEventListener('DOMContentLoaded', () => {
+    const map = L.map('map').setView([36.8065, 10.1815], 7);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 18,
+    }).addTo(map);
+
+    let marker;
+    map.on('click', function(e) {
+        const lat = e.latlng.lat.toFixed(5);
+        const lng = e.latlng.lng.toFixed(5);
+
+        if (marker) {
+            marker.setLatLng(e.latlng);
+        } else {
+            marker = L.marker(e.latlng).addTo(map);
+        }
+
+        document.querySelector('#evennement_local').value = `${lat}, ${lng}`; // Ensure correct ID for the local field
+    });
+});
+
+</script>
+{% endblock %}

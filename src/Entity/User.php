@@ -1,268 +1,396 @@
 <?php
-
+// src/Entity/User.php
 namespace App\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-
+use Doctrine\DBAL\Types\Types;
+use App\Repository\UserRepository;
 use Doctrine\Common\Collections\Collection;
-use App\Entity\Vol;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity]
-class User
+#[ORM\Table(name: 'user', options: [
+    'charset' => 'utf8mb4',
+    'collation' => 'utf8mb4_general_ci'
+])]
+#[ORM\Entity(repositoryClass: UserRepository::class)]
+#[UniqueEntity(fields: ['email'], message: 'This email is already registered.')]
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-
     #[ORM\Id]
-    #[ORM\Column(type: "integer")]
-    private int $user_id;
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: 'user_id', type: Types::INTEGER)]
+    private ?int $userId = null;
 
-    #[ORM\Column(type: "string", length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
+    #[Assert\NotBlank(message: 'Last name is required')]
+    #[Assert\Type(type: 'string', message: 'Last name must be a string')]
     private string $nom;
 
-    #[ORM\Column(type: "string", length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
+    #[Assert\NotBlank(message: 'first name is required')]
+    #[Assert\Type(type: 'string', message: 'First name must be a string')]
     private string $prenom;
 
-    #[ORM\Column(type: "string", length: 255)]
+    public function __construct()
+    {
+        $this->nom = '';
+        $this->prenom = '';
+        $this->email = '';
+        $this->pwd = '';
+        $this->role = 'user';
+        $this->hash = '';
+        $this->image_url = 'default.png';
+        $this->reclamations = new ArrayCollection();
+    }
+
+    #[ORM\Column(type: Types::STRING, length: 255, unique: true)]
+    #[Assert\NotBlank(message: 'Email is required')]
+    #[Assert\Email(message: 'The email "{{ value }}" is not a valid email.')]
     private string $email;
 
-    #[ORM\Column(type: "string", length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
     private string $pwd;
 
-    #[ORM\Column(type: "integer")]
-    private int $nbrVoyage;
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    private ?int $nbrVoyage = null;
 
-    #[ORM\Column(type: "string")]
+    #[ORM\Column(
+        type: Types::STRING,
+        columnDefinition: "ENUM('user', 'admin') NOT NULL"
+    )]
     private string $role;
 
-    #[ORM\Column(type: "string", length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
     private string $hash;
 
-    #[ORM\Column(type: "string", length: 16)]
-    private string $salt;
+    #[ORM\Column(
+        type: Types::BINARY,
+        columnDefinition: "BINARY(16) NOT NULL"
+    )]
+    private $salt;
 
-    #[ORM\Column(type: "string", length: 255)]
+    #[ORM\Column(name: 'image_url', type: Types::STRING, length: 255)]
+    #[Assert\NotBlank(message: 'Image URL is required')]
     private string $image_url;
 
-    #[ORM\Column(type: "string", length: 255)]
-    private string $reset_token;
+    #[ORM\Column(name: 'reset_token', type: Types::STRING, length: 255, nullable: true)]
+    private ?string $reset_token = null;
 
-    #[ORM\Column(type: "datetime")]
-    private \DateTimeInterface $token_expiry;
+    #[ORM\Column(name: 'token_expiry', type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $token_expiry = null;
 
-    #[ORM\Column(type: "text")]
-    private string $face_embedding;
+    #[ORM\Column(name: 'face_embedding', type: Types::TEXT, nullable: true)]
+    private ?string $face_embedding = null;
 
-    #[ORM\Column(type: "string", length: 65535)]
-    private string $face_image;
+    #[ORM\Column(
+        name: 'face_image',
+        type: Types::BLOB,
+        nullable: true,
+        columnDefinition: "BLOB"
+    )]
+    private $face_image = null;
 
-    #[ORM\Column(type: "text")]
-    private string $voice_features;
+    #[ORM\Column(name: 'voice_features', type: Types::TEXT, nullable: true)]
+    private ?string $voice_features = null;
 
-    #[ORM\Column(type: "string", length: 255)]
-    private string $remember_token;
+    #[ORM\Column(name: 'remember_token', type: Types::STRING, length: 255, nullable: true)]
+    private ?string $remember_token = null;
 
-    #[ORM\Column(type: "datetime")]
-    private \DateTimeInterface $remember_expiry;
+    #[ORM\Column(name: 'remember_expiry', type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $remember_expiry = null;
 
-    public function getUser_id()
+    #[ORM\Column(name: 'is_verified', type: Types::BOOLEAN)]
+    private bool $isVerified = false;
+
+    #[ORM\Column(name: 'google_id', type: Types::STRING, length: 255, nullable: true)]
+    private ?string $googleId = null;
+
+    #[ORM\Column(name: 'is_banned', type: Types::BOOLEAN)]
+private bool $isBanned = false;
+
+#[ORM\Column(name: 'banned_reason', type: Types::TEXT, nullable: true)]
+private ?string $bannedReason = null;
+
+#[ORM\Column(name: 'banned_until', type: Types::DATETIME_MUTABLE, nullable: true)]
+private ?\DateTimeInterface $bannedUntil = null;
+
+// Add these getters and setters
+public function isBanned(): bool
+{
+    return $this->isBanned;
+}
+
+public function setIsBanned(bool $isBanned): self
+{
+    $this->isBanned = $isBanned;
+    return $this;
+}
+
+public function getBannedReason(): ?string
+{
+    return $this->bannedReason;
+}
+
+public function setBannedReason(?string $bannedReason): self
+{
+    $this->bannedReason = $bannedReason;
+    return $this;
+}
+
+public function getBannedUntil(): ?\DateTimeInterface
+{
+    return $this->bannedUntil;
+}
+
+public function setBannedUntil(?\DateTimeInterface $bannedUntil): self
+{
+    $this->bannedUntil = $bannedUntil;
+    return $this;
+}
+
+    // Add getter and setter
+    public function getGoogleId(): ?string
     {
-        return $this->user_id;
+        return $this->googleId;
     }
 
-    public function setUser_id($value)
+    public function setGoogleId(?string $googleId): self
     {
-        $this->user_id = $value;
+        $this->googleId = $googleId;
+        return $this;
     }
 
-    public function getNom()
+    // Getters and Setters
+    public function getUserId(): ?int   
+    {
+        return $this->userId;
+    }
+
+    public function getNom(): string
     {
         return $this->nom;
     }
 
-    public function setNom($value)
+    public function setNom(string $nom): self
     {
-        $this->nom = $value;
+        $this->nom = $nom;
+        return $this;
     }
 
-    public function getPrenom()
+    public function getPrenom(): string
     {
         return $this->prenom;
     }
 
-    public function setPrenom($value)
+    public function setPrenom(string $prenom): self
     {
-        $this->prenom = $value;
+        $this->prenom = $prenom;
+        return $this;
     }
 
-    public function getEmail()
+    public function getEmail(): string
     {
         return $this->email;
     }
 
-    public function setEmail($value)
+    public function setEmail(string $email): self
     {
-        $this->email = $value;
+        $this->email = $email;
+        return $this;
     }
 
-    public function getPwd()
+    public function getPwd(): string
     {
         return $this->pwd;
     }
 
-    public function setPwd($value)
+    public function setPwd(string $pwd): self
     {
-        $this->pwd = $value;
+        $this->pwd = $pwd;
+        return $this;
     }
 
-    public function getNbrVoyage()
+    public function getNbrVoyage(): ?int
     {
         return $this->nbrVoyage;
     }
 
-    public function setNbrVoyage($value)
+    public function setNbrVoyage(?int $nbrVoyage): self
     {
-        $this->nbrVoyage = $value;
+        $this->nbrVoyage = $nbrVoyage;
+        return $this;
     }
 
-    public function getRole()
+    public function getRoles(): array
+{
+    $role = $this->getRole(); // Use the getter instead of direct property access
+    if (!str_starts_with($role, 'ROLE_')) {
+        $role = 'ROLE_' . strtoupper($role);
+    }
+    return [$role];
+}
+
+    public function getRole(): string
+{
+    return $this->role;
+}
+    public function setRole(string $role): self
     {
-        return $this->role;
+        $this->role = $role;
+        return $this;
     }
 
-    public function setRole($value)
-    {
-        $this->role = $value;
-    }
-
-    public function getHash()
+    public function getHash(): string
     {
         return $this->hash;
     }
 
-    public function setHash($value)
-    {
-        $this->hash = $value;
-    }
 
-    public function getSalt()
+
+    public function getSalt(): ?string
     {
         return $this->salt;
     }
 
-    public function setSalt($value)
+    public function setSalt(string $salt): self
     {
-        $this->salt = $value;
+        $this->salt = $salt;
+        return $this;
     }
 
-    public function getImage_url()
+
+    public function getImageUrl(): string
     {
         return $this->image_url;
     }
 
-    public function setImage_url($value)
-    {
-        $this->image_url = $value;
-    }
+   
+public function setImageUrl(string $image_url): self
+{
+    $this->image_url = $image_url;
+    return $this;
+}
 
-    public function getReset_token()
+    public function getResetToken(): ?string
     {
         return $this->reset_token;
     }
 
-    public function setReset_token($value)
+    public function setResetToken(?string $reset_token): self
     {
-        $this->reset_token = $value;
+        $this->reset_token = $reset_token;
+        return $this;
     }
 
-    public function getToken_expiry()
+    public function getTokenExpiry(): ?\DateTimeInterface
     {
         return $this->token_expiry;
     }
 
-    public function setToken_expiry($value)
+    public function setTokenExpiry(?\DateTimeInterface $token_expiry): self
     {
-        $this->token_expiry = $value;
+        $this->token_expiry = $token_expiry;
+        return $this;
     }
 
-    public function getFace_embedding()
+    public function getFaceEmbedding(): ?string
     {
         return $this->face_embedding;
     }
 
-    public function setFace_embedding($value)
+    public function setFaceEmbedding(?string $face_embedding): self
     {
-        $this->face_embedding = $value;
+        $this->face_embedding = $face_embedding;
+        return $this;
     }
 
-    public function getFace_image()
+    public function getFaceImage()
     {
-        return $this->face_image;
+        return is_resource($this->face_image) ? \stream_get_contents($this->face_image) : $this->face_image;
     }
 
-    public function setFace_image($value)
+    public function setFaceImage($face_image): self
     {
-        $this->face_image = $value;
+        $this->face_image = $face_image;
+        return $this;
     }
 
-    public function getVoice_features()
+    public function getVoiceFeatures(): ?string
     {
         return $this->voice_features;
     }
 
-    public function setVoice_features($value)
+    public function setVoiceFeatures(?string $voice_features): self
     {
-        $this->voice_features = $value;
+        $this->voice_features = $voice_features;
+        return $this;
     }
 
-    public function getRemember_token()
+    public function getRememberToken(): ?string
     {
         return $this->remember_token;
     }
 
-    public function setRemember_token($value)
+    public function setRememberToken(?string $remember_token): self
     {
-        $this->remember_token = $value;
+        $this->remember_token = $remember_token;
+        return $this;
     }
 
-    public function getRemember_expiry()
+    public function getRememberExpiry(): ?\DateTimeInterface
     {
         return $this->remember_expiry;
     }
 
-    public function setRemember_expiry($value)
+    public function setRememberExpiry(?\DateTimeInterface $remember_expiry): self
     {
-        $this->remember_expiry = $value;
+        $this->remember_expiry = $remember_expiry;
+        return $this;
     }
 
-    #[ORM\OneToMany(mappedBy: "id_user", targetEntity: Reclamation::class)]
-    private Collection $reclamations;
+    // UserInterface Methods
 
-        public function getReclamations(): Collection
-        {
-            return $this->reclamations;
-        }
-    
-        public function addReclamation(Reclamation $reclamation): self
-        {
-            if (!$this->reclamations->contains($reclamation)) {
-                $this->reclamations[] = $reclamation;
-                $reclamation->setId_user($this);
-            }
-    
-            return $this;
-        }
-    
-        public function removeReclamation(Reclamation $reclamation): self
-        {
-            if ($this->reclamations->removeElement($reclamation)) {
-                // set the owning side to null (unless already changed)
-                if ($reclamation->getId_user() === $this) {
-                    $reclamation->setId_user(null);
-                }
-            }
-    
-            return $this;
-        }
+    public function eraseCredentials(): void
+    {
+        // Clear temporary sensitive data
+    }
 
+    public function getUserIdentifier(): string
+    {
+        return $this->email;
+    }
+
+    public function getPassword(): ?string
+    {
+        return $this->hash;
+    }
+
+    public function setHash(string $hash): self
+    {
+        $this->hash = $hash;
+        return $this;
+    }
+
+
+    public function getRememberTokenName(): string
+    {
+        return 'remember_token';
+    }
+
+    public function isVerified(): bool
+    {
+    return $this->isVerified;
+    }
+
+public function setIsVerified(bool $isVerified): self
+    {
+    $this->isVerified = $isVerified;
+    return $this;
+    }
     #[ORM\OneToMany(mappedBy: "idUser", targetEntity: Fidelite::class)]
     private Collection $fidelites;
 
@@ -309,4 +437,34 @@ class User
             $this->nbrVoyage++;
             return $this;
         }
+
+        #[ORM\OneToMany(targetEntity: Reclamation::class, mappedBy: "id_user")]
+        private Collection $reclamations;
+        
+        // Add getter and methods to manage the collection
+        public function getReclamations(): Collection
+        {
+            return $this->reclamations;
+        }
+        
+        public function addReclamation(Reclamation $reclamation): self
+        {
+            if (!$this->reclamations->contains($reclamation)) {
+                $this->reclamations[] = $reclamation;
+                $reclamation->setId_user($this);
+            }
+            return $this;
+        }
+        
+        public function removeReclamation(Reclamation $reclamation): self
+        {
+            if ($this->reclamations->removeElement($reclamation)) {
+                // set the owning side to null (unless already changed)
+                if ($reclamation->getId_user() === $this) {
+                    $reclamation->setId_user(null);
+                }
+            }
+            return $this;
+        }
+    
 }

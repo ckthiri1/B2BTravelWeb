@@ -1,0 +1,219 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Login{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        .login-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn-face-login {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-face-login:hover {
+            background-color: #218838;
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-face-login i {
+            font-size: 20px;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .divider span {
+            padding: 0 10px;
+            color: #6c757d;
+            font-size: 14px;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="login-container">
+    <div class="form-section">
+        <div class="logo-container">
+            <img src="{{ asset('images/logo.png') }}" alt="Logo" class="logo">
+        </div>
+        
+        <div class="auth-header">
+            <h1>Welcome back</h1>
+            <p>Please enter your credentials to login</p>
+        </div>
+
+        <form method="post" class="auth-form" novalidate autocomplete="off">
+            {% if error %}
+                <div class="alert alert-danger">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <span>
+                        {% if error.message == 'Your account has been banned.' %}
+                            Your account is banned. Contact support for assistance.
+                        {% else %}
+                            {{ error.messageKey|trans(error.messageData, 'security') }}
+                        {% endif %}
+                    </span>
+                </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label class="form-label" for="username">Email</label>
+                <div class="input-wrapper">
+                    <input 
+                        type="email" 
+                        name="_username" 
+                        id="username" 
+                        value="{{ last_username }}" 
+                        class="form-input"
+                        placeholder="Enter your email"
+                        required
+                    >
+                </div>
+                <div class="invalid-feedback">
+                    Please enter a valid email address
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="label-row">
+                    <label class="form-label" for="password">Password</label>
+                    <a href="{{ path('forgot_password') }}" class="forgot-password">Forgot password?</a>
+                </div>
+                <div class="input-wrapper">
+                    <input 
+                        type="password" 
+                        name="_password" 
+                        id="password" 
+                        class="form-input"
+                        placeholder="Enter your password"
+                        required
+                    >
+                    <button type="button" class="password-toggle" aria-label="Toggle password visibility">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+                <div class="invalid-feedback">
+                    Please enter your password
+                </div>
+            </div>
+
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+            <div class="form-options">
+                <label class="checkbox-container">
+                    <input type="checkbox" name="_remember_me">
+                    <span class="checkmark"></span>
+                    Remember me
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <span>Login</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14M12 5l7 7-7 7"></path>
+                </svg>
+            </button>
+
+            <div class="divider">
+                <span>OR</span>
+            </div>
+
+            <div class="login-options">
+                <a href="{{ path('face_login') }}" class="btn-face-login">
+                    <i class="fas fa-camera"></i>
+                    Login with Face Recognition
+                </a>
+                <a href="{{ path('connect_google_start') }}" class="btn-google">
+                    <img src="{{ asset('images/google-logo.png') }}" alt="">
+                    Continue with Google
+                </a>
+            </div>
+
+            <div class="auth-footer">
+                <p>Don't have an account? <a href="{{ path('app_register') }}">Create account</a></p>
+            </div>
+        </form>
+    </div>
+    
+    <div class="image-section">
+        <div class="image-overlay"></div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const form = document.querySelector('.auth-form');
+    if (form) {
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    }
+
+    // Password toggle functionality
+    const passwordToggle = document.querySelector('.password-toggle');
+    const passwordInput = document.getElementById('password');
+    
+    if (passwordToggle && passwordInput) {
+        passwordToggle.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            // Toggle icon
+            this.innerHTML = type === 'password' ? 
+                `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>` :
+                `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>`;
+        });
+    }
+});
+</script>
+{% endblock %}

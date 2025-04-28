@@ -1,273 +1,646 @@
-{% if outboundFlights is empty and returnFlights is empty %}
-    <div class="no-flights-container">
-        <div class="no-flights-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M10.5 4.5v4.5m3-4.5v4.5M9 14h6m-8-3h10c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2H7c-1.1 0-2 .9-2 2v2c0 1.1.9 2 2 2z"/>
-                <path d="M14 14v4c0 1.1-.9 2-2 2s-2-.9-2-2v-4"/>
-                <circle cx="12" cy="12" r="9" stroke-dasharray="2"/>
-            </svg>
-        </div>
-        <p class="no-flights-title">Aucun vol trouvé</p>
-        <p class="no-flights-message">Nous n'avons pas pu trouver de vols correspondant à votre recherche.</p>
-       
-    </div>
-{% else %}
-    <div class="results-container">
-        {% if outboundFlights is not empty %}
-            <div class="results-section">
-                <h3 class="results-title">Vols :</h3>
-                <div class="results-list">
-                    {% for flight in outboundFlights %}
-                        <div class="flight-card">
-                            <div class="flight-card-header">
-                                <div class="airline-info">
-                                    <span class="airline-name">{{ flight.airline }}</span>
-                                    <span class="flight-number">{{ flight.flightNumber }}</span>
-                                </div>
-                                <div class="flight-price">{{ flight.price }} €</div>
-                            </div>
-                            <div class="flight-details">
-                                <div class="flight-detail">
-                                    <span class="flight-detail-label">Départ</span>
-                                    <span>{{ flight.departureTime|date('H:i') }}</span>
-                                    <span>{{ flight.departureTime|date('d/m/Y') }}</span>
-                                </div>
-                                <div class="flight-detail">
-                                    <span class="flight-detail-label">Arrivée</span>
-                                    <span>{{ flight.arrivalTime|date('H:i') }}</span>
-                                    <span>{{ flight.arrivalTime|date('d/m/Y') }}</span>
-                                </div>
-                                <div class="flight-detail">
-                                    <span class="flight-detail-label">Détails</span>
-                                    <span>Classe économique</span>
-                                    <span>Bagage: 1 x 23kg</span>
-                                </div>
-                            </div>
-                            <div class="flight-card-actions">
-                                <button class="book-button">Réserver</button>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-        {% endif %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Reservation System</title>
+    <meta name="csrf-token" content="{{ csrf_token('reservation') }}">
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* View toggle button styles */
+        .view-toggle-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+            padding: 0 20px;
+        }
+        
+        .view-toggle {
+            display: flex;
+            border: 1px solid #1a237e;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .view-toggle-btn {
+            padding: 8px 16px;
+            background: white;
+            color: #1a237e;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .view-toggle-btn.active {
+            background: #1a237e;
+            color: white;
+        }
+        
+        .view-toggle-btn:first-child {
+            border-right: 1px solid #1a237e;
+        }
+        
+        /* Option card view styles */
+        .option-card-view .flight-card {
+            display: flex;
+            flex-direction: column;
+            width: 248px;
+            height: 415px;
+            padding: 0;
+        }
+        
+        .option-card-view .flight-card-header {
+            flex-direction: column;
+            padding: 20px;
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .option-card-view .airline-info {
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .option-card-view .flight-img-placeholder {
+            width: 100%;
+            height: 190px;
+            background-color: #DADADD;
+            margin-bottom: 20px;
+        }
+        
+        .option-card-view .flight-details {
+            display: flex;
+            flex-direction: column;
+            width: 208px;
+            padding: 0 20px;
+            margin: 0 auto;
+        }
+        
+        .option-card-view .flight-detail {
+            margin-bottom: 12px;
+        }
+        
+        .option-card-view .flight-detail-label {
+            margin-bottom: 5px;
+        }
+        
+        .option-card-view .flight-card-actions {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        
+        .option-card-view .results-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(248px, 1fr));
+            gap: 20px;
+        }
+        
+        /* Your existing styles... */
+        /* NVIDIA-style notification */
+        .nvidia-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 350px;
+            background: #1a237e;
+            color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            transform: translateX(120%);
+            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            overflow: hidden;
+        }
+        
+        .nvidia-notification.show {
+            transform: translateX(0);
+        }
+        
+        .nvidia-notification::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .nvidia-notification-icon {
+            font-size: 24px;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .nvidia-notification-content {
+            flex-grow: 1;
+        }
+        
+        .nvidia-notification-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+        
+        .nvidia-notification-message {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .nvidia-notification-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin-left: 10px;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        
+        .nvidia-notification-close:hover {
+            opacity: 1;
+        }
+        
+        /* Progress bar for auto-close */
+        .nvidia-progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .nvidia-progress-bar::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background: white;
+            transform: scaleX(0);
+            transform-origin: left;
+            animation: progress 5s linear forwards;
+        }
+        
+        @keyframes progress {
+            to {
+                transform: scaleX(1);
+            }
+        }
+        
+        /* Success and error variants */
+        .nvidia-notification.success {
+            background:rgb(21, 160, 42);
+        }
+        
+        .nvidia-notification.error {
+            background: linear-gradient(135deg, #ff4d4d 0%, #cc0000 100%);
+        }
+        
+        .nvidia-notification.warning {
+            background: linear-gradient(135deg, #ffcc00 0%, #ff9900 100%);
+            color: #333;
+        }
 
-        {% if tripType == 'ALLER-RETOUR' and returnFlights is not empty %}
-            <div class="results-section">
-                <h3 class="results-title">Vols Retour</h3>
-                <div class="results-list">
-                    {% for flight in returnFlights %}
-                        <div class="flight-card">
-                            <div class="flight-card-header">
-                                <div class="airline-info">
-                                    <span class="airline-name">{{ flight.airline }}</span>
-                                    <span class="flight-number">{{ flight.flightNumber }}</span>
-                                </div>
-                                <div class="flight-price">{{ flight.price }} €</div>
-                            </div>
-                            <div class="flight-details">
-                                <div class="flight-detail">
-                                    <span class="flight-detail-label">Départ</span>
-                                    <span>{{ flight.departureTime|date('H:i') }}</span>
-                                    <span>{{ flight.departureTime|date('d/m/Y') }}</span>
-                                </div>
-                                <div class="flight-detail">
-                                    <span class="flight-detail-label">Arrivée</span>
-                                    <span>{{ flight.arrivalTime|date('H:i') }}</span>
-                                    <span>{{ flight.arrivalTime|date('d/m/Y') }}</span>
-                                </div>
-                                <div class="flight-detail">
-                                    <span class="flight-detail-label">Durée</span>
-                                    <span>{{ flight.duration }}</span>
-                                    <span>Classe économique</span>
-                                </div>
-                            </div>
-                            <div class="flight-card-actions">
-                                <button class="book-button">Réserver</button>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-        {% endif %}
-    </div>
-{% endif %}
+        /* Your original flight card styles */
+        .results-container {
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
 
-<style>
-    /* Shared styles for all sections */
-    .results-container {
-        background-color: #f5f5f5;
-        padding: 20px;
-    }
+        .results-section {
+            margin-bottom: 20px;
+        }
 
-    .results-section {
-        margin-bottom: 20px;
-    }
+        .results-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+            text-transform: uppercase;
+        }
 
-    .results-title {
-        font-size: 14px;
-        font-weight: bold;
-        margin-bottom: 15px;
-        color: #333;
-        text-transform: uppercase;
-    }
+        .results-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
 
-    .results-list {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    }
+        .flight-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
 
-    /* Flight card styles */
-    .flight-card {
-        background-color: white;
-        border-radius: 10px;
-        padding: 20px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .flight-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-    }
-
-    .flight-card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 15px;
-    }
-
-    .airline-info {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .airline-name {
-        font-weight: bold;
-        font-size: 16px;
-        color: #1a237e;
-    }
-
-    .flight-number {
-        font-size: 14px;
-        color: #666;
-    }
-
-    .flight-price {
-        font-weight: bold;
-        color: #1a237e;
-        font-size: 20px;
-    }
-
-    .flight-details {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 15px;
-        color: #666;
-        font-size: 14px;
-    }
-
-    .flight-detail {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .flight-detail-label {
-        font-weight: bold;
-        margin-bottom: 5px;
-        color: #333;
-    }
-
-    .flight-card-actions {
-        margin-top: 15px;
-        display: flex;
-        justify-content: flex-end;
-    }
-
-    .book-button {
-        background-color: white;
-        color: #1a237e;
-        border: 2px solid #1a237e;
-        padding: 10px 20px;
-        border-radius: 5px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .book-button:hover {
-        background-color: #1a237e;
-        color: white;
-    }
-
-    /* Enhanced No Flights Found styles */
-    .no-flights-container {
-        background-color: white;
-        border-radius: 12px;
-        padding: 40px 30px;
-        text-align: center;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        max-width: 1200px;
-        margin: 40px auto;
-        border: 1px solid #eee;
-    }
-
-    .no-flights-icon {
-        margin-bottom: 20px;
-        display: flex;
-        justify-content: center;
-    }
-
-    .no-flights-title {
-        font-size: 22px;
-        font-weight: 600;
-        color: #1a237e;
-        margin-bottom: 10px;
-    }
-
-    .no-flights-message {
-        font-size: 16px;
-        color: #666;
-        margin-bottom: 25px;
-    }
-
-   
-
-    /* Responsive styles */
-    @media (max-width: 768px) {
-        .flight-details {
-            grid-template-columns: 1fr;
+        .flight-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
         }
 
         .flight-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .airline-info {
+            display: flex;
             flex-direction: column;
-            align-items: flex-start;
-            text-align: left;
+        }
+
+        .airline-name {
+            font-weight: bold;
+            font-size: 16px;
+            color: #1a237e;
+        }
+
+        .flight-number {
+            font-size: 14px;
+            color: #666;
         }
 
         .flight-price {
-            margin-top: 10px;
-            align-self: flex-start;
-        }
-    }
-
-    @media (max-width: 576px) {
-        .no-flights-container {
-            padding: 30px 20px;
-            margin: 20px 15px;
-        }
-        
-        .no-flights-icon svg {
-            width: 60px;
-            height: 60px;
-        }
-        
-        .no-flights-title {
+            font-weight: bold;
+            color: #1a237e;
             font-size: 20px;
         }
+
+        .flight-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .flight-detail {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .flight-detail-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .flight-card-actions {
+            margin-top: 15px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .book-button {
+            position: relative;
+            z-index: 1000;
+            pointer-events: auto;
+            background-color: white;
+            color: #1a237e;
+            border: 2px solid #1a237e;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .book-button:hover {
+            background-color: #1a237e;
+            color: white;
+        }
+
+        /* Enhanced No Flights Found styles */
+        .no-flights-container {
+            background-color: white;
+            border-radius: 12px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            max-width: 1200px;
+            margin: 40px auto;
+            border: 1px solid #eee;
+        }
+
+        .no-flights-icon {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .no-flights-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #1a237e;
+            margin-bottom: 10px;
+        }
+
+        .no-flights-message {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .flight-details {
+                grid-template-columns: 1fr;
+            }
+
+            .flight-card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                text-align: left;
+            }
+
+            .flight-price {
+                margin-top: 10px;
+                align-self: flex-start;
+            }
+            
+            .option-card-view .results-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .no-flights-container {
+                padding: 30px 20px;
+                margin: 20px 15px;
+            }
+            
+            .no-flights-icon svg {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .no-flights-title {
+                font-size: 20px;
+            }
+            
+            .view-toggle-container {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Notification container -->
+    <div id="notification-container"></div>
+
+    <!-- Flight results -->
+    {% if outboundFlights is empty and returnFlights is empty %}
+        <div class="no-flights-container">
+            <div class="no-flights-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10.5 4.5v4.5m3-4.5v4.5M9 14h6m-8-3h10c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2H7c-1.1 0-2 .9-2 2v2c0 1.1.9 2 2 2z"/>
+                    <path d="M14 14v4c0 1.1-.9 2-2 2s-2-.9-2-2v-4"/>
+                    <circle cx="12" cy="12" r="9" stroke-dasharray="2"/>
+                </svg>
+            </div>
+            <p class="no-flights-title">Aucun vol trouvé</p>
+            <p class="no-flights-message">Nous n'avons pas pu trouver de vols correspondant à votre recherche.</p>
+        </div>
+    {% else %}
+        <div class="view-toggle-container">
+            <div class="view-toggle">
+                <button class="view-toggle-btn active" data-view="list">List View</button>
+                <button class="view-toggle-btn" data-view="card">Card View</button>
+            </div>
+        </div>
+        
+        <div class="results-container">
+            {% if outboundFlights is not empty %}
+                <div class="results-section">
+                    <h3 class="results-title">Vols :</h3>
+                    <div class="results-list">
+                        {% for flight in outboundFlights %}
+                            <div class="flight-card">
+                                <div class="flight-card-header">
+                                    <div class="airline-info">
+                                        <span class="airline-name">{{ flight.airline }}</span>
+                                        <span class="flight-number">{{ flight.flightNumber }}</span>
+                                    </div>
+                                    <div class="flight-price">{{ flight.price }} DT</div>
+                                </div>
+                                <div class="flight-details">
+                                    <div class="flight-detail">
+                                        <span class="flight-detail-label">Départ</span>
+                                        <span>{{ flight.departureTime|date('H:i') }}</span>
+                                        <span>{{ flight.departureTime|date('d/m/Y') }}</span>
+                                    </div>
+                                    <div class="flight-detail">
+                                        <span class="flight-detail-label">Arrivée</span>
+                                        <span>{{ flight.arrivalTime|date('H:i') }}</span>
+                                        <span>{{ flight.arrivalTime|date('d/m/Y') }}</span>
+                                    </div>
+                                    <div class="flight-detail">
+                                        <span class="flight-detail-label">Détails</span>
+                                        <span>Classe économique</span>
+                                        <span>Bagage: 1 x 23kg</span>
+                                    </div>
+                                </div>
+                                <div class="flight-card-actions">
+                                    <button class="book-button" 
+                                            data-airline="{{ flight.airline }}" 
+                                            data-flight-number="{{ flight.flightNumber }}" 
+                                            data-price="{{ flight.price }}" 
+                                            data-departure-time="{{ flight.departureTime|date('Y-m-d H:i:s') }}" 
+                                            data-arrival-time="{{ flight.arrivalTime|date('Y-m-d H:i:s') }}" 
+                                            data-depart="{{ departureCity }}" 
+                                            data-destination="{{ arrivalCity }}" 
+                                            data-type-vol="{{ flight.type }}">
+                                        Réserver
+                                    </button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if tripType == 'ALLER-RETOUR' and returnFlights is not empty %}
+                <div class="results-section">
+                    <h3 class="results-title">Vols Retour</h3>
+                    <div class="results-list">
+                        {% for flight in returnFlights %}
+                            <div class="flight-card">
+                                <div class="flight-card-header">
+                                    <div class="airline-info">
+                                        <span class="airline-name">{{ flight.airline }}</span>
+                                        <span class="flight-number">{{ flight.flightNumber }}</span>
+                                    </div>
+                                    <div class="flight-price">{{ flight.price }} DT</div>
+                                </div>
+                                <div class="flight-details">
+                                    <div class="flight-detail">
+                                        <span class="flight-detail-label">Départ</span>
+                                        <span>{{ flight.departureTime|date('H:i') }}</span>
+                                        <span>{{ flight.departureTime|date('d/m/Y') }}</span>
+                                    </div>
+                                    <div class="flight-detail">
+                                        <span class="flight-detail-label">Arrivée</span>
+                                        <span>{{ flight.arrivalTime|date('H:i') }}</span>
+                                        <span>{{ flight.arrivalTime|date('d/m/Y') }}</span>
+                                    </div>
+                                    <div class="flight-detail">
+                                        <span class="flight-detail-label">Durée</span>
+                                        <span>{{ flight.duration }}</span>
+                                        <span>Classe économique</span>
+                                    </div>
+                                </div>
+                                <div class="flight-card-actions">
+                                    <button class="book-button" 
+                                            data-airline="{{ flight.airline }}" 
+                                            data-flight-number="{{ flight.flightNumber }}" 
+                                            data-price="{{ flight.price }}" 
+                                            data-departure-time="{{ flight.departureTime|date('Y-m-d H:i:s') }}" 
+                                            data-arrival-time="{{ flight.arrivalTime|date('Y-m-d H:i:s') }}" 
+                                            data-depart="{{ departureCity }}" 
+                                            data-destination="{{ arrivalCity }}" 
+                                            data-type-vol="{{ flight.type }}">
+                                        Réserver
+                                    </button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <script>
+    // Notification system
+    function showNotification(type, title, message, duration = 5000) {
+        const notification = document.createElement('div');
+        notification.className = `nvidia-notification ${type}`;
+        notification.innerHTML = `
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} nvidia-notification-icon"></i>
+            <div class="nvidia-notification-content">
+                <div class="nvidia-notification-title">${title}</div>
+                <div class="nvidia-notification-message">${message}</div>
+            </div>
+            <button class="nvidia-notification-close"><i class="fas fa-times"></i></button>
+            <div class="nvidia-progress-bar"></div>
+        `;
+        
+        document.getElementById('notification-container').appendChild(notification);
+        
+        // Show notification
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 10);
+        
+        // Close button functionality
+        notification.querySelector('.nvidia-notification-close').addEventListener('click', () => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 300);
+        });
+        
+        // Auto-close after duration
+        if (duration) {
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, duration);
+        }
     }
-</style>
+    
+    // Book button handler
+    $(document).on('click', '.book-button', function() {
+        const button = $(this);
+        const originalText = button.html();
+        
+        // Show loading state
+        button.html('<i class="fas fa-spinner fa-spin"></i> Processing...');
+        button.prop('disabled', true);
+        
+        // Prepare flight data
+        const flightData = {
+            airline: button.data('airline'),
+            flightNumber: button.data('flight-number'),
+            price: button.data('price'),
+            departureTime: button.data('departure-time'),
+            arrivalTime: button.data('arrival-time'),
+            depart: button.data('depart'),
+            destination: button.data('destination'),
+            typeVol: button.data('type-vol') || 'ALLER'
+        };
+        
+        // Make AJAX request
+        $.ajax({
+            url: "{{ path('reservation_vol') }}",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(flightData),
+            dataType: "json",
+            success: function(response) {
+                if (response.success) {
+                    showNotification('success', 'Success', 
+                        `Flight ${response.flightNumber} booked successfully!`);
+                } else {
+                    showNotification('error', 'Error', response.error || 'Booking failed');
+                }
+            },
+            error: function(xhr) {
+                let errorMsg = 'An error occurred';
+                try {
+                    const err = JSON.parse(xhr.responseText);
+                    errorMsg = err.error || err.message || errorMsg;
+                } catch (e) {
+                    console.error("Error parsing response:", e);
+                }
+                showNotification('error', 'Error', errorMsg);
+            },
+            complete: function() {
+                button.html(originalText);
+                button.prop('disabled', false);
+            }
+        });
+    });
+    
+    // View toggle functionality
+    $(document).on('click', '.view-toggle-btn', function() {
+        const viewType = $(this).data('view');
+        
+        // Update active button
+        $('.view-toggle-btn').removeClass('active');
+        $(this).addClass('active');
+        
+        // Toggle view classes
+        if (viewType === 'card') {
+            $('.results-container').addClass('option-card-view');
+            
+            // Add image placeholders for card view
+            $('.flight-card').each(function() {
+                if (!$(this).find('.flight-img-placeholder').length) {
+                    $(this).prepend('<div class="flight-img-placeholder"></div>');
+                }
+            });
+        } else {
+            $('.results-container').removeClass('option-card-view');
+            $('.flight-img-placeholder').remove();
+        }
+    });
+    </script>
+</body>
+</html>

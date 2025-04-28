@@ -1,0 +1,109 @@
+{{ form_start(form, {'attr': {'class': 'form-container'}}) }}
+<style>
+    .form-container {
+        background: var(--card-bg);
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    [data-theme="dark"] .form-container {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        color: var(--text-primary);
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        background: var(--input-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        background: var(--input-bg);
+        border-color: var(--navy-blue);
+        color: var(--text-primary);
+        box-shadow: 0 0 0 0.2rem rgba(19, 17, 125, 0.25);
+    }
+
+    [data-theme="dark"] .form-control,
+    [data-theme="dark"] .form-select {
+        background: var(--input-bg);
+        color: var(--text-primary);
+        border-color: var(--border-color);
+    }
+
+    [data-theme="dark"] .form-control:focus,
+    [data-theme="dark"] .form-select:focus {
+        background: var(--input-bg);
+        border-color: var(--navy-blue);
+    }
+
+    .btn-primary {
+        background: var(--navy-blue);
+        border-color: var(--navy-blue);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background: var(--navy-blue-dark);
+        border-color: var(--navy-blue-dark);
+        transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+        background: transparent;
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+        background: var(--hover-bg);
+        border-color: var(--border-color);
+        transform: translateY(-2px);
+    }
+
+    /* Style des messages d'erreur */
+    .invalid-feedback {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    /* Style des champs requis */
+    .required:after {
+        content: "*";
+        color: #dc3545;
+        margin-left: 4px;
+    }
+</style>
+
+<div class="form-group">
+    {{ form_widget(form) }}
+</div>
+
+<div class="d-flex justify-content-between align-items-center mt-4">
+    <button class="btn btn-primary">{{ button_label|default('Enregistrer') }}</button>
+    <a href="{{ path('app_hebergement_index') }}" class="btn btn-secondary">Retour à la liste</a>
+</div>
+{{ form_end(form) }}

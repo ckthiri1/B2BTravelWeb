@@ -3,6 +3,7 @@
 {% block title %}Détails du Rang{% endblock %}
 
 {% block body %}
+ {{ include('Sidebar/Sidebar.twig') }}
 <div class="rank-details-container">
     <div class="rank-card">
         <div class="rank-header">
@@ -47,8 +48,8 @@
     {{ parent() }}
     <style>
         :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #34495e;
+            --primary-color: #13117D;
+            --secondary-color: #13117D;
             --background-color: #ecf0f1;
             --text-color: #333;
             --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
@@ -56,19 +57,19 @@
 
         body {
             background-color: var(--background-color);
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            margin: 0;
-            padding: 20px;
+           
             box-sizing: border-box;
+             padding-left: 250px;
+
         }
 
         .rank-details-container {
             width: 100%;
-            max-width: 500px;
+            max-width: 900px;
         }
 
         .rank-card {

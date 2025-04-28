@@ -1,0 +1,22 @@
+            /* assets/css/language-selector.css */
+
+            .language-selector {
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                z-index: 9999;
+            }
+            
+            .language-selector select {
+                padding: 8px 12px;
+                border-radius: 4px;
+                border: 1px solid #ddd;
+                background-color: white;
+                cursor: pointer;
+                font-size: 14px;
+            }
+            
+            .language-selector select:focus {
+                outline: none;
+                border-color: #1a237e;
+            }

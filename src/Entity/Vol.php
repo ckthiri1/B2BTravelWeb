@@ -13,38 +13,55 @@ class Vol
 {
 
     #[ORM\Id]
-    #[ORM\Column(type: "integer")]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: "volID",type: "integer")]
     private int $volID;
 
-    #[ORM\Column(type: "date")]
+    #[ORM\Column(name: "dateDepart",type: "datetime")]  
     private \DateTimeInterface $dateDepart;
 
-    #[ORM\Column(type: "date")]
+    #[ORM\Column(name: "dateArrival",type: "datetime")]
     private \DateTimeInterface $dateArrival;
 
-    #[ORM\Column(type: "string", length: 255)]
+    #[ORM\Column(name: "airLine",type: "string", length: 255)]
     private string $airLine;
 
-    #[ORM\Column(type: "integer")]
+    #[ORM\Column(name: "flightNumber",type: "integer")]
     private int $flightNumber;
 
-    #[ORM\Column(type: "string", length: 255)]
+    #[ORM\Column(name: "dureeVol",type: "string", length: 255)]
     private string $dureeVol;
 
-    #[ORM\Column(type: "integer")]
+    #[ORM\Column(name: "prixVol",type: "integer")]
     private int $prixVol;
 
-    #[ORM\Column(type: "string")]
+    #[ORM\Column(name: "typeVol",type: "string")]
     private string $typeVol;
 
-        #[ORM\ManyToOne(targetEntity: Voyage::class, inversedBy: "vols")]
-    #[ORM\JoinColumn(name: 'idVoyage', referencedColumnName: 'VID', onDelete: 'CASCADE')]
+    #[ORM\ManyToOne(targetEntity: Voyage::class)]
+    #[ORM\JoinColumn(name: 'idVoyage', referencedColumnName: 'VID')]
     private Voyage $idVoyage;
 
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: "user_id", referencedColumnName: "user_id")]
+    private User $user;
+    
+    public function setUser(User $user): self
+    {
+        $this->user = $user;
+        return $this;
+    }
+    
+    public function getUser(): User
+    {
+        return $this->user;
+    }
 
-
-    #[ORM\Column(type: "string")]
-    private string $status;
+    #[ORM\Column(type: 'string', length: 20)]
+    private string $status = 'NON_RESERVER';
+    
+    public const STATUS_NON_RESERVER = 'NON_RESERVER';
+    public const STATUS_RESERVER = 'RESERVER';
 
     public function getVolID()
     {
@@ -126,14 +143,15 @@ class Vol
         $this->typeVol = $value;
     }
 
-    public function getIdVoyage()
+    public function getIdVoyage() : Voyage
     {
         return $this->idVoyage;
     }
 
-    public function setIdVoyage($value)
+    public function setIdVoyage($value) : self
     {
         $this->idVoyage = $value;
+        return $this;
     }
 
     public function getStatus()

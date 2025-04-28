@@ -1,31 +1,56 @@
-# This file is the entry point to configure your own services.
-# Files in the packages/ subdirectory configure your dependencies.
-
-# Put parameters here that don't need to change on each machine where the app is deployed
-# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-  app.huggingface_api_token: 'hello'   #'%env(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)%'
+  app.huggingface_api_token: '%env(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)%'
   app.email_from: 'myapp@gmail.com'
+  profile_image_directory: '%kernel.project_dir%/public/uploads/profile_images' # Make sure this is defined
+
+  facepp.api_key: '%env(FACEPP_API_KEY)%'
+  facepp.api_secret: '%env(FACEPP_API_SECRET)%'
 
 services:
-    # default configuration for services in *this* file
-    _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
-        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+  _defaults:
+    autowire: true
+    autoconfigure: true
 
-    App\Service\VoyageDescriptionIA:
-        arguments:
-            $parameterBag: '@parameter_bag'
+  App\Service\VoyageDescriptionIA:
+    arguments:
+      $parameterBag: '@parameter_bag'
 
-   
-    # makes classes in src/ available to be used as services
-    # this creates a service per class whose id is the fully-qualified class name
-    App\:
-        resource: '../src/'
-        exclude:
-            - '../src/DependencyInjection/'
-            - '../src/Entity/'
-            - '../src/Kernel.php'
+  App\:
+    resource: '../src/'
+    exclude:
+      - '../src/DependencyInjection/'
+      - '../src/Entity/'
+      - '../src/Kernel.php'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+  # Explicit service configurations
+  App\Security\LoginSuccessHandler:
+    arguments:
+      - '@router.default'
+
+  App\Controller\User\RegistrationController:
+    arguments:
+      $profileImageDirectory: '%profile_image_directory%'
+    tags: ['controller.service_arguments']
+
+  App\Controller\User\Admin\UserAdminController:
+    arguments:
+      $profileImageDirectory: '%profile_image_directory%'
+
+  App\Controller\User\ProfileController:
+    arguments:
+      $profileImageDirectory: '%profile_image_directory%'
+
+  App\Controller\User\Admin\AdminProfileController:
+    arguments:
+      $profileImageDirectory: '%profile_image_directory%'
+
+  App\Service\TwilioService:
+    arguments:
+      $sid: '%env(TWILIO_SID)%'
+      $token: '%env(TWILIO_AUTH_TOKEN)%'
+      $from: '%env(TWILIO_PHONE_NUMBER)%'
+
+  App\Service\FaceRecognitionService:
+    arguments:
+      $apiKey: '%facepp.api_key%'
+      $apiSecret: '%facepp.api_secret%'

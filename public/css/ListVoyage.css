@@ -6,7 +6,7 @@
 
 body {
  
-    background-color: var(--background-gray);
+    background-color: #e3e3e3 !important;
     margin: 0;
     padding-left: 250px;
 }

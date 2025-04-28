@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        :root {
+            --primary-color: #1a237e; /* Dark blue */
+            --secondary-color: #3e92cc; /* Medium blue */
+            --accent-color: #d8315b; /* Pink/red */
+            --light-bg: #f5f7fa; /* Light gray background */
+            --card-bg: #ffffff; /* White cards */
+            --text-dark: #2d3748; /* Dark gray text */
+            --text-light: #4a5568; /* Medium gray text */
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        
+        .payment-container {
+            max-width: 100%;
+            margin: 0;
+            padding: 2rem;
+            background-color: var(--light-bg);
+        }
+        
+        .payment-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            padding: 2rem;
+        }
+        
+        .page-header {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .payment-method {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: var(--card-bg);
+        }
+        
+        .payment-method:hover {
+            border-color: var(--secondary-color);
+            box-shadow: 0 2px 10px rgba(62, 146, 204, 0.1);
+        }
+        
+        .payment-method.selected {
+            border-color: var(--secondary-color);
+            background-color: rgba(62, 146, 204, 0.05);
+        }
+        
+        .payment-details {
+            display: none;
+            margin-top: 1rem;
+            padding: 1.5rem;
+            background-color: rgba(245, 247, 250, 0.7);
+            border-radius: 8px;
+            border-left: 3px solid var(--secondary-color);
+        }
+        
+        #card-element {
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 12px;
+            background: var(--card-bg);
+        }
+        
+        .back-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .back-button:hover {
+            background-color: #0f1a5a;
+            color: white;
+        }
+        
+        .order-summary {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary-color);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0f1a5a;
+            border-color: #0f1a5a;
+        }
+        
+        .btn-outline-secondary {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .btn-outline-secondary:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        #card-errors {
+            color: var(--accent-color);
+            margin-top: 0.75rem;
+            font-size: 0.9rem;
+            padding: 0.5rem;
+            background-color: rgba(216, 49, 91, 0.05);
+            border-radius: 4px;
+        }
+        
+        .payment-details-card {
+            background-color: rgba(245, 247, 250, 0.7);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-top: 1.5rem;
+            border-left: 3px solid var(--secondary-color);
+        }
+        
+        @media (max-width: 768px) {
+            .payment-content {
+                padding: 1.5rem;
+            }
+            
+            .payment-method {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <div class="container-fluid">
+            <a href="{{ path('reservation_page') }}" class="btn back-button"> 
+                <i class="bi bi-arrow-left me-1"></i> Back to Reservation
+            </a>
+            
+            <div class="payment-content">
+                <h1 class="page-header">Payment Details</h1>
+                
+                <div class="order-summary">
+                    <h5 class="fw-bold mb-3" style="color: var(--primary-color);">Order Summary</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Subtotal:</span>
+                                <span id="payment-subtotal" class="fw-bold">0 DT</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2" id="discount-row">
+                                <span class="text-muted">Discount:</span>
+                                <span id="payment-discount" class="fw-bold" style="color: var(--accent-color);">-0 DT</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between fw-bold py-2 px-3" style="background-color: rgba(26, 35, 126, 0.05); border-radius: 6px;">
+                                <span style="color: var(--primary-color);">Total:</span>
+                                <span id="payment-total" style="color: var(--primary-color);">0 DT</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <h5 class="fw-bold mb-3" style="color: var(--primary-color);">Select Payment Method</h5>
+                
+                <div class="payment-method selected" data-method="credit">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="creditCard" checked>
+                        <label class="form-check-label fw-bold" for="creditCard" style="color: var(--text-dark);">
+                            <i class="bi bi-credit-card me-2"></i> Credit/Debit Card
+                        </label>
+                    </div>
+                    <div class="payment-details" id="credit-details">
+                        <div id="card-element" class="mb-3"></div>
+                        <div id="card-errors" role="alert"></div>
+                    </div>
+                </div>
+                
+                <div class="payment-method" data-method="paypal">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="paypal">
+                        <label class="form-check-label fw-bold" for="paypal" style="color: var(--text-dark);">
+                            <i class="bi bi-paypal me-2"></i> PayPal
+                        </label>
+                    </div>
+                    <div class="payment-details" id="paypal-details">
+                        <p class="text-muted">You will be redirected to PayPal to complete your payment</p>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-3 mt-4">
+                    <button class="btn btn-primary btn-lg py-3" id="completePayment">
+                        <i class="bi bi-lock-fill me-2"></i> Complete Payment
+                    </button>
+                    <button class="btn btn-outline-secondary py-3" id="cancelPayment">
+                        <i class="bi bi-x-circle me-2"></i> Cancel Payment
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load the reservation data from sessionStorage
+            const reservationData = JSON.parse(sessionStorage.getItem('pendingReservation')) || {};
+            
+            // Display prices
+            document.getElementById('payment-subtotal').textContent = reservationData.subtotal || '0 DT';
+            document.getElementById('payment-discount').textContent = reservationData.discount || '-0 DT';
+            document.getElementById('payment-total').textContent = reservationData.total || '0 DT';
+            
+            // Hide discount row if no discount
+            if (reservationData.discount === '-0 DT') {
+                document.getElementById('discount-row').style.display = 'none';
+            }
+
+            // Payment method selection
+            document.querySelectorAll('.payment-method').forEach(method => {
+                method.addEventListener('click', function() {
+                    document.querySelectorAll('.payment-method').forEach(m => {
+                        m.classList.remove('selected');
+                        document.getElementById(m.dataset.method + '-details').style.display = 'none';
+                    });
+                    
+                    this.classList.add('selected');
+                    const detailsId = this.dataset.method + '-details';
+                    document.getElementById(detailsId).style.display = 'block';
+                    document.getElementById(this.querySelector('input').id).checked = true;
+                });
+            });
+
+            // Initialize Stripe
+            const stripe = Stripe('pk_test_51RH6oTR8oYx3CziC4mEVLUcxkb05dttVJV0ulMBDYVkPZAPexX27SuMtxELTHfaHG4PMqnO1CP5BuNhx5K1GUDdE00JAxZVCvo');
+            
+            const elements = stripe.elements();
+            const cardElement = elements.create('card', {
+                style: {
+                    base: {
+                        fontSize: '16px',
+                        color: '#32325d',
+                        fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+                        fontSmoothing: 'antialiased',
+                        '::placeholder': {
+                            color: '#aab7c4'
+                        }
+                    },
+                    invalid: {
+                        color: '#fa755a',
+                        iconColor: '#fa755a'
+                    }
+                }
+            });
+
+            cardElement.mount('#card-element');
+
+            // Handle card validation errors
+            cardElement.addEventListener('change', function(event) {
+                const displayError = document.getElementById('card-errors');
+                if (event.error) {
+                    displayError.textContent = event.error.message;
+                } else {
+                    displayError.textContent = '';
+                }
+            });
+
+            // Complete payment button
+            document.getElementById('completePayment').addEventListener('click', async function() {
+                const paymentBtn = this;
+                const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').id;
+                
+                // Show processing animation
+                paymentBtn.disabled = true;
+                paymentBtn.innerHTML = `
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    Processing Payment...
+                `;
+                
+                try {
+                    // Get reservation data
+                    const reservationData = JSON.parse(sessionStorage.getItem('pendingReservation'));
+                    const totalAmount = parseFloat(reservationData.total.replace(' DT', '')) * 100; // Convert to cents
+                    
+                    if (paymentMethod === 'creditCard') {
+                        // 1. Create payment intent
+                        const response = await fetch('{{ path("create_payment_intent") }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: JSON.stringify({
+                                amount: Math.round(totalAmount),
+                                currency: 'usd',
+                                description: 'Flight reservation'
+                            })
+                        });
+                        
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.error || 'Failed to create payment intent');
+                        }
+                        
+                        const { clientSecret } = await response.json();
+                        
+                        // 2. Confirm card payment
+                        const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+                            payment_method: {
+                                card: cardElement,
+                                billing_details: {
+                                    name: 'Customer Name'
+                                }
+                            }
+                        });
+                        
+                        if (error) {
+                            throw error;
+                        }
+                        
+                        // Add payment details to reservation data
+                        reservationData.paymentMethod = 'Credit Card';
+                        reservationData.paymentStatus = paymentIntent.status;
+                        reservationData.transactionId = paymentIntent.id;
+                    } 
+                    else if (paymentMethod === 'paypal') {
+                        // Mock PayPal integration
+                        reservationData.paymentMethod = 'PayPal';
+                        reservationData.paymentStatus = 'completed';
+                        reservationData.transactionId = 'PAYPAL-' + Date.now();
+                    }
+                    
+                    // 3. Confirm reservation with server
+                    const reservationResponse = await fetch('{{ path("confirm_reservation") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify(reservationData)
+                    });
+                    
+                    if (!reservationResponse.ok) {
+                        const errorData = await reservationResponse.json();
+                        throw new Error(errorData.error || 'Failed to confirm reservation');
+                    }
+                    
+                    const responseData = await reservationResponse.json();
+                    
+                    // Show success message
+                    await Swal.fire({
+                        icon: 'success',
+                        title: 'Payment Successful!',
+                        html: `
+                            <div style="text-align: left;">
+                                <p>Your flight reservation has been confirmed</p>
+                                <div class="payment-details-card">
+                                    <p><strong>Reservation Code:</strong> ${responseData.reservationCode}</p>
+                                    <p><strong>Transaction ID:</strong> ${reservationData.transactionId}</p>
+                                    <p><strong>Payment Method:</strong> ${reservationData.paymentMethod}</p>
+                                    <p><strong>Amount Paid:</strong> ${reservationData.total}</p>
+                                </div>
+                            </div>
+                        `,
+                        confirmButtonColor: '#3085d6',
+                    });
+                    
+                    // Clear the pending reservation
+                    sessionStorage.removeItem('pendingReservation');
+                    
+                    // Redirect to history page
+                    window.location.href = responseData.redirect || '{{ path("flight_history") }}';
+                    
+                } catch (error) {
+                    console.error('Payment error:', error);
+                    await Swal.fire({
+                        icon: 'error',
+                        title: 'Payment Failed',
+                        text: error.message || 'Error processing payment',
+                        confirmButtonColor: '#3085d6',
+                    });
+                    paymentBtn.disabled = false;
+                    paymentBtn.innerHTML = `
+                        <i class="bi bi-lock-fill"></i> Complete Payment
+                    `;
+                }
+            });
+            
+            // Cancel button
+            document.getElementById('cancelPayment').addEventListener('click', function() {
+                window.location.href = '{{ path("reservation_page") }}';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <style>
+        body {
+            font-family: helvetica;
+            font-size: 12px;
+        }
+        .header {
+            width: 100%;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .logo {
+            width: 120px;
+            height: auto;
+        }
+        h1 {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+        }
+        table td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+        }
+        .signature-container {
+            width: 100%;
+            text-align: right;
+            margin-top: 30px;
+        }
+        .signature-image {
+            width: 150px;
+            height: auto;
+        }
+        .signature-text {
+            font-style: italic;
+            margin-top: 5px;
+        }
+        .date-info {
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        .filter-info {
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="{{ logo_path }}" class="logo" />
+    </div>
+
+    <h1>Liste des Rangs</h1>
+    
+    <div class="date-info">
+        Date d'exportation: {{ "now"|date('d/m/Y') }}
+    </div>
+
+    {% if searchTerm or sort %}
+    <div class="filter-info">
+        {% if searchTerm %}
+            Filtre: "{{ searchTerm }}"<br>
+        {% endif %}
+        {% if sort %}
+            Trié par points: {{ sort == 'asc' ? 'Croissant' : 'Décroissant' }}
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom du Rang</th>
+                <th>Points</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for rank in ranks %}
+                <tr>
+                    <td>#{{ rank.IDRang }}</td>
+                    <td>{{ rank.NomRank }}</td>
+                    <td>{{ rank.points }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="3" style="text-align: center;">Aucun rang disponible</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="signature-container">
+        <img src="{{ signature_path }}" class="signature-image" />
+        <p class="signature-text">Liste Des Rangs Disponible Le {{ "now"|date('d/m/Y') }}</p>
+    </div>
+</body>
+</html>
