@@ -23,13 +23,17 @@
 1. Clonez le repository :
 git clone https://github.com/ckthiri1/B2BTravelWeb.git
 cd B2BTravelWeb
+
 2.Installez les dépendances :
 -composer install
+
 3.Configurez votre base de données :
 cp .env .env.local
+
 # Modifier les paramètres DATABASE_URL dans .env.local
 php bin/console doctrine:database:create
 php bin/console doctrine:migrations:migrate
+
 4.Démarrez le serveur :
 symfony server:start
 
