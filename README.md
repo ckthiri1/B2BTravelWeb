@@ -16,6 +16,7 @@
 - [Modules du Projet](#modules-du-projet)
 - [Contribution](#contribution)
 - [Licence](#licence)
+- [🙏 Remerciements](#-remerciements)
 
 ## Installation
 
@@ -33,7 +34,7 @@ php bin/console doctrine:migrations:migrate
 symfony server:start
 
 
-## 🛠️ Utilisation
+## Utilisation
 Le projet repose sur les technologies suivantes :
 
 PHP 8.1+
@@ -51,7 +52,7 @@ Composer (gestionnaire de dépendances PHP)
 Naviguez ensuite vers http://b2btravel:8000 pour accéder à l'application.
 
 
-## 📦 Modules du Projet
+## Modules du Projet
 
 👤 Gestion des Utilisateurs
 Connexion / Inscription
@@ -112,7 +113,12 @@ Poussez votre branche (git push origin feature/ma-nouvelle-fonctionnalite).
 
 Créez une Pull Request.
 
-📄 ##  License
+## Licence
 Ce projet est sous licence MIT. Vous pouvez l’utiliser, le modifier et le redistribuer librement.
 
 🔗 Dépôt GitHub : https://github.com/ckthiri1/B2BTravelWeb
+
+## 🙏 Remerciements
+Un grand merci à Esprit School of Engineering pour le soutien pédagogique et l'encadrement tout au long de la réalisation de ce projet.
+
+
