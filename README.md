@@ -15,6 +15,7 @@
 - [Utilisation](#utilisation)
 - [Modules du Projet](#modules-du-projet)
 - [Contribution](#contribution)
+- [Collaborateurs](#Collaborateurs)
 - [Licence](#licence)
 - [🙏 Remerciements](#-remerciements)
 
@@ -117,6 +118,13 @@ Poussez votre branche (git push origin feature/ma-nouvelle-fonctionnalite).
 
 Créez une Pull Request.
 
+## Collaborateurs
+- [Chedi Kthiri](https://github.com/ckthiri1)
+- [Ghassen Hchaichi](https://github.com/Hchaichi8)
+- [Aziz Loueti](https://github.com/azizx0)
+- [Hamza Mathlouthi](https://github.com/xmizou07)
+- [Emna Gaied](https://github.com/amnagaied)
+- [Islem Bouchaala](https://github.com/slayeeeem)
 ## Licence
 Ce projet est sous licence MIT. Vous pouvez l’utiliser, le modifier et le redistribuer librement.
 
